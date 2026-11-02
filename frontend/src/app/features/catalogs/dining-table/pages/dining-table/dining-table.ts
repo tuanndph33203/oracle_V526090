@@ -254,9 +254,7 @@ export class DiningTable implements OnInit {
         { label: 'Đã kiểm đồ', value: 'Checked' },
         { label: 'Đặt trước', value: 'Reserved' },
         { label: 'Chờ thanh toán', value: 'WaitingPayment' },
-        { label: 'Chờ xác nhận', value: 'WaitingConfirm' },
-        { label: 'Mang về', value: 'TakeAway' },
-        { label: 'Giao hàng', value: 'Delivery' }
+        { label: 'Mang về', value: 'TakeAway' }
     ];
     takeAwayCount = signal<number>(0);
     deliveryCount = signal<number>(0);

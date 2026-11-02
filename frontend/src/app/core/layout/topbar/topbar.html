@@ -39,47 +39,9 @@
                     </button>
                 </div>
                 }
-                @if (name !== 'production') {
-                <button
-                    class="hidden md:block whitespace-nowrap px-4 py-2 xl:px-6 xl:py-3 rounded-lg text-white font-semibold uppercase bg-gradient-to-r from-primary via-primary-300 to-primary-900 bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] text-xs sm:text-sm">{{
-                    name }}</button>
-                }
-                <button pButton class="flex flex-1 sm:flex-initial max-w-[260px] md:w-60 !text-xs sm:!text-sm !py-2 !px-2.5 sm:!py-2.5 sm:!px-3.5 min-h-[38px] sm:min-h-[42px] truncate"
-                    severity="secondary" [outlined]="true" [raised]="true" (click)="op.toggle($event)"
-                    icon="pi pi-building">
-                    <div
-                        class="w-full flex justify-between items-center whitespace-nowrap overflow-hidden text-xs sm:text-sm">
-                        @if(branchUser.length === 1){
-                        <span class="truncate font-semibold">{{ branchUser[0]?.Name ?? '' }}</span>
-                        }@else {
-                        <span>+{{ branchUser.length }} chi nhánh</span>
-                        <i class="pi pi-angle-down ml-1"></i>
-                        }
-                    </div>
-                </button>
-                <div class="block">
-                    <p-popover #op>
-                        <ng-template #content>
-                            <div class="p-2 space-y-2 rounded-2xl">
-                                <p-listbox [options]="branchOptions()" [(ngModel)]="branchUser" [selectAll]="selectAll"
-                                    dataKey="Code" [multiple]="true" [checkbox]="true" [highlightOnSelect]="false"
-                                    [metaKeySelection]="false"
-                                    [styleClass]="branchUser.length === 1 ? 'branch-checked' : ''"
-                                    class="w-full md:w-60" (onChange)="onChange()"
-                                    (onSelectAllChange)="onSelectAllChange($event)">
-                                    <ng-template pTemplate="filter">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs sm:text-base"> Chọn tất cả</span>
-                                        </div>
-                                    </ng-template>
-                                    <ng-template #item let-item>
-                                        <span class="whitespace-nowrap text-xs sm:text-base">{{ item.Code }}</span> -
-                                        <span class="whitespace-nowrap text-xs sm:text-base">{{ item.Name }}</span>
-                                    </ng-template>
-                                </p-listbox>
-                            </div>
-                        </ng-template>
-                    </p-popover>
+                <div class="flex items-center gap-2 px-3 py-1.5 sm:py-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-lg border border-emerald-200 dark:border-emerald-800 text-xs sm:text-sm font-bold shadow-xs">
+                    <i class="pi pi-coffee text-base"></i>
+                    <span class="whitespace-nowrap">Quán Café UTC</span>
                 </div>
                 <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next"
                     enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden"
@@ -90,14 +52,9 @@
                 <div class="layout-topbar-menu hidden lg:block">
                     <div class="layout-topbar-menu-content">
                         <div class="flex items-center gap-2">
-                            <app-floating-configurator [pTooltip]="'Thiết lập'" [float]="false" [rounded]="true"
+                            <app-floating-configurator [pTooltip]="'Thiết lập giao diện'" [float]="false" [rounded]="true"
                                 severity="secondary" [raised]="true" />
                             <span class="lg:hidden">Thiết lập</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <p-button icon="pi pi-check-square" [pTooltip]="'Công việc'" [rounded]="true"
-                                severity="secondary" [raised]="true" />
-                            <span class="lg:hidden">Công việc</span>
                         </div>
 
                         <div class="flex items-center gap-2">

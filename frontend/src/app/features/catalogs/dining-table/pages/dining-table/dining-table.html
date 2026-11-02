@@ -3,10 +3,6 @@
 
     <div
         class="border-b border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-800 p-2 sm:p-3 flex flex-col gap-2 sm:gap-3">
-        <div class="flex justify-end">
-            <p-button label="QR đặt mang đi / giao hàng" icon="pi pi-qrcode" size="small" [outlined]="true"
-                (onClick)="showRemoteOrderQr()"></p-button>
-        </div>
         <div *ngIf="isMobile()"
             class="flex-shrink-0 flex items-center justify-between gap-1 w-full overflow-x-auto no-scrollbar pt-2.5 pb-1">
             <!-- Mobile: Thao tác Bàn Dropdown Button -->
@@ -63,31 +59,6 @@
                         {{ takeAwayCount() }}
                     </span>
                 </div>
-                <div class="relative overflow-visible">
-                    <p-button icon="ph-bold ph-truck" severity="info" [outlined]="statusFilter() !== 'Delivery'"
-                        (onClick)="actionDelivery()" pTooltip="Giao hàng" tooltipPosition="bottom"
-                        styleClass="w-9 h-9 sm:w-10 sm:h-10 shadow-sm text-sm sm:text-base rounded-lg flex items-center justify-center">
-                    </p-button>
-                    <span *ngIf="deliveryCount() > 0"
-                        class="absolute -top-2 -right-1.5 z-10 font-mono min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center pointer-events-none shadow-md border border-white dark:border-surface-800">
-                        {{ deliveryCount() }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="w-px h-5 bg-surface-200 dark:bg-surface-700 mx-0.5 shrink-0"></div>
-
-            <div class="relative overflow-visible shrink-0">
-                <p-button icon="ph-bold ph-clock" label="Chờ xác nhận" severity="danger"
-                    [outlined]="statusFilter() !== 'WaitingConfirm'"
-                    (onClick)="statusFilter() === 'WaitingConfirm' ? onStatusFilterChange('All') : onStatusFilterChange('WaitingConfirm')"
-                    pTooltip="Đơn chờ xác nhận" tooltipPosition="bottom"
-                    styleClass="h-9 sm:h-10 text-[11px] sm:text-xs font-bold shadow-sm rounded-lg px-2 sm:px-2.5 flex items-center gap-1 whitespace-nowrap">
-                </p-button>
-                <span *ngIf="waitingConfirmCount() > 0"
-                    class="absolute -top-2 -right-1.5 z-10 font-mono min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center leading-none pointer-events-none shadow-md border border-white dark:border-surface-800">
-                    {{ waitingConfirmCount() }}
-                </span>
             </div>
 
             <!-- Filter popup button -->
@@ -104,7 +75,7 @@
 
             <!-- Left: Custom floor tab header -->
             <div class="w-fit max-w-full overflow-x-auto flex gap-0 no-scrollbar"
-                *ngIf="statusFilter() !== 'TakeAway' && statusFilter() !== 'Delivery' && statusFilter() !== 'WaitingConfirm'">
+                *ngIf="statusFilter() !== 'TakeAway'">
                 <button *ngFor="let floor of floors" (click)="selectFloor(floor)"
                     class="relative px-3 py-2 sm:px-5 sm:py-3 text-sm sm:text-base md:!text-xl font-bold sm:!font-extrabold uppercase transition-colors duration-200 cursor-pointer whitespace-nowrap"
                     [ngClass]="activeFloor?.Id === floor.Id
@@ -117,14 +88,12 @@
                 </button>
             </div>
 
-            <!-- Special mode label for TakeAway / Delivery / WaitingConfirm -->
+            <!-- Special mode label for TakeAway -->
             <span
-                *ngIf="statusFilter() === 'TakeAway' || statusFilter() === 'Delivery' || statusFilter() === 'WaitingConfirm'"
+                *ngIf="statusFilter() === 'TakeAway'"
                 class="self-center text-xs font-extrabold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border border-primary bg-primary-50 text-primary flex items-center gap-1.5 shadow-sm">
-                <i class="pi"
-                    [ngClass]="statusFilter() === 'TakeAway' ? 'pi-shopping-bag' : (statusFilter() === 'Delivery' ? 'pi-truck' : 'pi-mobile')"></i>
-                Đơn {{ statusFilter() === 'TakeAway' ? 'Mang về' : statusFilter() === 'Delivery' ? 'Giao hàng' :
-                'Chờ xác nhận' }}
+                <i class="pi pi-shopping-bag"></i>
+                Đơn Mang về
                 <i class="pi pi-times cursor-pointer text-xs hover:text-red-600 ml-1.5"
                     (click)="onStatusFilterChange('All')"></i>
             </span>
@@ -154,10 +123,9 @@
                 <div class="w-px h-6 bg-surface-200 dark:bg-surface-700 mx-1"></div>
 
                 <div class="flex gap-1.5 items-center">
-
                     <div class="relative overflow-visible">
                         <p-button icon="ph-bold ph-shopping-bag" severity="success"
-                            [outlined]="statusFilter() !== 'TakeAway'" (onClick)="actionTakeAway()" pTooltip="Mang về"
+                            [outlined]="statusFilter() !== 'TakeAway'" (onClick)="actionTakeAway()" pTooltip="Đơn mang về"
                             tooltipPosition="bottom" label="Mang về"
                             styleClass="h-10 shadow-sm text-base rounded-lg flex items-center justify-center">
                         </p-button>
@@ -166,30 +134,8 @@
                             {{ takeAwayCount() }}
                         </span>
                     </div>
-                    <div class="relative overflow-visible">
-                        <p-button icon="ph-bold ph-truck" severity="info" [outlined]="statusFilter() !== 'Delivery'"
-                            (onClick)="actionDelivery()" pTooltip="Giao hàng" tooltipPosition="bottom" label="Giao hàng"
-                            styleClass="h-10 shadow-sm text-base rounded-lg flex items-center justify-center">
-                        </p-button>
-                        <span *ngIf="deliveryCount() > 0"
-                            class="absolute -top-2 -right-1.5 z-10 font-mono min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center pointer-events-none shadow-md border border-white dark:border-surface-800">
-                            {{ deliveryCount() }}
-                        </span>
-                    </div>
                 </div>
 
-                <div class="w-px h-6 bg-surface-200 dark:bg-surface-700 mx-1"></div>
-                <div class="relative overflow-visible">
-                    <p-button icon="ph-bold ph-clock" severity="danger" [outlined]="statusFilter() !== 'WaitingConfirm'"
-                        (onClick)="statusFilter() === 'WaitingConfirm' ? onStatusFilterChange('All') : onStatusFilterChange('WaitingConfirm')"
-                        pTooltip="Đơn chờ xác nhận" label="Chờ xác nhận" tooltipPosition="bottom"
-                        styleClass="h-10 shadow-sm text-base rounded-lg flex items-center justify-center">
-                    </p-button>
-                    <span *ngIf="waitingConfirmCount() > 0"
-                        class="absolute -top-2 -right-1.5 z-10 font-mono min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center pointer-events-none shadow-md border border-white dark:border-surface-800">
-                        {{ waitingConfirmCount() }}
-                    </span>
-                </div>
                 <!-- Filter popup button -->
                 <p-button icon="ph-bold ph-funnel"
                     [severity]="statusFilter() !== 'All' ? getStatusSeverity(statusFilter()) : 'secondary'"
