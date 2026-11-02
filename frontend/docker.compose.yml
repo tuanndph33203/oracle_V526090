@@ -1,0 +1,165 @@
+services:
+  anfood-fe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_ENV: uat
+    image: trananh2024/anfood-fe:1.0.0
+    container_name: anfood-fe
+    restart: always
+    ports:
+      - '8086:80'
+    depends_on:
+      - anfood-service
+      - anpos-service
+    networks:
+      - api-app-net
+
+  anfood-fe-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        BUILD_ENV: production
+    image: trananh2024/anfood-fe-prod:1.0.0
+    container_name: anfood-fe-prod
+    restart: always
+    ports:
+      - '8088:80'
+    depends_on:
+      - anfood-service
+      - anpos-service
+    networks:
+      - api-app-net
+
+  anfood-qr-order:
+    build:
+      context: ../qr-order-client
+      dockerfile: Dockerfile
+    image: trananh2024/anfood-qr-order:1.0.0
+    container_name: anfood-qr-order
+    restart: always
+    ports:
+      - '8087:80'
+    depends_on:
+      - anfood-service
+    networks:
+      - api-app-net
+
+  anfood-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    image: trananh2024/anfood-be:1.0.0
+    container_name: anfood-service
+    restart: always
+    ports:
+      - "2001:2001"
+    environment:
+      - TZ=Asia/Bangkok
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:2001
+      - ConnectionString__SqlServerDatabase=Server=10.8.101.236,1433;Database=staging_anfood;User Id=srv_dev;Password=abcde12345-;Encrypt=False;TrustServerCertificate=True
+      - ConnectionStringHangFire=Server=10.8.101.236,1433;Database=staging_anfood_hangfire;User Id=srv_dev;Password=abcde12345-;Encrypt=False;TrustServerCertificate=True
+      - RedisConfiguration__ConnectionString=10.8.101.211
+    networks:
+      - api-app-net
+
+  anpos-service:
+    image: trananh2024/anpos-be-api:2.0.3
+    container_name: anpos-service
+    restart: always
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:1920"
+      ConnectionString__IsTesting: "NO"
+      ConnectionString__DbType: "SqlServerDatabase"
+      ConnectionString__PostgreSQLDatabase: ""
+      ConnectionString__SqlServerDatabase: "Server=10.8.101.236,1433;Database=staging_anpos;User Id=srv_dev;Password=abcde12345-;Encrypt=False;TrustServerCertificate=True"
+      ConnectionStringHangFire: "Server=10.8.101.236,1433;Database=staging_anpos_hangfire;User Id=srv_dev;Password=abcde12345-;Encrypt=False;TrustServerCertificate=True"
+      RedisConfiguration__ConnectionString: "10.8.101.211:6379"
+      RedisConfiguration__Enabled: "true"
+      Swagger__Enabled: "true"
+      ServiceInfomartion__ServiceName : "AnPos"
+      ServiceInfomartion__Environment : "prod"
+      environment__isProd : true
+      LogServices__APIKey : "FSbYqkMBzC8tYjcv7nxor0ZSw"
+      LogServices__UrlAppLog : "https://logs-api.ansolution.vn/api/logs/app"
+      LogServices__UrlAuditLog : "https://logs-api.ansolution.vn/api/logs/audit"
+      Jwt__Issuer : "https://sso.ansolution.vn"
+      Jwt__Audience :  "User"
+      Jwt__Key : "e7+gFLUw7oVcQmpXubQ0zHK5r1H1dN2eN5pgX/o/6F3gJ2MycPvOAiFsdDRDaIRn7WQnArW0KNkxLQa0QKBIxQ=="
+      PaymentGateway__BaseUrl: "https://pg.trananh.org/"
+      PaymentGateway__QrInvoicesEndpoint: "api/v1/transaction/qr-invoices"
+      PaymentGateway__XKey: "app_845b3d.8A6939F35EB74B07D44E536683CE8DFFBB9C789030FD917ACD2E7C49DD830F85"
+      PaymentGateway__WebhookApiKey: "1BVt2jOuG9YQfZAaIoaoyuLIHpBWVU2D"
+      SmsGateway__BaseUrl: "https://app.trananh.org111/"
+      SmsGateway__SendEndpoint: SMS/rest/api/Send
+      SmsGateway__AppId: "0001"
+      SmsGateway__Key: 6tsdgdjl9fsKEd5zsvnwmdjosDmrufbs93susadLHDvjfhbnwt
+      SmsGateway__DefaultOtpType: "1"
+      SmsGateway__DefaultTransactionType: "2"
+      Minio__Endpoint: "s3-api.ansolution.vn"
+      Minio__UseSSL: "true"
+      Minio__Bucket: "anpos"
+      Minio__AccessKey: "admin"
+      Minio__SecretKey: "Trananh@2024"
+    ports:
+      - "1920:1920"
+    networks:
+      - api-app-net
+
+  report-service:
+    image: trananh2024/report-service:1.0.0
+    container_name: dynamicreport-api
+    restart: always
+    dns:
+      - 10.8.101.2
+      - 10.8.101.3
+    ports:
+      - "1999:1999"
+    environment:
+      - TZ=Asia/Bangkok
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:1999
+      - ConnectionStrings__MetadataDb=Server=10.8.101.236,1433;Database=staging_anpos;User Id=srv_dev;Password=abcde12345-;Encrypt=False;TrustServerCertificate=True
+      - ConnectionStrings__HangfireDb=Server=10.8.101.236,1433;Database=staging_anpos_hangfire;User Id=srv_dev;Password=abcde12345-;Encrypt=False;TrustServerCertificate=True
+      - Minio__Endpoint=s3-api.ansolution.vn
+      - Minio__UseSSL=true
+      - Minio__Bucket=anpos
+      - Minio__AccessKey=admin
+      - Minio__SecretKey=Trananh@2024
+      - Smtp__Host=smtp.gmail.com
+      - Smtp__Port=587
+      - Smtp__UseSsl=true
+      - Smtp__Username=walltadeas@gmail.com
+      - Smtp__Password=ufon rfpr xeco tisy
+      - Smtp__FromEmail=walltadeas@gmail.com
+      - Smtp__FromName=Dynamic Report Service
+      - Smtp__TimeoutSeconds=60
+      - Smtp__MaxAttachmentSizeMB=10
+      - Report__TempFolder=temp/reports
+      - Report__DefaultTimeoutSeconds=300
+      - Report__MaxTimeoutSeconds=1800
+      - Report__DefaultMaxRows=100000
+      - Report__PresignedUrlExpiryMinutes=60
+    networks:
+      - api-app-net
+
+  report-ui:
+    image: trananh2024/report-ui:1.0.1
+    container_name: dynamicreport-ui
+    restart: always
+    ports:
+      - "8099:80"
+    depends_on:
+      - report-service
+      - anpos-service
+    networks:
+      - api-app-net
+
+networks:
+  api-app-net:
+    driver: bridge

@@ -1,0 +1,49 @@
+<p-fileupload #fu class="h-full" [multiple]="false" [fileLimit]="1" [customUpload]="true" [showUploadButton]="false" [showCancelButton]="false" (onSelect)="onSelectedFiles($event)">
+    <ng-template #header let-files let-chooseCallback="chooseCallback" let-clearCallback="clearCallback" let-uploadCallback="uploadCallback"> </ng-template>
+    <ng-template #content let-files let-removeFileCallback="removeFileCallback">
+        <div class="flex flex-wrap gap-4">
+            <div *ngFor="let file of files; let i = index" class="p-1 flex col gap-4 max-w-full">
+                <div class="relative">
+                    <p-image appendTo="body" [src]="file.objectURL" alt="Image" width="160" height="90" [preview]="true"  class="h-[90px] object-cover"  />
+                    <button class="absolute top-0 right-0 text-red-600 cursor-pointer" (click)="onRemoveTemplatingFile($event, removeFileCallback, i)"><i class="pi pi-times"></i></button>
+                </div>
+
+                <div class="w-[calc(100%-170px)] overflow-hidden">
+                    <div class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">{{ file.name }}</div>
+                    <div
+                        [ngClass]="{
+                        'text-yellow-500 font-semibold': file.size > 1024 * 1024,
+                        'text-surface-600': file.size <= 1024 * 1024
+                    }"
+                    >
+                        {{ formatSize(file.size) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template #empty>
+        <ng-container *ngIf="fileLink && fileLink.length > 0; else noFile">
+            <div class="flex flex-wrap gap-4 p-4 border border-dashed border-gray-300 rounded-md w-full">
+                <div *ngFor="let link of fileLink; let i = index" class="p-1 flex col gap-4 max-w-full">
+                    <div class="relative">
+                        <p-image appendTo="body" [src]="getImageUrl(link)" alt="Image" width="160" height="90" [preview]="true" class="h-[90px] object-cover" />
+                        <button type="button" class="absolute top-0 right-0 text-red-600 cursor-pointer bg-white rounded-full p-1 shadow-md hover:bg-red-50" (click)="onRemoveOldFile($event, i)">
+                            <i class="pi pi-times"></i>
+                        </button>
+                    </div>
+                    <div class="w-[calc(100%-170px)] overflow-hidden flex flex-col justify-center">
+                        <div class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">Ảnh đã tải lên</div>
+                        <p-button (click)="openFileChooser()" label="Thay đổi ảnh" icon="pi pi-pencil" [outlined]="true" size="small" class="mt-2"></p-button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <ng-template #noFile>
+            <div class="flex items-center justify-center flex-col select-none">
+                <p-button (click)="openFileChooser()" icon="pi pi-cloud-upload" [rounded]="true" [outlined]="true"></p-button>
+                <p class="mt-6 mb-0">Kéo hoặc thả file vào đây để đẩy lên.</p>
+            </div>
+        </ng-template>
+    </ng-template>
+</p-fileupload>

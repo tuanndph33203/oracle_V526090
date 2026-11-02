@@ -1,0 +1,43 @@
+<div class="layout-sidebar flex flex-col h-full relative">
+    <div class="flex-1 overflow-y-auto pb-[180px]">
+        <app-menu></app-menu>
+    </div>
+    <div class="mt-auto border-t border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 p-3 z-10 w-full block sm:hidden">
+        @if (name !== 'production') {
+            <button class="w-full mb-3 whitespace-nowrap px-6 py-3 rounded-lg text-white font-semibold uppercase bg-gradient-to-r from-primary via-primary-300 to-primary-900 bg-[length:200%_auto] animate-[gradient_3s_linear_infinite]">{{ name }}</button>
+        }
+        <button pButton class="w-full text-sm" severity="secondary" [outlined]="true" [raised]="true"
+            (click)="opSidebar.toggle($event)" icon="pi pi-building">
+            <div class="w-full flex justify-between items-center ml-2">
+                @if(branchUser.length === 1){ {{branchUser[0]?.Name ?? ''}} }@else {
+                <span>+{{branchUser.length}} <span class="hidden sm:inline">chi nhánh</span></span> <i
+                    class="pi pi-angle-down"></i>
+                }
+            </div>
+        </button>
+        <div>
+            <p-popover #opSidebar>
+                <ng-template #content>
+                    <div class="p-2 space-y-2 rounded-2xl w-full">
+                        <p-listbox [options]="branchOptions()" [(ngModel)]="branchUser" [selectAll]="selectAll"
+                            dataKey="Code" [multiple]="true" [checkbox]="true" [highlightOnSelect]="false"
+                            [metaKeySelection]="false"
+                            [styleClass]="branchUser.length === 1 ? 'branch-checked' : ''"
+                            class="w-full max-w-[280px]" (onChange)="onChange()"
+                            (onSelectAllChange)="onSelectAllChange($event)">
+                            <ng-template pTemplate="filter">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs sm:text-base"> Chọn tất cả</span>
+                                </div>
+                            </ng-template>
+                            <ng-template #item let-item>
+                                <span class="whitespace-nowrap text-xs sm:text-base">{{ item.Code }}</span> -
+                                <span class="whitespace-nowrap text-xs sm:text-base">{{ item.Name }}</span>
+                            </ng-template>
+                        </p-listbox>
+                    </div>
+                </ng-template>
+            </p-popover>
+        </div>
+    </div>
+</div>

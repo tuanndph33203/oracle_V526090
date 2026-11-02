@@ -1,0 +1,52 @@
+/* Styling for POS Shift Session Management */
+.shift-session-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--p-surface-50, #f8fafc);
+    background-image: radial-gradient(var(--p-surface-200, #cbd5e1) 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
+}
+
+:host-context(.dark) .shift-session-container {
+    background-color: var(--p-surface-950, #090d16);
+    background-image: radial-gradient(var(--p-surface-800, #1e293b) 1.2px, transparent 1.2px);
+}
+
+.denomination-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th {
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+:host ::ng-deep {
+    .p-select {
+        width: 100%;
+        border-radius: 0.75rem;
+        font-size: 1rem !important;
+
+        .p-select-label {
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            padding: 0.75rem 1rem !important;
+        }
+    }
+    
+    .p-inputnumber {
+        width: 100%;
+    }
+
+    .p-tablist {
+        border-bottom: 1px solid var(--p-surface-200);
+        
+        .p-tab {
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+            padding: 0.85rem 1.25rem !important;
+        }
+    }
+}

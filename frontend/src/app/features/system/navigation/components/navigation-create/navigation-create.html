@@ -1,0 +1,116 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa điều hướng' : 'Thêm điều hướng'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-y-2 gap-x-5 p-4" (ngSubmit)="submit()">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-y-2 gap-x-5">
+            <div class="flex flex-col gap-1 w-full">
+                <label for="name" class="font-medium"> Tên menu <span class="text-red-500">*</span> </label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="name" formControlName="name" placeholder="VD: Quản lý người dùng" />
+
+                <div *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+                    <small *ngIf="form.get('name')?.errors?.['required']" class="text-red-500"> Tên menu là bắt buộc </small>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="icon" class="font-medium">Icon</label>
+                <p-autocomplete
+                    openOnClick
+                    class="w-[270px]"
+                    appendTo="body"
+                    formControlName="icon"
+                    [suggestions]="filteredIcon()"
+                    optionLabel="key"
+                    dataKey="class"
+                    placeholder="Chọn icon"
+                    [dropdown]="true"
+                    [forceSelection]="true"
+                    (completeMethod)="onFilterIcon($event)"
+                >
+                    <ng-template let-item pTemplate="selectedItem">
+                        <div class="flex items-center gap-2">
+                            <i [class]="item.class + ' text-base'"></i>
+                            <span>{{ item.key }}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-item pTemplate="item">
+                        <div class="flex items-center gap-2 w-[260px]">
+                            <i [class]="item.class + ' text-lg w-5 text-center'"></i>
+                            <span class="truncate text-sm flex-1">{{ item.key }}</span>
+                            <span *ngIf="item.library === 'phosphor'"
+                                class="text-[10px] px-1 rounded bg-orange-100 text-orange-600 shrink-0">ph</span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="empty">
+                        <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                    </ng-template>
+                </p-autocomplete>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="path" class="font-medium"> Path </label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="path" formControlName="path" placeholder="/user-management" />
+
+                <small *ngIf="form.get('path')?.touched && form.get('path')?.invalid" class="text-red-500"> Path là bắt buộc </small>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="parentId" class="font-medium">Menu cha</label>
+                <p-autocomplete
+                    openOnClick
+                    class="ư-full min-w-[270px]"
+                    appendTo="body"
+                    formControlName="parentId"
+                    [suggestions]="filteredNavs()"
+                    optionLabel="lable"
+                    placeholder="Chọn menu cha (nếu có)"
+                    [dropdown]="true"
+                    [forceSelection]="true"
+                    dataKey="id"
+                    (completeMethod)="searchComplete($event, navigations, filteredNavs )"
+                >
+                    <ng-template let-item pTemplate="item">
+                        <div class="flex items-center gap-2 w-[200px]">
+                            <i [class]="item.icon"></i>
+                            <span>{{ item.lable }}</span>
+                        </div>
+                    </ng-template>
+                </p-autocomplete>
+            </div>
+
+            <div class="flex flex-col gap-1 lg:col-span-2">
+                <label for="permissionIds" class="font-medium">Danh sách quyền <span class="text-red-500">*</span></label>
+                <p-autocomplete
+                    openOnClick
+                    class="w-full max-w-[560px]"
+                    appendTo="body"
+                    formControlName="permissionIds"
+                    [suggestions]="filteredPermissions()"
+                    optionLabel="name"
+                    placeholder="Chọn quyền"
+                    [dropdown]="true"
+                    [forceSelection]="true"
+                    dataKey="id"
+                    [multiple]="true"
+                    (completeMethod)="searchComplete($event, permissions, filteredPermissions)"
+                >
+                    <ng-template pTemplate="empty">
+                        <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                    </ng-template>
+                </p-autocomplete>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="order" class="font-medium">Thứ tự</label>
+                <p-inputNumber [min]="0" [showButtons]="true" formControlName="order" placeholder="0" />
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="name" class="font-medium">Trạng thái</label>
+                <div class="flex flex-col justify-center h-full">
+                    <p-toggleswitch formControlName="status" />
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-6 gap-6">
+            <!-- <button pButton type="button" icon="pi pi-times" label="Đóng" severity="contrast" outlined="true" (click)="dialogRef?.close()" size="large"></button> -->
+
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{ edition() ? 'Cập nhật' : 'Thêm mới' }}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

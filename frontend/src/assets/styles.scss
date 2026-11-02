@@ -1,0 +1,241 @@
+/* You can add global styles to this file, and also import other style files */
+@use './tailwind.css';
+@use './layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@import '../../node_modules/@phosphor-icons/web/src/regular/style.css';
+@import '../../node_modules/@phosphor-icons/web/src/bold/style.css';
+@import '../../node_modules/@phosphor-icons/web/src/fill/style.css';
+
+:root {
+    --p-content-border-radius: 12px;
+    --p-form-field-border-radius: 8px;
+    --p-overlay-border-radius: 12px;
+
+    /* Quy chuẩn cỡ chữ toàn hệ thống POS thu ngân 24 inch */
+    --page-title-font-size: 24px;
+    --modal-title-font-size: 20px;
+    --section-title-font-size: 18px;
+    --large-button-font-size: 16px;
+    --body-font-size: 14px;
+    --helper-text-font-size: 13px;
+    --note-font-size: 12px;
+}
+
+html,
+body,
+.p-component {
+    --content-border-radius: 12px;
+}
+
+input,
+textarea,
+select,
+button {
+    border-radius: 8px;
+}
+
+.p-inputtext,
+.p-inputnumber-input,
+.p-select,
+.p-multiselect,
+.p-datepicker-input,
+.p-autocomplete-input,
+.p-password-input,
+.p-button,
+.p-togglebutton,
+.p-selectbutton .p-togglebutton,
+.p-checkbox-box,
+.p-radiobutton-box,
+.p-toggleswitch-slider,
+.p-inputgroupaddon,
+.p-fileupload-choose-button,
+.p-splitbutton-button,
+.p-splitbutton-dropdown,
+.p-tab,
+.p-picklist-filter,
+.p-column-filter,
+.p-column-filter-overlay,
+.p-editor-content,
+.p-editor-toolbar,
+.p-colorpicker-preview,
+.p-cascadeselect,
+.p-treeselect,
+.p-rating-option,
+.p-progressbar,
+.p-stepper-separator,
+.p-stepper-header,
+.p-tabview-nav-link {
+    border-radius: 8px !important;
+}
+
+.p-listbox,
+.p-tree,
+.p-treetable,
+.p-datatable,
+.p-paginator,
+.p-card,
+.p-panel,
+.p-fieldset,
+.p-toolbar,
+.p-tablist-tab-list,
+.p-dialog,
+.p-drawer,
+.p-popover,
+.p-menu,
+.p-tieredmenu,
+.p-megamenu,
+.p-contextmenu,
+.p-breadcrumb,
+.p-toast-message,
+.p-message,
+.p-accordionpanel,
+.p-accordionheader,
+.p-accordioncontent-content {
+    border-radius: 12px !important;
+}
+
+.p-dialog-header,
+.p-dialog-content,
+.p-dialog-footer,
+.p-drawer-header,
+.p-drawer-content,
+.p-drawer-footer,
+.p-menu-list,
+.p-tieredmenu-root-list,
+.p-contextmenu-root-list,
+.p-megamenu-root-list,
+.p-panel-header,
+.p-panel-content,
+.p-panel-footer,
+.p-card-body,
+.p-card-content,
+.p-card-footer,
+.p-datatable-header,
+.p-datatable-footer,
+.p-paginator-content,
+.p-accordioncontent {
+    border-radius: inherit;
+}
+
+.p-tag,
+.p-chip {
+    border-radius: 8px !important;
+}
+
+.p-badge,
+.p-avatar,
+.p-overlaybadge .p-badge {
+    border-radius: 999px !important;
+}
+
+/* Typography size mappings for entire system */
+h1, .page-title, [class*="page-title"] {
+    font-size: var(--page-title-font-size) !important;
+}
+
+.p-dialog-title, .p-dialog-header, [class*="dialog-title"], [class*="modal-title"] {
+    font-size: var(--modal-title-font-size) !important;
+}
+
+h2, .section-title, [class*="section-title"] {
+    font-size: var(--section-title-font-size) !important;
+}
+
+.p-button-lg, .large-button, .p-tabview-nav-link, [class*="large-button"] {
+    font-size: var(--large-button-font-size) !important;
+}
+
+body, .p-component, .p-datatable, table, form, input, textarea, select, .body-text {
+    font-size: var(--body-font-size) !important;
+}
+
+.helper-text, .description-text, [class*="helper-text"], [class*="description-text"] {
+    font-size: var(--helper-text-font-size) !important;
+}
+
+.note-text, .small-status, [class*="note-text"], [class*="small-status"] {
+    font-size: var(--note-font-size) !important;
+}
+
+/* Hide number input spinners */
+.no-spin::-webkit-outer-spin-button,
+.no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.no-spin {
+    -moz-appearance: textfield;
+}
+
+/* ── Global Theme Primary Synchronization ────────────────────────── */
+/* Ép tất cả thành phần active, nút bấm mặc định, focus ring dùng chuẩn Primary Theme variable */
+.bg-primary {
+    background-color: var(--p-primary-color) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+}
+
+.text-primary {
+    color: var(--p-primary-color) !important;
+}
+
+.border-primary {
+    border-color: var(--p-primary-color) !important;
+}
+
+/* Các nút bấm có class primary hoặc mặc định */
+.p-button:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast) {
+    background: var(--p-primary-color) !important;
+    border-color: var(--p-primary-color) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+}
+
+.p-button-outlined.p-button-primary,
+.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast) {
+    background: transparent !important;
+    border-color: var(--p-primary-color) !important;
+    color: var(--p-primary-color) !important;
+}
+
+/* Hover effect chuẩn theo theme */
+.p-button:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast):hover {
+    filter: brightness(0.92);
+}
+
+.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warn):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast):hover {
+    background: var(--p-primary-50, rgba(59, 130, 246, 0.08)) !important;
+}
+
+/* The POS option dialog is appended to body, outside the page component styles. */
+.pos-option-dialog.p-dialog {
+    border: 1px solid #d9e8de;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 24px 64px #102c1a38;
+    max-height: calc(100dvh - 24px);
+    display: flex;
+    flex-direction: column;
+}
+.pos-option-dialog.p-dialog .p-dialog-header {
+    padding: 18px 30px 15px !important;
+    border-bottom: 1px solid #e0ebe4;
+    background: #fff;
+    flex: none;
+}
+.pos-option-dialog.p-dialog .p-dialog-content {
+    padding: 20px 30px 6px !important;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: #fff;
+}
+.pos-option-dialog.p-dialog .p-dialog-content::-webkit-scrollbar { display: none; }
+.pos-option-dialog.p-dialog .p-dialog-footer {
+    padding: 14px 30px 18px !important;
+    border-top: 1px solid #e0ebe4;
+    background: #fff;
+    flex: none;
+}

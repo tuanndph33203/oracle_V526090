@@ -1,0 +1,13 @@
+<div class="grid grid-cols-[auto_1fr] h-full">
+    <p-listbox [options]="tabs()" [(ngModel)]="value" optionLabel="name" optionValue="value" class="hidden md:blobk w-full md:min-w-56 h-fit !border-none !bg-transparent !shadow-none text-lg font-semibold" />
+    <p-tabs scrollable="true" [value]="value" class="h-full">
+        <p-tablist class="!hidden md:block">
+            <p-tab [value]="0"><i class="pi pi-user"></i></p-tab>
+            <!-- <p-tab [value]="1"><i class="pi pi-lock"></i></p-tab> -->
+        </p-tablist>
+        <p-tabpanels>
+            <p-tabpanel [value]="0"><app-profile-form /> </p-tabpanel>
+            <p-tabpanel [value]="1"> <app-profile-change-password /></p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</div>

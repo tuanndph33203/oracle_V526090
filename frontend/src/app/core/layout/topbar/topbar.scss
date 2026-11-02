@@ -1,0 +1,41 @@
+::ng-deep {
+    .branch-checked {
+        .p-listbox-option[data-p-disabled='true'],
+        .p-listbox-option[aria-selected='true'] {
+            pointer-events: none;
+        }
+    }
+}
+
+.mobile-sound-button {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .mobile-sound-button {
+        position: fixed;
+        right: max(1rem, env(safe-area-inset-right));
+        bottom: max(1rem, env(safe-area-inset-bottom));
+        z-index: 996;
+        display: grid;
+        place-items: center;
+        width: 3.25rem;
+        height: 3.25rem;
+        border: 1px solid var(--surface-border);
+        border-radius: 50%;
+        background: var(--surface-card);
+        color: var(--text-color-secondary);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+        cursor: pointer;
+
+        i {
+            font-size: 1.35rem;
+        }
+
+        &.mobile-sound-button-ready {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: var(--primary-contrast-color);
+        }
+    }
+}

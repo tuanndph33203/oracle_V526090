@@ -1,0 +1,242 @@
+<div [ngStyle]="{ height: scrollHeight() }">
+    <p-treeTable [value]="data()" dataKey="key" [scrollable]="true" scrollHeight="flex" [virtualScroll]="virtualScroll()" [virtualScrollItemSize]="rowHeight()" showGridlines stripedRows rowHover class="w-full">
+        <ng-template pTemplate="header">
+            <tr>
+                @if (showCheckboxToggle()) {
+                <th class="text-center w-[40px]">
+                    <p-checkbox [binary]="true" [ngModel]="allSelected" (onChange)="toggleSelectAll($event)" />
+                </th>
+                } @for (item of columns(); track item.field) { @if (item.visible) {
+                <th [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width" [style.textAlign]="item.align || 'left'" class="font-bold">{{ item.label }}</th>
+                } }
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-rowIndex="rowIndex">
+            <tr>
+                @if (showCheckboxToggle()) {
+                <td class="text-center">
+                    <p-checkbox [binary]="true" [ngModel]="selectedRows.has(rowData.raw)" (onChange)="toggleRow(rowData.raw, $event)" />
+                </td>
+                } @for (item of columns(); track item.field) { @if (item.visible) { @switch (item.type) { @case ('index') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'center',
+                  }"
+                >
+                    <span class="font-medium px-2">{{ rowData[item.field] ?? '' }}</span>
+                </td>
+                } @case ('text') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'left',
+                    fontWeight: item.treeToggle ? '700' : '600'
+                  }"
+                    pTooltip="{{ item.tooltip && rowData[item.tooltipField ?? ''] }}"
+                    [ngClass]="{ 'font-bold': item.treeToggle}
+                  "
+                    tooltipPosition="top"
+                >
+                    @if(item.treeToggle){
+                    <p-treeTableToggler [rowNode]="rowNode" />
+                    }
+                    <span class="line-clamp" [ngClass]="item.lineClamp ? 'line-clamp-' + item.lineClamp : ''">{{ rowData[item.field] }}</span>
+                </td>
+                } @case ('image') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'center',
+                  }"
+                    class="bg-white flex justify-center"
+                >
+                    <img [ngSrc]="rowData[item.field] ?? 'no-img.jpg'" width="56" height="56" class="aspect-square object-cover object-center rounded" alt="item image" [style]="{ width: item.width }" priority />
+                </td>
+                } @case ('transform') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'center',
+                    fontWeight: item.treeToggle ? '700' : '600'
+                  }"
+                    pTooltip="{{ item.tooltip && rowData[item.tooltipField ?? ''] }}"
+                >
+                    <div class="flex items-center gap-1">
+                        @if (item.treeToggle) {
+                        <div class="flex items-center justify-center">
+                            <p-treeTableToggler [rowNode]="rowNode" />
+                        </div>
+                        }
+                        <span
+                            class="flex-1"
+                            [innerHTML]="
+                            item.transformFn
+                                ? item.transformFn(rowData[item.field])
+                                : item.transformRowFn
+                                ? item.transformRowFn(rowData)
+                                : rowData[item.field]
+                            "
+                        ></span>
+                    </div>
+                </td>
+                } @case ('currency') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'right',
+                    fontWeight: item.treeToggle ? '700' : '600'
+                  }"
+                >
+                    @if(item.treeToggle){
+                    <p-treeTableToggler [rowNode]="rowNode" />
+                    }
+                    <span>{{ rowData[item.field] | number : '' : 'vi-VN' }}</span>
+                </td>
+                } @case ('date') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'center',
+                    fontWeight: item.treeToggle ? '700' : '600'
+                    
+                  }"
+                >
+                    @if(item.treeToggle){
+                    <p-treeTableToggler [rowNode]="rowNode" />
+                    }
+                    <span> {{ rowData[item.field] | date: 'dd-MM-yyyy' }} </span>
+                </td>
+                } @case ('number') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'right',
+                    fontWeight: item.treeToggle ? '700' : '600'
+                  }"
+                >
+                    @if(item.treeToggle){
+                    <p-treeTableToggler [rowNode]="rowNode" />
+                    }
+                    <span>{{ rowData[item.field] }}</span>
+                </td>
+
+                } @case ('severity') {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'center'
+                }"
+                >
+                    @if(item.treeToggle){
+                    <p-treeTableToggler [rowNode]="rowNode" />
+                    } @if (item.severity; as cfg) {
+                    <p-badge [value]="item.severity[booleanToInt(rowData[item.field])].label ?? ''" [severity]="item.severity[booleanToInt(rowData[item.field])].severity ?? 'success'" />
+                    } @else {
+                    <span>-</span>
+                    }
+                </td>
+                } @case ('action') {
+                <td
+                    class="!px-4"
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                  }"
+                >
+                    <div class="flex gap-1">
+                        @for (btn of item.actionButtons; track $index) { @if (!btn.visible || btn.visible(rowData, rowNode)) {
+                        <button
+                            type="button"
+                            [pTooltip]="getActionTooltip(btn, rowData, item)"
+                            tooltipPosition="top"
+                            class="flex justify-center items-center gap-1 px-2 py-1 rounded text-sm cursor-pointer"
+                            (click)="
+                            btn.children ? toggleMenu($event, menu) : onActionClick(btn, rowData)
+                          "
+                        >
+                            @if (btn.icon) {
+                            <i style="font-size: 1.2rem" [class]="getActionIcon(btn, rowData, item)"></i>
+                            } @if (btn.label) {
+                            <span class="w-fit"> {{ btn.label }} </span>
+                            }
+                        </button>
+                        <p-popover #menu>
+                            @for (btnChild of btn.children; track $index) {
+                            <button type="button" [pTooltip]="getActionTooltip(btnChild, rowData, item)" tooltipPosition="top" class="flex items-center justify-center gap-1 px-2 py-1 rounded text-sm cursor-pointer" (click)="onActionClick(btnChild, rowData)">
+                                @if (btnChild.icon) {
+                                <i style="font-size: 1.2rem" [class]="getActionIcon(btnChild, rowData, item)"></i>
+                                } @if (btn.label) {
+                                <span class="w-fit"> {{ btn.label }} </span>
+                                }
+                            </button>
+                            }
+                        </p-popover>
+                        } }
+                    </div>
+                </td>
+                } @default {
+                <td
+                    [style]="{
+                    minWidth: item.minWidth,
+                    maxWidth: item.maxWidth,
+                    width: item.width,
+                    textAlign: item.align || 'left',
+                  }"
+                >
+                    <span>{{ rowData[item.field] }}</span>
+                </td>
+                } } } }
+            </tr>
+        </ng-template>
+        @if(showFooter() ){
+        <ng-template pTemplate="footer">
+            @if(data().length) {
+            <tr class="font-extrabold text-[15px]">
+                @if (showCheckboxToggle()) {
+                <td></td>
+                } @for (item of columns(); track item.field) { @if (item.visible) { @if (item.type !== 'action') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width" [style.textAlign]="item.align || 'left'" [ngClass]="item.footer?.class || ''">
+                    <span>{{ getFooterValue(item) }}</span>
+                </td>
+                } @else {
+                <td pFrozenColumn [alignFrozen]="'right'" [frozen]="true" class="!px-2 font-bold !bg-surface-300 dark:!bg-surface-600" [style]="{ minWidth: item.minWidth, maxWidth: item.maxWidth, width: item.width }">
+                    <span>{{ getFooterValue(item) }}</span>
+                </td>
+                } } }
+            </tr>
+            }
+        </ng-template>
+        }
+        <ng-template pTemplate="emptymessage">
+            <div
+                [style]="{
+            height: `${scrollHeight()}`,
+          }"
+                class="flex items-center justify-center"
+            ></div>
+            @if (showLoading()) {
+            <app-loading [strokeWidth]="'5'" [animationDuration]="'1s'" />
+            } @else {
+            <app-no-data />
+            }
+        </ng-template>
+    </p-treeTable>
+</div>

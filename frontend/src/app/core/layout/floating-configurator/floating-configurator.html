@@ -1,0 +1,8 @@
+<div [ngClass]="{ 'fixed flex gap-4 top-1/2 -translate-y-1/2 right-0': float() }">
+    <div class="relative">
+        <p-button class="rounded-0" icon="pi pi-spin pi-cog" type="button" (click)="visible = !visible" [rounded]="rounded()" [severity]="severity()" [raised]="raised()" />
+        <p-drawer header="Thiết lập" [(visible)]="visible" position="right" [modal]="false" styleClass="!w-[28rem] sm:!w-[30rem]">
+            <app-configurator />
+        </p-drawer>
+    </div>
+</div>

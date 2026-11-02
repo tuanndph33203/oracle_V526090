@@ -1,0 +1,28 @@
+<app-floating-configurator />
+
+<div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-[100svh] w-full overflow-hidden px-3 sm:px-6">
+    <div class="flex flex-col items-center justify-center w-full max-w-4xl">
+        <div class="w-full" style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(247, 149, 48, 0.4) 10%, rgba(247, 149, 48, 0) 30%)">
+            <div class="w-full bg-surface-0 dark:bg-surface-900 px-4 sm:px-8 py-10 sm:py-14 lg:py-20 max-h-[90svh] overflow-auto flex flex-col items-center" style="border-radius: 53px">
+                <div class="flex flex-col items-center gap-3 text-center max-h-full">
+                    <div class="flex justify-center items-center border-2 border-orange-500 rounded-full w-10 h-10 sm:w-14 sm:h-14 [@media(max-height:700px)]:w-9 [@media(max-height:700px)]:h-9">
+                        <i class="text-orange-500 pi pi-fw pi-lock text-lg sm:text-2xl [@media(max-height:700px)]:text-base"></i>
+                    </div>
+
+                    <h1 class="text-surface-900 dark:text-surface-0 font-bold text-xl sm:text-3xl lg:text-5xl [@media(max-height:700px)]:text-lg">Truy cập bị từ chối</h1>
+
+                    <span class="text-muted-color text-sm"> Tài khoản của bạn không được cấp quyền truy cập. </span>
+                    <span class="text-muted-color text-sm mb-4 sm:mb-8 [@media(max-height:700px)]:mb-2"> Vui lòng liên hệ quản trị viên để được hỗ trợ. </span>
+
+                    <div class="w-full flex justify-center sm:w-3/4 lg:w-2/3 [@media(max-height:700px)]:hidden">
+                        <img src="no_access.png" alt="Access denied" class="w-full max-w-xs sm:max-w-md lg:max-w-lg" />
+                    </div>
+                    <div class="mt-4 sm:mt-8 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center w-full">
+                        <p-button label="Đăng nhập lại" (onClick)="reLogin()" severity="danger" class="w-full sm:w-auto" />
+                        <p-button label="Trang chính" [routerLink]="'/'" severity="info" class="w-full sm:w-auto" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

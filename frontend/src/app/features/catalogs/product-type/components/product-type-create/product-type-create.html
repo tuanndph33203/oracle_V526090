@@ -1,0 +1,32 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa loại sản phẩm' : 'Thêm loại sản phẩm'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-y-2 gap-x-5 p-4" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label for="code" class="font-medium">Mã loại sản phẩm</label>
+            <input pInputText autocomplete="off" pInputText class="min-w-[270px]" id="code" formControlName="Code" placeholder="Nhập mã loại sản phẩm" />
+
+            <div *ngIf="form.get('Code')?.touched && form.get('Code')?.invalid">
+                <small *ngIf="form.get('Code')?.errors?.['required']" class="text-red-500"> Mã loại sản phẩm là bắt buộc </small>
+                <small
+                    *ngIf="
+            form.get('Code')?.errors?.['minlength'] ||
+            form.get('Code')?.errors?.['maxlength']
+        "
+                    class="text-red-500"
+                >
+                    Mã loại sản phẩm không hợp lệ
+                </small>
+            </div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="name" class="font-medium">Tên loại sản phẩm</label>
+            <input pInputText autocomplete="off" pInputText class="min-w-[270px]" id="name" formControlName="Name" placeholder="Nhập tên loại sản phẩm" />
+
+            <small *ngIf="form.get('Name')?.touched && form.get('Name')?.invalid" class="text-red-500"> Tên loại sản phẩm là bắt buộc </small>
+        </div>
+
+        <div class="flex justify-end pt-6 gap-6">
+            <!-- <button pButton type="button" icon="pi pi-times" label="Đóng" severity="contrast" outlined="true" (click)="dialogRef?.close()" size="large"></button> -->
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{edition() ? "Cập nhật" : "Thêm mới"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

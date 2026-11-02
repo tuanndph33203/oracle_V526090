@@ -1,0 +1,38 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa' : 'Thêm mới'" (close)="closeDialog()">
+    <form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5 p-4 w-full md:w-[580px]" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label for="code" class="font-medium text-sm">Mã nhóm <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="w-full" id="code" formControlName="Code" placeholder="Nhập mã nhóm" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="name" class="font-medium text-sm">Tên nhóm <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="w-full" id="name" formControlName="Name" placeholder="Nhập tên nhóm" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium text-sm">Loại nhóm <span class="text-red-500">*</span></label>
+            <p-select [options]="[
+                { value: 1, label: 'Món ăn' }, { value: 2, label: 'Đồ uống' }, { value: 3, label: 'Combo' }, { value: 4, label: 'Khác' }
+            ]" optionValue="value" optionLabel="label" formControlName="Type" placeholder="Chọn loại nhóm" styleClass="w-full" class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="priority" class="font-medium text-sm">Ưu tiên (thứ tự hiển thị)</label>
+            <p-inputnumber id="priority" class="w-full" styleClass="w-full" inputStyleClass="w-full" formControlName="Priority" [min]="0" placeholder="Để trống hoặc nhập số (1, 2...)" />
+        </div>
+        <div class="flex flex-col gap-1" [ngClass]="edition() ? '' : 'md:col-span-2'">
+            <label class="font-medium text-sm">Khu vực chế biến</label>
+            <p-select [options]="PreparationAreaIdOptions()" optionValue="Id" optionLabel="Name" formControlName="PreparationAreaId" placeholder="Chọn khu vực chế biến" styleClass="w-full" class="w-full" [showClear]="true" />
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium text-sm">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status" placeholder="Chọn trạng thái" styleClass="w-full" class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1 md:col-span-2">
+            <label for="description" class="font-medium text-sm">Mô tả</label>
+            <textarea pTextarea autocomplete="off" class="w-full" id="description" formControlName="Description" rows="3" placeholder="Nhập mô tả"></textarea>
+        </div>
+
+        <div class="flex justify-end pt-4 gap-4 md:col-span-2">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{edition() ? "Cập nhật" : "Thêm mới"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

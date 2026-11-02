@@ -1,0 +1,44 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa nhóm sản phẩm' : 'Thêm nhóm sản phẩm'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-4 p-4" (ngSubmit)="submit()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-5">
+            <div class="flex flex-col gap-1">
+                <label for="code" class="font-medium">Mã nhóm</label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="code" formControlName="Code" placeholder="Nhập mã nhóm" />
+
+                <div *ngIf="form.get('Code')?.touched && form.get('Code')?.invalid">
+                    <small *ngIf="form.get('Code')?.errors?.['required']" class="text-red-500"> Mã nhóm là bắt buộc </small>
+                    <small
+                        *ngIf="
+            form.get('Code')?.errors?.['minlength'] ||
+            form.get('Code')?.errors?.['maxlength']
+        "
+                        class="text-red-500"
+                    >
+                        Mã nhóm không hợp lệ
+                    </small>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="name" class="font-medium">Loại</label>
+                <p-select [options]="groupOptionConfig" formControlName="Type" optionLabel="label" optionValue="value" placeholder="Lựa chọn nhóm" class="w-full md:w-56" />
+            </div>
+            <div class="flex flex-col gap-1 md:col-span-2">
+                <label for="name" class="font-medium">Tên nhóm</label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="name" formControlName="Name" placeholder="Nhập tên nhóm" />
+                <small *ngIf="form.get('Name')?.touched && form.get('Name')?.invalid" class="text-red-500"> Tên nhóm là bắt buộc </small>
+            </div>
+
+            @if(edition()){
+            <div class="flex flex-col gap-1">
+                <label for="name" class="font-medium">Trạng thái</label>
+                <p-toggleswitch formControlName="Status" />
+            </div>
+            }
+        </div>
+
+        <div class="flex justify-end pt-6 gap-6">
+            <!-- <button pButton type="button" icon="pi pi-times" label="Đóng" severity="contrast" outlined="true" (click)="dialogRef?.close()" size="large"></button> -->
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{edition() ? "Cập nhật" : "Thêm mới"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-4 p-4 bg-surface-50 dark:bg-surface-900 rounded-xl min-h-[700px]">
+    <!-- Top toolbar: Header & Filters -->
+    <app-page-header
+        title="LỊCH SỬ ĐƠN HÀNG"
+        icon="ph-bold ph-clock-counter-clockwise">
+        <!-- Filters Form Container -->
+        <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Search input -->
+            <div class="w-full sm:w-[220px]">
+                <input type="text" pInputText [(ngModel)]="searchQuery" placeholder="Tìm mã đơn, phục vụ..."
+                    class="w-full font-semibold text-sm" (keyup.enter)="loadOrders()" />
+            </div>
+
+            <!-- Status Select Dropdown -->
+            <div class="w-full sm:w-[170px]">
+                <p-select [options]="statusFilters" [(ngModel)]="selectedStatus" optionLabel="label" optionValue="value"
+                    placeholder="Chọn trạng thái" (onChange)="loadOrders()" class="w-full">
+                </p-select>
+            </div>
+
+            <!-- Shared Date Range Picker Component -->
+            <app-input-date-picker [(ngModel)]="dateRange" class="w-[270px]"></app-input-date-picker>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <p-button label="Tìm kiếm" icon="pi pi-search" severity="success" [raised]="true" (onClick)="loadOrders()"></p-button>
+                <p-button label="Làm mới" icon="pi pi-refresh" severity="info" [outlined]="true" [raised]="true"
+                    (onClick)="resetFilters()"></p-button>
+            </div>
+        </div>
+    </app-page-header>
+
+    <!-- Main Workspace taking full width -->
+    <div class="flex flex-col gap-4 flex-1">
+        <app-table-meta 
+            [dataTable]="ordersList()" [columns]="colsTemp()" [showNodata]="true" [showLoading]="loading()"
+            [currentPage]="page()" [totalData]="totalElements()" [pageSize]="size()" [loading]="loading()"
+            [hasActionDbClick]="true" (actionDbClick)="selectOrder($event)" (actionClick)="handleAction($event)"
+            (actionPageChange)="onPageChange($event)" />
+
+    </div>
+</div>

@@ -1,0 +1,22 @@
+<div class="flex flex-col items-center justify-center gap-4">
+    <div class="flex items-center gap-2 mb-3">
+        <img class="w-14 h-full aspect-square object-cover rounded-full bg-primary" src="logo_an.png" alt="logo" />
+        <span class="font-serif text-4xl font-medium tracking-[0.1em] text-surface-600 leading-none translate-y-[2px]">POS</span>
+    </div>
+    <p-progressSpinner strokeWidth="3"></p-progressSpinner>
+    <div class="flex flex-col items-center gap-2 w-full px-4">
+        <p class="text-surface-500 text-center">{{ loadingMessage }}</p>
+        <div *ngIf="showTroubleshootGuide" class="bg-primary-50 p-4 rounded-xl border border-primary-100 mt-2 text-surface-700 text-sm max-w-md w-full shadow-sm">
+            <div class="flex items-center gap-2 text-primary font-bold mb-3">
+                <i class="pi pi-info-circle text-lg"></i>
+                <span>Mẹo khắc phục:</span>
+            </div>
+            <ol class="list-decimal pl-5 space-y-2">
+                <li>Tìm ứng dụng có tên <span class="text-primary font-extrabold">WireGuard</span> trên máy tính</li>
+                <li>Chọn <span class="text-primary font-extrabold">Deactivate</span> để tắt kết nối</li>
+                <li>Chọn <span class="text-primary font-extrabold">Activate</span> để bật lại kết nối</li>
+                <li>Quay lại Chrome và ấn <span class="text-primary font-extrabold">Ctrl + Shift + R</span> để tải lại</li>
+            </ol>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+<form [formGroup]="form" class="grid grid-cols-2 gap-6 w-full">
+    <div class="rounded-xl bg-white p-6 shadow-sm">
+        <div class="flex items-start gap-4 mb-6">
+            <p-avatar size="xlarge" shape="circle" icon="pi pi-user" />
+
+            <div>
+                <div class="flex gap-2 mb-2">
+                    <p-button label="Tải ảnh lên" size="small" />
+                    <p-button label="Xóa ảnh" severity="danger" size="small" outlined />
+                </div>
+                <p class="text-sm text-surface-500">Định dạng JPG, GIF hoặc PNG. Kích thước tối đa 1MB</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-medium">Tên người dùng</label>
+                <input pInputText formControlName="username" class="w-full" readonly />
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Tên gọi</label>
+                <input pInputText formControlName="nickname" class="w-full" readonly />
+            </div>
+        </div>
+        <div class="mt-4">
+            <label class="block mb-1 font-medium">Email</label>
+            <input pInputText formControlName="email" class="w-full" readonly />
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div>
+                <label class="block mb-1 font-medium">Điện thoại</label>
+                <input pInputText formControlName="phone" class="w-full" readonly />
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Fax</label>
+                <input pInputText formControlName="fax" class="w-full" readonly />
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div>
+                <label class="block mb-1 font-medium">Số CMND</label>
+                <input pInputText formControlName="identity" class="w-full" readonly />
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Ngân hàng</label>
+                <input pInputText formControlName="bank" class="w-full" readonly />
+            </div>
+        </div>
+    </div>
+    <div class="rounded-xl bg-white p-6 shadow-sm">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block mb-1 font-medium">Mã nhân viên</label>
+                <input pInputText formControlName="employeeCode" class="w-full" readonly />
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Tên nhân viên</label>
+                <input pInputText formControlName="employeeName" class="w-full" readonly />
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div>
+                <label class="block mb-1 font-medium">Ngày sinh</label>
+                <p-datePicker formControlName="birthday" dateFormat="dd-mm-yy" class="w-full"  [readonlyInput]="true"></p-datePicker>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Giới tính</label>
+                <div class="flex gap-4 mt-2">
+                    @for (g of genders; track g.value) {
+                    <div class="flex items-center gap-2">
+                        <p-radioButton name="gender" [value]="g.value" formControlName="gender" [disabled]="true" />
+                        <label>{{ g.label }}</label>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div>
+                <label class="block mb-1 font-medium">Tỉnh / Thành phố</label>
+                <p-select [options]="cities" optionLabel="label" optionValue="value" placeholder="-- Mời chọn --" formControlName="city" class="w-full"  [readonly]="true"/>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Quận / Huyện</label>
+                <p-select [options]="cities" optionLabel="label" optionValue="value" placeholder="-- Mời chọn --" formControlName="city" class="w-full" [readonly]="true"/>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+            <div>
+                <label class="block mb-1 font-medium">Xã / Phường</label>
+                <p-select [options]="cities" optionLabel="label" optionValue="value" placeholder="-- Mời chọn --" formControlName="city" class="w-full" [readonly]="true"/>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Quốc gia</label>
+                <input pInputText formControlName="country" class="w-full" readonly />
+            </div>
+        </div>
+        <div class="mt-4">
+            <label class="block mb-1 font-medium">Địa chỉ</label>
+            <input pInputText formControlName="address" class="w-full" readonly />
+        </div>
+    </div>
+</form>

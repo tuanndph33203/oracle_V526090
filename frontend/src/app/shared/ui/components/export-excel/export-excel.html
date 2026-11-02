@@ -1,0 +1,20 @@
+<div class="w-full p-5">
+    <textarea pInputTextarea [(ngModel)]="notes" rows="1" autoResize="true" placeholder="Nhập tên file" class="w-full mt-2"></textarea>
+     <p-select
+        appendTo="body"
+        [options]="exportTypeOptions"
+        [(ngModel)]="type"
+        optionLabel="Name"
+        optionValue="Code"
+        [showClear]="true"
+        class="w-full mt-2"
+    ></p-select>
+    <div class="flex items-center gap-3 mt-2">
+        <label>Cell Auto Width: </label>
+        <p-toggleswitch  [(ngModel)]="format" />
+    </div>
+    <div class="flex justify-end pt-3 gap-6">
+        <button pButton type="submit" [disabled]="!notes" size="large" (click)="print()">Tải xuống</button>
+        <button pButton type="button" size="large" (click)="close()" severity="secondary" >Hủy</button>
+    </div>
+</div>

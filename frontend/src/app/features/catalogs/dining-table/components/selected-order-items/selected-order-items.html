@@ -1,0 +1,102 @@
+<div class="flex-1 min-h-0 overflow-y-auto bg-transparent flex flex-col gap-1.5 sm:gap-2.5 py-1 sm:py-1.5 px-0.5">
+    <div *ngFor="let item of orderItems; let i = index"
+        class="p-2 sm:p-3.5 bg-surface-0 dark:bg-surface-800 rounded-lg sm:rounded-xl border border-surface-200 dark:border-surface-700 shadow-sm hover:border-primary/45 transition-all duration-200 flex gap-2 sm:gap-4">
+        <!-- Column 1: Item Details & Note -->
+        <div class="flex-1 flex flex-col gap-1 sm:gap-2 min-w-0">
+            <!-- Item Name -->
+            <span class="font-bold text-surface-900 dark:text-surface-50 text-sm sm:text-base leading-snug truncate">{{
+                i + 1 }}. {{ item.ItemName }}</span>
+            <span *ngIf="item.SelectedOptions?.length" class="text-xs text-surface-500">
+                <ng-container *ngFor="let option of item.SelectedOptions; let last = last">{{ option.GroupName }}: {{ option.ValueName }}<span *ngIf="!last"> · </span></ng-container>
+            </span>
+
+            <!-- Unit Price & Badges -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs sm:text-sm font-bold text-surface-500 dark:text-surface-400">{{ item.Price |
+                    number:'1.0-0' }}đ</span>
+                <span *ngIf="item.PromotionCode && item.DiscountRate === 100"
+                    class="bg-red-500 text-white text-[9px] px-1 py-0.5 rounded font-bold whitespace-nowrap">Tặng</span>
+                <span *ngIf="requireKitchenSend"
+                    class="inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold whitespace-nowrap"
+                    [ngClass]="getKitchenStatusClass(item)">
+                    {{ getKitchenStatusText(item) }}
+                </span>
+                <span *ngIf="requireKitchenSend && item.ReturnedQuantity > 0"
+                    class="bg-red-600 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-bold whitespace-nowrap shadow-2xs">
+                    Khách trả: {{ item.ReturnedQuantity }}
+                </span>
+                <span *ngIf="!requireKitchenSend || item.SentQty > 0 || item.IsChecked === 1"
+                    class="bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-200 font-bold px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] whitespace-nowrap border border-purple-300">
+                    Thực dùng: {{ getActualUsedQty(item) }}
+                </span>
+            </div>
+
+            <!-- Note input: compact on mobile, full on desktop -->
+            <div class="flex items-center gap-1.5 mt-1">
+                <i class="pi pi-pencil text-surface-400 dark:text-surface-500 text-xs sm:text-base flex-shrink-0"></i>
+                <input type="text" [(ngModel)]="item.Note" placeholder="Ghi chú..."
+                    class="w-full h-[26px] sm:h-[36px] py-0.5 px-2 text-xs sm:text-base font-semibold border border-surface-300 dark:border-surface-600 rounded-md sm:rounded-lg bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-100 focus:border-primary focus:bg-surface-0 outline-none transition-all placeholder:text-surface-400 shadow-2xs box-border"
+                    [disabled]="!!billId && !isBillEditUnlocked" />
+            </div>
+        </div>
+
+        <!-- Column 2: Total Price & Qty Controller -->
+        <div
+            class="flex-shrink-0 flex flex-col items-end justify-between gap-1.5 sm:gap-3 min-w-[80px] sm:min-w-[120px]">
+            <!-- Total Price & Delete -->
+            <div class="flex items-center gap-1 sm:gap-2">
+                <span class="font-black text-primary text-sm sm:text-lg whitespace-nowrap text-right">{{
+                    getItemTotalAmount(item) | number:'1.0-0' }}đ</span>
+                <button *ngIf="showDeleteButton && (!billId || isBillEditUnlocked) && canDeleteItem(item)" type="button"
+                    (click)="removeItem.emit(item)"
+                    title="Xóa khỏi danh sách"
+                    class="text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer p-0.5 text-sm flex items-center justify-center transition-colors">
+                    <i class="pi pi-trash text-xs sm:text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Quantity Pill Selector & Nút Hủy Món -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <div
+                    class="flex items-center bg-surface-50 dark:bg-surface-900 rounded-lg border border-surface-300 dark:border-surface-600 overflow-hidden shadow-2xs h-[28px] sm:h-[36px]">
+                    <button *ngIf="!billId || isBillEditUnlocked" type="button" (click)="decreaseQty.emit(item)"
+                        [disabled]="!canDecreaseItem(item)"
+                        title="Giảm số lượng"
+                        class="w-8 sm:w-9.5 h-full flex items-center justify-center text-surface-600 dark:text-surface-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-surface-400 disabled:cursor-not-allowed transition-colors border-0 bg-transparent outline-none cursor-pointer">
+                        <i class="pi pi-minus text-xs sm:text-sm font-bold"></i>
+                    </button>
+                    <input *ngIf="!billId || isBillEditUnlocked; else readOnlyQty"
+                        type="number"
+                        [ngModel]="item.Quantity"
+                        (focus)="$any($event.target).select()"
+                        (change)="onQtyInputChange(item, $event)"
+                        (keydown.enter)="$any($event.target).blur()"
+                        min="1"
+                        class="font-mono font-bold text-primary dark:text-primary text-base sm:text-xl px-0.5 w-[32px] sm:w-[44px] h-full text-center bg-transparent border-0 outline-none p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                    <ng-template #readOnlyQty>
+                        <span
+                            class="font-mono font-bold text-primary dark:text-primary text-base sm:text-xl px-1.5 sm:px-2 min-w-[24px] sm:min-w-[32px] text-center select-none leading-none">{{
+                            item.Quantity }}</span>
+                    </ng-template>
+                    <button *ngIf="!billId || isBillEditUnlocked" type="button" (click)="increaseQty.emit(item)"
+                        class="w-8 sm:w-9.5 h-full flex items-center justify-center text-surface-600 dark:text-surface-300 hover:bg-green-50 dark:hover:bg-green-950/20 hover:text-green-600 transition-colors border-0 bg-transparent outline-none cursor-pointer">
+                        <i class="pi pi-plus text-xs sm:text-sm font-bold"></i>
+                    </button>
+                </div>
+
+                <!-- Nút Hủy món bên cạnh nút - 1 + (Chỉ hiển thị khi đang sửa bill đã lưu có món) -->
+                <button *ngIf="billId && isBillEditUnlocked && (item.IsSentToKitchen === 1 || item.OriginalQuantity > 0 || item.Id)" type="button" (click)="cancelItem.emit(item)"
+                    title="Hủy món & In bill hủy"
+                    class="h-[28px] sm:h-[36px] px-2 sm:px-2.5 flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg cursor-pointer transition-colors shadow-2xs text-xs sm:text-sm font-bold">
+                    <i class="pi pi-times-circle text-xs sm:text-sm"></i>
+                    <span class="text-xs font-semibold whitespace-nowrap">Hủy món</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!orderItems.length"
+        class="p-8 text-center text-surface-400 dark:text-surface-500 italic text-sm sm:text-base">
+        Chưa chọn món ăn nào.
+    </div>
+</div>

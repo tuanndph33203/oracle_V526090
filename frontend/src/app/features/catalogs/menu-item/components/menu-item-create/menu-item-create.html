@@ -1,0 +1,366 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa' : 'Thêm mới'" (close)="closeDialog()">
+    <form [formGroup]="form" class="grid grid-cols-2 gap-y-3 gap-x-5 p-4 min-w-[700px] max-h-[85vh] overflow-y-auto"
+        (ngSubmit)="submit()">
+        <!-- Row 1: Code & Name -->
+        <div class="flex flex-col gap-1">
+            <label for="code" class="font-medium">Mã thực đơn <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="w-full" id="code" formControlName="Code"
+                placeholder="Nhập mã thực đơn" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="name" class="font-medium">Tên món <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="w-full" id="name" formControlName="Name"
+                placeholder="Nhập tên món" />
+        </div>
+
+        <!-- Row 2: Image -->
+        <div class="flex flex-col gap-1 col-span-2">
+            <label class="font-medium">Ảnh món ăn</label>
+            <app-file-upload-meta (uploaded)="onImagesUploaded($event)" formControlName="ImageUrl" />
+        </div>
+
+        <!-- Row 3: MenuGroup & Unit -->
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Nhóm thực đơn <span class="text-red-500">*</span></label>
+            <p-multiselect [options]="menuGroupOptions()" optionValue="Id" optionLabel="Name"
+                formControlName="MenuGroupIds" placeholder="Chọn nhóm thực đơn" class="w-full" [filter]="true" />
+            <small>Khi tạo món, nhóm đầu tiên là nhóm chính để xác định khu vực chế biến. Khi sửa, nhóm chính được giữ
+                nếu vẫn được chọn.</small>
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Đơn vị tính <span class="text-red-500">*</span></label>
+            <p-select [options]="unitOptions()" optionValue="Id" optionLabel="Name" formControlName="UnitId"
+                placeholder="Chọn đơn vị tính" class="w-full" />
+        </div>
+
+        <!-- Row 4: ItemType & CourseOrder -->
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Loại món <span class="text-red-500">*</span></label>
+            <p-select [options]="itemTypeOptions" optionValue="value" optionLabel="label" formControlName="ItemType"
+                placeholder="Chọn loại món" class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="courseOrder" class="font-medium">Số thứ tự (STT)</label>
+            <input pInputText type="number" min="0" autocomplete="off" class="w-full no-spin" id="courseOrder"
+                formControlName="CourseOrder" placeholder="Nhập số thứ tự hiển thị (1, 2, 3...)" />
+        </div>
+
+        <!-- Row 5: Prices -->
+        <div class="flex flex-col gap-1">
+            <label for="price" class="font-medium">Giá bán <span class="text-red-500">*</span></label>
+            <input pInputText type="number" autocomplete="off" class="w-full no-spin" id="price"
+                formControlName="SalePrice" placeholder="Nhập giá bán" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="purchaseprice" class="font-medium">Giá mua</label>
+            <input pInputText type="number" autocomplete="off" class="w-full no-spin" id="purchaseprice"
+                formControlName="CostPrice" placeholder="Nhập giá mua" />
+        </div>
+
+        <!-- Row 6: Taxes -->
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Thuế suất</label>
+            <p-select [options]="taxRateOptions()" optionValue="Id" optionLabel="Name" formControlName="TaxRateId"
+                placeholder="Chọn thuế suất" class="w-full" [showClear]="true" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="fixedtax" class="font-medium">Thuế cố định (VNĐ)</label>
+            <input pInputText type="number" autocomplete="off" class="w-full no-spin" id="fixedtax"
+                formControlName="FixedTaxAmount" placeholder="Nhập thuế cố định" />
+        </div>
+
+        <!-- Row 7: Expected Total & Preparation Area -->
+        <div class="flex flex-col gap-1">
+            <label class="font-medium text-primary font-bold">Thành tiền dự kiến (Sau thuế)</label>
+            <input pInputText class="w-full bg-surface-50 dark:bg-surface-800/50 font-semibold" readonly
+                [value]="expectedTotalPrice() | number:'1.0-0' : 'vi-VN'" placeholder="Thành tiền dự kiến" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Chế biến tại (Bar - Bếp)</label>
+            <p-select [options]="preparationAreaOptions()" optionValue="Id" optionLabel="Name"
+                formControlName="PreparationAreaId" placeholder="Chọn Bar/Bếp chế biến" class="w-full"
+                [showClear]="true" />
+        </div>
+
+        <!-- Row 8: Branch & Status -->
+        <div class="flex flex-col gap-1" [ngClass]="edition() ? '' : 'col-span-2'">
+            <label class="font-medium">Chi nhánh áp dụng</label>
+            <p-multiselect appendTo="body" [options]="branchOptions()" formControlName="BranchIds" optionLabel="Name"
+                optionValue="Id" filterBy="Code,Name" placeholder="Chọn nhiều chi nhánh"
+                selectedItemsLabel="+{0} chi nhánh" [maxSelectedLabels]="2" class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status"
+                placeholder="Chọn trạng thái" class="w-full" />
+        </div>
+
+        <!-- Row 9: Quản lý số lượng bán trong ngày (IsTrackStock) -->
+        <div class="col-span-2 bg-surface-50 dark:bg-surface-900/50 p-3 rounded-lg border border-surface-200 dark:border-surface-800 my-1">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="font-medium text-surface-900 dark:text-surface-0 flex items-center gap-2">
+                        <i class="pi pi-box text-primary"></i>
+                        Quản lý số lượng bán trong ngày
+                    </div>
+                    <div class="text-xs text-surface-500">Giới hạn số suất bán trong ngày. Khi bán về 0 hệ thống sẽ tự động chuyển sang Hết món.</div>
+                </div>
+                <p-toggleswitch formControlName="IsTrackStock" />
+            </div>
+
+            <!-- Khi bật quản lý số lượng thì hiện 2 ô nhập -->
+            <div *ngIf="form.get('IsTrackStock')?.value" class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-surface-200 dark:border-surface-700">
+                <div class="flex flex-col gap-1">
+                    <label class="text-sm font-medium">Số lượng còn lại hiện tại <span class="text-red-500">*</span></label>
+                    <input pInputText type="number" min="0" autocomplete="off" class="w-full no-spin"
+                        formControlName="StockQuantity" placeholder="Nhập số suất còn bán" />
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-sm font-medium">Định mức nạp lúc 00:00 <span class="text-xs text-surface-400">(Tự reset mỗi ngày)</span></label>
+                    <input pInputText type="number" min="0" autocomplete="off" class="w-full no-spin"
+                        formControlName="DailyQuota" placeholder="Số suất tự reset đầu ngày" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 10: IsAvailable (Hiển thị món) -->
+        <div
+            class="flex items-center justify-between col-span-2 bg-surface-50 dark:bg-surface-900/50 p-3 rounded-lg border border-surface-200 dark:border-surface-800 my-1">
+            <div>
+                <div class="font-medium text-surface-900 dark:text-surface-0">Hiển thị món (Còn món)</div>
+                <div class="text-xs text-surface-500">Tắt nút này khi hết món (ẩn/khóa món trên POS & QR bàn). Nút sẽ tự
+                    động bật lại lúc 00:00 hàng ngày.</div>
+            </div>
+            <p-toggleswitch formControlName="IsAvailable" />
+        </div>
+
+        <div
+            class="flex items-center justify-between col-span-2 bg-surface-50 dark:bg-surface-900/50 p-3 rounded-lg border border-surface-200 dark:border-surface-800 my-1">
+            <div>
+                <div class="font-medium text-surface-900 dark:text-surface-0">Món yêu thích</div>
+                <div class="text-xs text-surface-500">Hiển thị nhãn Must try cho món này trên thực đơn QR.</div>
+            </div>
+            <p-toggleswitch formControlName="IsMustTry" />
+        </div>
+
+        <!-- Row 10: Description -->
+        <div class="flex flex-col gap-1 col-span-2">
+            <label for="description" class="font-medium">Mô tả</label>
+            <textarea pTextarea autocomplete="off" class="w-full" id="description" formControlName="Description"
+                placeholder="Nhập mô tả"></textarea>
+        </div>
+
+        <!-- Row 10: Service Preferences (Sở thích phục vụ) -->
+        <div class="col-span-2 border-t border-surface-200 dark:border-surface-800 pt-3 mt-2">
+            <div class="flex justify-between items-center mb-3">
+                <label class="font-semibold text-surface-800 dark:text-surface-200 flex items-center gap-2">
+                    <i class="pi pi-heart text-red-500"></i>
+                    Sở thích phục vụ & Thu thêm
+                </label>
+                <button pButton type="button" icon="pi pi-plus" label="Thêm dòng" (click)="addServicePreference()"
+                    class="p-button-sm p-button-secondary p-button-outlined"></button>
+            </div>
+
+            <div formArrayName="ServicePreferences" class="space-y-3">
+                <div *ngIf="servicePreferences.length === 0" class="text-xs text-surface-400 italic py-2 text-center">
+                    Chưa cấu hình sở thích phục vụ nào cho món này.
+                </div>
+
+                <div *ngFor="let item of servicePreferences.controls; let i=index" [formGroupName]="i"
+                    class="flex gap-3 items-center bg-surface-50 dark:bg-surface-900/50 p-2.5 rounded-lg border border-surface-150 dark:border-surface-800/80">
+                    <div class="flex-1 flex flex-col gap-1">
+                        <label class="text-[10px] font-medium text-surface-500">Sở thích phục vụ</label>
+                        <p-select [options]="servicePreferenceOptions()" optionValue="Id" optionLabel="Name"
+                            formControlName="ServicePreferenceId" placeholder="Chọn sở thích phục vụ"
+                            class="w-full p-inputtext-sm" />
+                    </div>
+                    <div class="w-[150px] flex flex-col gap-1">
+                        <label class="text-[10px] font-medium text-surface-500">Thu thêm (VNĐ)</label>
+                        <input pInputText type="number" formControlName="ExtraCharge" placeholder="Nhập số tiền"
+                            class="w-full no-spin p-inputtext-sm" />
+                    </div>
+                    <div class="self-end pb-0.5">
+                        <button pButton type="button" severity="danger" icon="pi pi-trash" [outlined]="true"
+                            (click)="removeServicePreference(i)" class="p-button-sm p-button-danger p-button-text"
+                            title="Xóa dòng"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-2 border-t border-surface-200 pt-4 mt-2 flex items-center justify-between gap-4">
+            <div>
+                <div class="font-semibold">Tùy chọn khi gọi món</div>
+                <div class="text-xs text-surface-500">{{ optionGroups.length }} nhóm tùy chọn · Giá trị và phụ thu được cấu hình trong màn hình riêng.</div>
+            </div>
+            <button pButton type="button" icon="pi pi-sliders-h" label="Quản lý tùy chọn" [outlined]="true"
+                (click)="openOptionEditor()"></button>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="col-span-2 flex justify-end pt-6 gap-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{ edition() ? 'Cập
+                nhật' : 'Thêm mới' }}</button>
+        </div>
+    </form>
+</app-dialog-wrap>
+
+<p-dialog [(visible)]="optionEditorVisible" (onHide)="onOptionEditorHide()" [modal]="true" [showHeader]="false" [draggable]="false"
+    [resizable]="false" [dismissableMask]="false" appendTo="body" styleClass="menu-option-editor"
+    [style]="{ width: 'min(96vw, 1500px)', height: 'min(94vh, 980px)' }"
+    [contentStyle]="{ padding: '0', height: '100%', overflow: 'hidden' }">
+    <div class="option-shell" [formGroup]="form">
+        <div class="option-header">
+            <div class="option-item-icon">
+                <img *ngIf="optionItemImageUrl; else optionImagePlaceholder" [src]="optionItemImageUrl" alt="Ảnh món" />
+                <ng-template #optionImagePlaceholder><i class="pi pi-image"></i></ng-template>
+            </div>
+            <div class="option-item-info">
+                <span class="option-overline">Món ăn</span>
+                <strong>{{ form.get('Name')?.value || 'Món mới' }}</strong>
+                <span>Mã: {{ form.get('Code')?.value || '—' }} <span class="option-divider">|</span>
+                    Giá bán: {{ form.get('SalePrice')?.value || 0 | number:'1.0-0' }}đ</span>
+            </div>
+            <button type="button" class="option-close" (click)="optionEditorVisible = false" aria-label="Đóng">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
+
+        <div class="option-body">
+            <aside class="option-sidebar" formArrayName="OptionGroups">
+                <div class="option-sidebar-title">
+                    <strong>Danh sách tùy chọn ({{ optionGroups.length }})</strong>
+                    <button pButton type="button" icon="pi pi-plus" label="Thêm" size="small"
+                        (click)="addOptionGroup()"></button>
+                </div>
+                <div class="option-list">
+                    <div *ngFor="let group of optionGroups.controls; let gi=index" class="option-list-item"
+                        [class.selected]="selectedOptionGroupIndex === gi" (click)="selectOptionGroup(gi)">
+                        <span class="option-drag"><i class="pi pi-bars"></i></span>
+                        <span class="option-type-icon"><i [class]="group.get('Multiple')?.value ? 'pi pi-check-square' : 'pi pi-list'"></i></span>
+                        <span class="option-list-copy">
+                            <strong>{{ group.get('Name')?.value || 'Tùy chọn mới' }}</strong>
+                            <small>{{ group.get('Multiple')?.value ? 'Chọn nhiều' : 'Chọn một' }}
+                                <span class="option-separator">·</span>
+                                <span [class.option-required]="group.get('Required')?.value">{{ group.get('Required')?.value ? 'Bắt buộc' : 'Không bắt buộc' }}</span>
+                            </small>
+                        </span>
+                        <button type="button" class="option-list-delete" (click)="$event.stopPropagation(); removeOptionGroup(gi)"
+                            title="Xóa tùy chọn"><i class="pi pi-trash"></i></button>
+                    </div>
+                    <div *ngIf="!optionGroups.length" class="option-empty">Chưa có tùy chọn. Nhấn “Thêm” để bắt đầu.</div>
+                </div>
+            </aside>
+
+            <main class="option-main" *ngIf="selectedOptionGroup as group; else optionNoSelection" [formGroup]="group">
+                <div class="option-section-title"><strong>Thông tin tùy chọn</strong>
+                    <button type="button" class="option-danger" (click)="removeOptionGroup(selectedOptionGroupIndex)">
+                        <i class="pi pi-trash"></i> Xóa tùy chọn này
+                    </button>
+                </div>
+                <div class="option-settings">
+                    <label><span>Mã <em>*</em></span><input pInputText formControlName="Code" placeholder="VD: SIZE" /></label>
+                    <label><span>Tên <em>*</em></span><input pInputText formControlName="Name" placeholder="VD: Kích cỡ" /></label>
+                    <label><span>Kiểu dữ liệu <em>*</em></span>
+                        <select class="option-data-type" [value]="group.get('Multiple')?.value ? 'checkbox' : 'selectbox'"
+                            (change)="setOptionDataType($any($event.target).value)">
+                            <option value="selectbox">Selectbox (chọn một)</option>
+                            <option value="checkbox">Checkbox (chọn nhiều)</option>
+                        </select>
+                    </label>
+                    <label><span>Bắt buộc</span>
+                        <span class="option-checkbox-line"><input type="checkbox" formControlName="Required" /> Có</span>
+                    </label>
+                </div>
+
+                <div class="option-section-title option-values-title"><strong>Danh sách giá trị ({{ optionValues(selectedOptionGroupIndex).length }})</strong>
+                    <button pButton type="button" icon="pi pi-plus" label="Thêm giá trị" size="small" [outlined]="true"
+                        (click)="addOptionValue(selectedOptionGroupIndex)"></button>
+                </div>
+                <div class="option-table-scroll" formArrayName="Values">
+                    <table class="option-table">
+                        <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Phụ thu</th>
+                                <th class="option-th-number">Thuế</th>
+                                <th>Thuế cố định</th>
+                                <th class="option-th-number">Thành tiền cộng</th>
+                                <th class="option-th-center">Mặc định</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let value of optionValues(selectedOptionGroupIndex).controls; let vi=index" [formGroupName]="vi">
+                                <td><input pInputText formControlName="Code" placeholder="S" /></td>
+                                <td><input pInputText formControlName="Name" placeholder="Nhỏ" /></td>
+                                <td><input pInputText type="number" formControlName="ExtraCharge" placeholder="0" (blur)="resetEmptyOptionAmount(value, 'ExtraCharge')" /></td>
+                                <td class="option-number">
+                                    <span class="font-semibold">{{ previewTaxRate | number:'1.0-2' }}%</span>
+                                    <div class="text-xs text-muted-color">({{ optionValueTax(value) | number:'1.0-0' }}đ)</div>
+                                </td>
+                                <td>
+                                    <input pInputText type="number" formControlName="FixedTax" placeholder="0" title="Nhập thuế cố định VNĐ; có thể nhập âm để giảm tiền" (blur)="resetEmptyOptionAmount(value, 'FixedTax')" />
+                                </td>
+                                <td class="option-number font-semibold text-emerald-600">{{ optionValueTotal(value) | number:'1.0-0' }}đ</td>
+                                <td class="option-default"><input type="checkbox" [checked]="value.get('IsDefault')?.value"
+                                        (change)="setDefaultValue(vi)" /></td>
+                                <td><button type="button" class="option-row-delete" title="Xóa giá trị"
+                                        (click)="removeOptionValue(selectedOptionGroupIndex, vi)"><i class="pi pi-trash"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="option-bottom-panels">
+                    <div class="option-preview-panel">
+                        <h4>Xem trước hiển thị (trên màn chọn món)</h4>
+                        <div class="option-preview-inner">
+                            <div class="option-preview-picker">
+                                <strong>{{ group.get('Name')?.value || 'Tên tùy chọn' }} <em *ngIf="group.get('Required')?.value">*</em></strong>
+                                <ng-container *ngIf="!group.get('Multiple')?.value; else multiplePreview">
+                                    <select (change)="selectPreviewValue(+$any($event.target).value, true)">
+                                        <option value="-1" *ngIf="!group.get('Required')?.value">Không chọn</option>
+                                        <option *ngFor="let value of optionValues(selectedOptionGroupIndex).controls; let vi=index" [value]="vi" [selected]="previewSelectedIndexes.includes(vi)">
+                                            {{ value.get('Name')?.value || 'Giá trị mới' }} ({{ optionValueTotal(value) > 0 ? '+' : '' }}{{ optionValueTotal(value) | number:'1.0-0' }}đ)
+                                        </option>
+                                    </select>
+                                </ng-container>
+                                <ng-template #multiplePreview>
+                                    <label *ngFor="let value of optionValues(selectedOptionGroupIndex).controls; let vi=index" class="option-preview-check">
+                                        <input type="checkbox" [checked]="previewSelectedIndexes.includes(vi)"
+                                            (change)="selectPreviewValue(vi, $any($event.target).checked)" />
+                                        {{ value.get('Name')?.value || 'Giá trị mới' }}
+                                        <span>{{ optionValueTotal(value) > 0 ? '+' : '' }}{{ optionValueTotal(value) | number:'1.0-0' }}đ</span>
+                                    </label>
+                                </ng-template>
+                            </div>
+                            <div class="option-preview-detail">
+                                <div>Giá món: <strong>{{ form.get('SalePrice')?.value || 0 | number:'1.0-0' }}đ</strong></div>
+                                <div>Phụ thu: <strong>{{ previewExtraCharge | number:'1.0-0' }}đ</strong></div>
+                                <div>Thuế: <strong>{{ previewTaxAmount | number:'1.0-0' }}đ</strong></div>
+                                <div class="option-preview-total">Thành tiền: <strong>{{ previewTotal | number:'1.0-0' }}đ</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-calc-panel">
+                        <h4>Tính thành tiền</h4>
+                        <div>Giá món <strong>{{ form.get('SalePrice')?.value || 0 | number:'1.0-0' }}đ</strong></div>
+                        <div>Phụ thu đã chọn <strong>{{ previewExtraCharge | number:'1.0-0' }}đ</strong></div>
+                        <div>Thuế {{ previewTaxRate | number:'1.0-2' }}% <strong>{{ previewTaxAmount | number:'1.0-0' }}đ</strong></div>
+                        <div class="option-calc-total">Thành tiền <strong>{{ previewTotal | number:'1.0-0' }}đ</strong></div>
+                    </div>
+                </div>
+            </main>
+            <ng-template #optionNoSelection><main class="option-main option-placeholder">Chọn một tùy chọn ở bên trái hoặc nhấn “Thêm”.</main></ng-template>
+        </div>
+
+        <div class="option-footer">
+            <span *ngIf="!edition()">Các tùy chọn sẽ được lưu khi bạn lưu món ăn.</span>
+            <button pButton type="button" label="Hủy" [outlined]="true" (click)="optionEditorVisible = false"></button>
+            <button pButton type="button" icon="pi pi-save" [label]="edition() ? 'Lưu' : 'Áp dụng'"
+                (click)="saveOptionEditor()"></button>
+        </div>
+    </div>
+</p-dialog>

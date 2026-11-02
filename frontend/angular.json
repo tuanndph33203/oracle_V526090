@@ -1,0 +1,141 @@
+{
+    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+    "version": 1,
+    "newProjectRoot": "projects",
+    "projects": {
+        "an-ng": {
+            "projectType": "application",
+            "schematics": {
+                "@schematics/angular:component": {
+                    "style": "scss"
+                }
+            },
+            "root": "",
+            "sourceRoot": "src",
+            "prefix": "app",
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:application",
+                    "options": {
+                        "outputPath": "dist/an-ng",
+                        "index": "src/index.html",
+                        "browser": "src/main.ts",
+                        "polyfills": [
+                            "zone.js"
+                        ],
+                        "tsConfig": "tsconfig.app.json",
+                        "inlineStyleLanguage": "scss",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            }
+                        ],
+                        "styles": [
+                            "node_modules/@phosphor-icons/web/src/regular/style.css",
+                            "node_modules/@phosphor-icons/web/src/bold/style.css",
+                            "node_modules/@phosphor-icons/web/src/fill/style.css",
+                            "src/assets/styles.scss"
+                        ],
+                        "scripts": [],
+                        "allowedCommonJsDependencies": [
+                            "qrcode",
+                            "quill-delta"
+                        ]
+                    },
+                    "configurations": {
+                        "production": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                }
+                            ],
+                            "optimization": true,
+                            "outputHashing": "all"
+                        },
+                        "uat": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.uat.ts"
+                                }
+                            ],
+                            "optimization": true,
+                            "outputHashing": "all"
+                        },
+                        "development": {
+                            "optimization": false,
+                            "extractLicenses": false,
+                            "sourceMap": true
+                        },
+                        "local": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.local.ts"
+                                }
+                            ],
+                            "optimization": false,
+                            "sourceMap": true,
+                            "extractLicenses": false,
+                            "outputHashing": "none"
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "configurations": {
+                        "production": {
+                            "buildTarget": "an-ng:build:production"
+                        },
+                        "development": {
+                            "buildTarget": "an-ng:build:development"
+                        },
+                        "local": {
+                            "buildTarget": "an-ng:build:local"
+                        },
+                        "uat": {
+                            "buildTarget": "an-ng:build:uat"
+                        }
+                    },
+                    "defaultConfiguration": "development"
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n"
+                },
+                "test": {
+                    "builder": "@angular-devkit/build-angular:karma",
+                    "configurations": {
+                        "menu-visibility": {
+                            "styles": [],
+                            "include": ["src/app/features/catalogs/menu-visibility/menu-visibility.spec.ts"]
+                        }
+                    },
+                    "options": {
+                        "polyfills": [
+                            "zone.js",
+                            "zone.js/testing"
+                        ],
+                        "tsConfig": "tsconfig.spec.json",
+                        "inlineStyleLanguage": "scss",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            }
+                        ],
+                        "styles": [
+                            "src/assets/styles.scss"
+                        ],
+                        "scripts": []
+                    }
+                }
+            }
+        }
+    },
+    "cli": {
+        "analytics": false
+    }
+}

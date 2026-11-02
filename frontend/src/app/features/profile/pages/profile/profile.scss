@@ -1,0 +1,15 @@
+:host ::ng-deep {
+    .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected {
+        pointer-events: none;
+        border-radius: 0;
+    }
+    .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(to bottom, color-mix(in srgb, var(--p-listbox-option-selected-color) 30%, transparent), var(--p-listbox-option-selected-color), color-mix(in srgb, var(--p-listbox-option-selected-color) 50%, transparent));
+    }
+}

@@ -1,0 +1,36 @@
+<div class="bg-surface-0 dark:bg-surface-800 p-4 rounded-md space-y-4">
+    <form [formGroup]="formSearch" class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <p-button *hasPermission=" 'SYSTEM_ACCOUNT_CREATE'" label="Thêm" icon="pi pi-plus" severity="primary" (click)="onCreateRow()"></p-button>
+        </div>
+        <div class="flex items-center gap-3 ml-auto">
+            <div class="flex">
+                <p-checkbox formControlName="IsGetDeleted" [binary]="true" />
+                <label for="IsGetDeleted" class="ml-2 whitespace-nowrap">Đã xóa</label>
+            </div>
+            <app-input-date-picker formControlName="date" class="w-[270px]" />
+            <p-floatlabel variant="on">
+                <p-iconfield>
+                    <p-inputicon class="pi pi-search" />
+                    <input type="text" pInputText formControlName="TextSearch" />
+                </p-iconfield>
+                <label>Tìm kiếm</label>
+            </p-floatlabel>
+        </div>
+    </form>
+    <app-table-meta
+        #table
+        [dataTable]="data()"
+        [columns]="colsTemp()"
+        [showNodata]="true"
+        [showLoading]="true"
+        [currentPage]="searchQuery().page"
+        [pageSize]="searchQuery().size"
+        [totalData]="total()"
+        [loading]="loading()"
+        [virtualScroll]="true"
+        [scrollHeight]="`${37 * itemViewport() + 48}px`"
+        (actionClick)="handleAction($event)"
+        (actionPageChange)="onPageChange($event)"
+    />
+</div>

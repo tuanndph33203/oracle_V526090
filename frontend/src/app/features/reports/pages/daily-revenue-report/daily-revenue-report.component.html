@@ -1,0 +1,205 @@
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-slate-50 dark:bg-surface-950 p-6 flex flex-col gap-6">
+
+    <!-- ───── Page Header & Filters in 1 Row Toolbar ───── -->
+    <app-page-header
+        title="BÁO CÁO DOANH THU THEO NGÀY"
+        description="Thống kê tổng hợp doanh thu, thanh toán và khách hàng theo từng ngày"
+        icon="pi pi-chart-line">
+        <div class="flex flex-wrap items-end gap-3">
+            <!-- Chi nhánh -->
+            <div class="flex flex-col gap-1 min-w-[180px]" *ngIf="rawBranchesLength() > 1">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Chi nhánh</label>
+                <p-select
+                    [options]="branches()"
+                    [ngModel]="selectedBranchId()"
+                    (ngModelChange)="selectedBranchId.set($event); onFilterChange()"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Chọn chi nhánh"
+                    styleClass="w-full text-xs"
+                    [filter]="true">
+                </p-select>
+            </div>
+
+            <!-- Từ ngày -->
+            <div class="flex flex-col gap-1 min-w-[140px]">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Từ ngày</label>
+                <p-datepicker
+                    [ngModel]="fromDate()"
+                    (ngModelChange)="fromDate.set($event); onFilterChange()"
+                    dateFormat="dd/mm/yy"
+                    [showIcon]="true"
+                    placeholder="Từ ngày">
+                </p-datepicker>
+            </div>
+
+            <!-- Đến ngày -->
+            <div class="flex flex-col gap-1 min-w-[140px]">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Đến ngày</label>
+                <p-datepicker
+                    [ngModel]="toDate()"
+                    (ngModelChange)="toDate.set($event); onFilterChange()"
+                    dateFormat="dd/mm/yy"
+                    [showIcon]="true"
+                    placeholder="Đến ngày">
+                </p-datepicker>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center gap-2">
+                <button
+                    pButton
+                    label="Đồng bộ dữ liệu"
+                    icon="pi pi-refresh"
+                    [loading]="isSyncing()"
+                    (click)="triggerSync()"
+                    class="p-button-outlined p-button-secondary text-xs px-3 py-2">
+                </button>
+                <button
+                    pButton
+                    label="Xuất Excel"
+                    icon="pi pi-file-excel"
+                    [loading]="isExporting()"
+                    (click)="exportExcel()"
+                    class="p-button-success text-xs px-3 py-2">
+                </button>
+            </div>
+        </div>
+    </app-page-header>
+
+    <!-- ───── Data Table ───── -->
+    <section class="bg-white dark:bg-surface-900 rounded-2xl shadow-sm border border-surface-200 dark:border-surface-800 overflow-hidden">
+
+        <!-- Loading skeleton overlay -->
+        @if (isLoading()) {
+            <div class="flex items-center justify-center py-16">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500"></div>
+                    <span class="text-sm text-surface-500">Đang tải dữ liệu...</span>
+                </div>
+            </div>
+        }
+
+        @if (!isLoading()) {
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-left text-xs border border-surface-200 dark:border-surface-700 min-w-max">
+                    <!-- ─── HEADER (grouped colspan) ─── -->
+                    <thead>
+                        <!-- Row 1: Group headers -->
+                        <tr class="bg-surface-100 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-20 font-bold text-center text-surface-800 dark:text-surface-200">
+                            <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center w-[44px] min-w-[44px]">STT</th>
+                            <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left min-w-[120px]">
+                                Ngày
+                                <span class="block text-[10px] font-normal text-surface-500 dark:text-surface-400 mt-0.5">Kích đúp để xem chi tiết</span>
+                            </th>
+                            <!-- DOANH THU group -->
+                            <th colspan="4" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center bg-primary/20 dark:bg-primary-950/60 text-primary-950 dark:text-primary-100 font-extrabold">DOANH THU</th>
+                            <!-- KHÁCH HÀNG / THANH TOÁN group -->
+                            <th colspan="4" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center">KHÁCH HÀNG / ĐỐI TÁC THANH TOÁN</th>
+                            <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[90px]">Số KH</th>
+                        </tr>
+                        <!-- Row 2: Sub-column headers -->
+                        <tr class="bg-surface-100 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-9 z-20 font-bold text-center text-surface-800 dark:text-surface-200">
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Tổng</th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Tiền hàng<br/><span class="text-[10px] font-normal opacity-75">Trước thuế</span></th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Thuế GTGT</th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Khuyến mại<br/><span class="text-[10px] font-normal opacity-75">Trước thuế</span></th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Tiền mặt</th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Chuyển khoản</th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Voucher</th>
+                            <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[130px]">Thực thu</th>
+                        </tr>
+                    </thead>
+
+                    <!-- ─── BODY ─── -->
+                    <tbody>
+                        @for (item of items(); track item.STT; let i = $index) {
+                            <tr class="bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800 text-surface-800 dark:text-surface-200 hover:bg-slate-50 dark:hover:bg-surface-850 transition-colors">
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center text-surface-400">{{ (pageNumber() - 1) * pageSize() + i + 1 }}</td>
+
+                                <!-- Ngày: double-click opens invoice dialog -->
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 font-semibold text-primary-700 dark:text-primary-300 cursor-pointer select-none whitespace-nowrap"
+                                    (dblclick)="onDateDblClick(item)"
+                                    title="Kích đúp để xem chi tiết hóa đơn ngày này">
+                                    {{ (item.ReportDate || item.reportDate) | date:'dd/MM/yyyy' }}
+                                </td>
+
+                                <!-- DOANH THU -->
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right font-bold text-surface-800 dark:text-surface-100 whitespace-nowrap">
+                                    {{ (item.TotalAmount || 0) | number:'1.0-0' }}đ
+                                </td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (item.PreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-amber-700 dark:text-amber-300 whitespace-nowrap">{{ (item.TaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-red-500 whitespace-nowrap">{{ (item.DiscountAmount || 0) | number:'1.0-0' }}đ</td>
+
+                                <!-- KHÁCH HÀNG / THANH TOÁN -->
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (item.CashAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (item.TransferAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-surface-400 whitespace-nowrap">{{ (item.VoucherAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">{{ (item.ActualReceipt || 0) | number:'1.0-0' }}đ</td>
+
+                                <td class="p-2.5 text-center whitespace-nowrap">{{ item.CustomerCount || 0 }}</td>
+                            </tr>
+                        } @empty {
+                            <tr>
+                                <td colspan="11" class="p-12 text-center text-surface-400 dark:text-surface-600 bg-white dark:bg-surface-900">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <i class="pi pi-chart-bar text-4xl opacity-25"></i>
+                                        <span class="text-sm">Không có dữ liệu trong khoảng thời gian này</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                    <!-- ─── FOOTER: Dòng Tổng toàn cục ─── -->
+                    @if (items().length > 0) {
+                        <tfoot>
+                            <tr class="bg-primary/15 dark:bg-primary-950/40 font-black text-primary-950 dark:text-primary-100 text-xs border-t-2 border-primary/30">
+                                <td colspan="2" class="p-3 text-left pl-4 font-black tracking-wider uppercase">TỔNG CỘNG</td>
+                                <td class="p-3 text-right font-black text-primary-700 dark:text-primary-300 whitespace-nowrap">{{ (summary().TotalTotalAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-extrabold whitespace-nowrap">{{ (summary().TotalPreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-extrabold whitespace-nowrap">{{ (summary().TotalTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-extrabold text-red-600 dark:text-red-400 whitespace-nowrap">{{ (summary().TotalDiscountAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-bold whitespace-nowrap">{{ (summary().TotalCashAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-bold whitespace-nowrap">{{ (summary().TotalTransferAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-bold whitespace-nowrap">{{ (summary().TotalVoucherAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right font-black text-primary-700 dark:text-primary-300 whitespace-nowrap">{{ (summary().TotalActualReceipt || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-center font-bold whitespace-nowrap">{{ summary().TotalCustomerCount || 0 }}</td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            </div>
+
+            <!-- ─── Pagination ─── -->
+            @if (totalRecords > 0) {
+                <div class="flex items-center justify-between px-4 py-3 border-t border-surface-200 dark:border-surface-800">
+                    <span class="text-xs text-surface-500">
+                        Hiển thị trang <strong class="text-surface-800 dark:text-surface-100">{{ pageNumber() }}</strong>
+                        / <strong>{{ totalPages }}</strong>
+                        &nbsp;·&nbsp; Tổng <strong>{{ totalRecords }}</strong> ngày
+                    </span>
+                    <p-paginator
+                        [first]="(pageNumber() - 1) * pageSize()"
+                        [rows]="pageSize()"
+                        [totalRecords]="totalRecords"
+                        [rowsPerPageOptions]="[10, 20, 50]"
+                        (onPageChange)="onPageChange($event)"
+                        styleClass="text-xs p-0 bg-transparent border-none">
+                    </p-paginator>
+                </div>
+            }
+        }
+    </section>
+</div>
+
+<!-- ───── Invoice Detail Dialog ───── -->
+<app-daily-invoice-dialog
+    [visible]="isInvoiceDialogVisible()"
+    (visibleChange)="isInvoiceDialogVisible.set($event)"
+    [reportDate]="selectedReportDate()"
+    [branchId]="selectedBranchId()">
+</app-daily-invoice-dialog>

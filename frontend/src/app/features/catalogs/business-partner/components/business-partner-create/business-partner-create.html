@@ -1,0 +1,64 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa đối tác' : 'Thêm mới đối tác'" (close)="closeDialog()">
+    <form [formGroup]="form" class="grid grid-cols-2 gap-x-5 gap-y-3 p-4 w-[650px]" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Loại đối tác <span class="text-red-500">*</span></label>
+            <p-select [options]="partnerTypeOptions" optionValue="value" optionLabel="label" formControlName="PartnerTypes" placeholder="Chọn loại đối tác" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Mã đối tác (Tự sinh)</label>
+            <input pInputText autocomplete="off" formControlName="Code" placeholder="Mã tự động sinh" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Họ và tên</label>
+            <input pInputText autocomplete="off" formControlName="Name" placeholder="Nhập họ và tên" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Tên công ty</label>
+            <input pInputText autocomplete="off" formControlName="CompanyName" placeholder="Nhập tên công ty" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Nhóm đối tác</label>
+            <p-select [options]="PartnerGroupIdOptions()" optionValue="Id" optionLabel="Name" formControlName="PartnerGroupId" placeholder="Chọn nhóm đối tác" [showClear]="true" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Số điện thoại</label>
+            <input pInputText autocomplete="off" formControlName="MobilePhone" placeholder="Nhập số điện thoại" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Số CCCD</label>
+            <input pInputText autocomplete="off" formControlName="IdentityNumber" placeholder="Nhập số CCCD" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Ngày sinh</label>
+            <p-datepicker appendTo="body" formControlName="DateOfBirth" [showIcon]="true" placeholder="Chọn ngày sinh" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Giới tính</label>
+            <p-select [options]="genderOptions" optionValue="value" optionLabel="label" formControlName="Gender" placeholder="Chọn giới tính" [showClear]="true" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Mã số thuế</label>
+            <input pInputText autocomplete="off" formControlName="TaxCode" placeholder="Nhập mã số thuế" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Email</label>
+            <input pInputText autocomplete="off" formControlName="Email" placeholder="Nhập email" />
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status" placeholder="Chọn trạng thái" />
+        </div>
+        <div class="flex flex-col gap-1 col-span-2">
+            <label class="font-medium">Địa chỉ</label>
+            <input pInputText autocomplete="off" formControlName="Address" placeholder="Nhập địa chỉ" />
+        </div>
+        <div class="flex flex-col gap-1 col-span-2">
+            <label class="font-medium">Ghi chú</label>
+            <textarea pTextarea autocomplete="off" formControlName="Note" placeholder="Nhập ghi chú"></textarea>
+        </div>
+
+        <div class="flex justify-end col-span-2 pt-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid || isSubmitting()" size="large">{{edition() ? "Cập nhật" : "Lưu"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

@@ -1,0 +1,195 @@
+<div class="grid grid-cols-12 gap-4 h-full min-h-[650px] p-4 bg-surface-50 dark:bg-surface-900 rounded-lg">
+    <!-- Left Column: Floor Plans & Settings -->
+    <div class="col-span-12 md:col-span-3 bg-surface-0 dark:bg-surface-800 p-4 rounded-md shadow-sm flex flex-col justify-start gap-4">
+        <!-- Branch Selector -->
+        <div class="mb-2" *ngIf="branchUser().length > 1">
+            <label class="block font-bold mb-1 text-sm text-surface-700 dark:text-surface-300">Chi nhánh</label>
+            <p-select 
+                [options]="branchUser()" 
+                [(ngModel)]="selectedBranchCode" 
+                optionLabel="Name" 
+                optionValue="Code" 
+                (onChange)="onBranchChange()" 
+                class="w-full"
+                placeholder="Chọn chi nhánh">
+            </p-select>
+        </div>
+
+        <!-- Floor List -->
+        <div class="mb-2">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-sm text-surface-700 dark:text-surface-300">Danh sách mặt sàn</span>
+                <p-button 
+                    icon="pi pi-plus" 
+                    [outlined]="true" 
+                    severity="primary" 
+                    size="small" 
+                    label="Thêm sàn" 
+                    (onClick)="showAddFloorDialog()">
+                </p-button>
+            </div>
+            
+            <div class="max-h-[300px] overflow-y-auto border border-surface-200 dark:border-surface-700 rounded-md">
+                <div 
+                    *ngFor="let floor of floors" 
+                    class="flex items-center justify-between p-3 cursor-pointer hover:bg-surface-100 dark:hover:bg-surface-700 border-b border-surface-200 dark:border-surface-700 last:border-0"
+                    [ngClass]="activeFloor?.Id === floor.Id ? 'bg-primary-50 dark:bg-primary-950 font-bold border-l-4 border-l-primary' : ''"
+                    (click)="selectFloor(floor)">
+                    
+                    <div class="flex flex-col">
+                        <span class="text-sm">{{ floor.Name }}</span>
+                        <span class="text-xs text-surface-500">Mã: {{ floor.Code }}</span>
+                    </div>
+                    
+                    <div class="flex gap-1" (click)="$event.stopPropagation()">
+                        <p-button icon="pi pi-pencil" [text]="true" severity="secondary" size="small" (onClick)="showEditFloorDialog(floor)"></p-button>
+                        <p-button icon="pi pi-trash" [text]="true" severity="danger" size="small" (onClick)="deleteFloor(floor)"></p-button>
+                    </div>
+                </div>
+                <div *ngIf="!floors.length" class="p-4 text-center text-sm text-surface-500">
+                    Chưa có mặt sàn nào cho chi nhánh này.
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Table Settings -->
+        <div *ngIf="activeTable" class="border-t border-surface-200 dark:border-surface-700 pt-4 mt-2">
+            <div class="flex items-center justify-between mb-3">
+                <span class="font-bold text-sm text-primary">Cấu hình bàn: {{ activeTable.Name }}</span>
+                <p-button icon="pi pi-times" [text]="true" severity="secondary" size="small" (onClick)="activeTable = null"></p-button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold mb-1">Mã bàn</label>
+                    <input type="text" pInputText [(ngModel)]="activeTable.Code" class="w-full p-inputtext-sm" />
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">Tên bàn</label>
+                    <input type="text" pInputText [(ngModel)]="activeTable.Name" class="w-full p-inputtext-sm" />
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Sức chứa</label>
+                        <p-inputnumber [(ngModel)]="activeTable.Capacity" [showButtons]="true" [min]="1" class="w-full input-sm" styleClass="w-full" inputStyleClass="w-full" size="small"></p-inputnumber>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Số thứ tự</label>
+                        <p-inputnumber [(ngModel)]="activeTable.SortOrder" [showButtons]="true" [min]="0" class="w-full input-sm" styleClass="w-full" inputStyleClass="w-full" size="small"></p-inputnumber>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Rộng (px)</label>
+                        <p-inputnumber [(ngModel)]="activeTable.Width" [showButtons]="true" [min]="40" class="w-full" styleClass="w-full" inputStyleClass="w-full" size="small"></p-inputnumber>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">Cao (px)</label>
+                        <p-inputnumber [(ngModel)]="activeTable.Height" [showButtons]="true" [min]="40" class="w-full" styleClass="w-full" inputStyleClass="w-full" size="small"></p-inputnumber>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">Xoay bàn ({{ activeTable.Rotate }}°)</label>
+                    <p-slider [(ngModel)]="activeTable.Rotate" [min]="0" [max]="360" class="w-full mt-2"></p-slider>
+                </div>
+                <div class="pt-2">
+                    <p-button label="Xóa bàn này" icon="pi pi-trash" severity="danger" [outlined]="true" class="w-full" (onClick)="removeTable(activeTable)"></p-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Canvas Layout Area -->
+    <div class="col-span-12 md:col-span-9 bg-surface-0 dark:bg-surface-800 p-4 rounded-md shadow-sm flex flex-col gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-surface-200 dark:border-surface-700 pb-3">
+            <div>
+                <h2 class="text-lg font-bold mb-0">Thiết kế Sơ đồ: {{ activeFloor ? activeFloor.Name : 'Chưa chọn mặt sàn' }}</h2>
+                <span class="text-xs text-surface-500" *ngIf="activeFloor">Branch: {{ selectedBranchCode }} | Code: {{ activeFloor.Code }}</span>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 items-center" *ngIf="activeFloor">
+                <!-- Zoom Control Panel -->
+                <div class="flex items-center gap-2 border border-surface-200 dark:border-surface-700 rounded px-2 py-1 bg-surface-50 dark:bg-surface-900 shadow-sm">
+                    <i class="pi pi-search-plus text-surface-500 text-xs"></i>
+                    <span class="text-xs font-semibold w-10 text-right">{{ zoom() }}%</span>
+                    <p-button icon="pi pi-minus" [text]="true" size="small" (onClick)="zoomOut()" styleClass="p-1"></p-button>
+                    <p-button icon="pi pi-plus" [text]="true" size="small" (onClick)="zoomIn()" styleClass="p-1"></p-button>
+                    <p-button label="Reset" size="small" [text]="true" (onClick)="zoomReset()" styleClass="p-0.5 text-xs"></p-button>
+                </div>
+                <p-button label="Thêm bàn ăn" icon="pi pi-plus" severity="success" (onClick)="addTable()"></p-button>
+                <p-button label="Lưu Layout" icon="pi pi-save" severity="primary" [loading]="savingLayout" (onClick)="saveLayout()"></p-button>
+            </div>
+        </div>
+
+        <!-- The Canvas Workspace -->
+        <div class="relative flex-1 min-h-[500px] border-2 border-dashed border-surface-300 dark:border-surface-700 rounded-lg bg-surface-50 dark:bg-surface-950 overflow-auto canvas-workspace">
+            <div *ngIf="!activeFloor" class="absolute inset-0 flex flex-col items-center justify-center text-surface-400">
+                <i class="pi pi-sitemap text-4xl mb-2"></i>
+                <span>Vui lòng chọn hoặc thêm mặt sàn để bắt đầu cấu hình sơ đồ bàn ăn</span>
+            </div>
+
+            <!-- Zoomable inner container -->
+            <div *ngIf="activeFloor && tables.length" [style.width.px]="3000 * (zoom() / 100)" [style.height.px]="3000 * (zoom() / 100)" style="position: relative;">
+                <div [style.transform]="'scale(' + zoom() / 100 + ')'" style="transform-origin: top left; width: 3000px; height: 3000px; position: absolute; top: 0; left: 0;">
+                    <!-- Draggable Tables -->
+                    <ng-container>
+                        <div 
+                            *ngFor="let table of tables"
+                            class="absolute p-2 rounded-lg border-2 flex flex-col items-center justify-center cursor-move select-none transition-shadow hover:shadow-md"
+                            [ngClass]="activeTable?.Id === table.Id ? 'border-primary bg-primary-50 dark:bg-primary-950 shadow-lg' : 'border-surface-300 bg-surface-0 dark:bg-surface-800 dark:border-surface-700 shadow-sm'"
+                            [style.left.px]="table.X"
+                            [style.top.px]="table.Y"
+                            [style.width.px]="table.Width"
+                            [style.height.px]="table.Height"
+                            [style.transform]="'rotate(' + table.Rotate + 'deg)'"
+                            (mousedown)="onTableMouseDown($event, table)"
+                            (click)="selectTable(table, $event)">
+                            
+                            <span class="font-black text-sm text-center truncate w-full">{{ table.Name }}</span>
+                            <span class="text-xs font-bold text-surface-600 dark:text-surface-300 truncate w-full text-center">{{ table.Code }}</span>
+                            <div class="flex items-center gap-1 text-xs font-extrabold text-surface-800 dark:text-surface-200 mt-1">
+                                <i class="pi pi-users text-xs"></i>
+                                <span>{{ table.Capacity }}</span>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div *ngIf="activeFloor && !tables.length" class="absolute inset-0 flex flex-col items-center justify-center text-surface-400">
+                <i class="pi pi-plus-circle text-3xl mb-2"></i>
+                <span>Chưa có bàn ăn nào. Hãy nhấn nút "Thêm bàn ăn" ở trên.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Floor Dialog -->
+<p-dialog 
+    [header]="floorDialogHeader" 
+    [(visible)]="floorDialogVisible" 
+    [modal]="true" 
+    [style]="{ width: '400px' }"
+    [draggable]="false" 
+    [resizable]="false">
+    
+    <div class="space-y-4 pt-2">
+        <div>
+            <label class="block font-bold mb-1 text-sm">Mã mặt sàn</label>
+            <input type="text" pInputText [(ngModel)]="floorForm.Code" [disabled]="floorForm.IsEdit" class="w-full" placeholder="Ví dụ: TANG1, TANG2" />
+        </div>
+        <div>
+            <label class="block font-bold mb-1 text-sm">Tên mặt sàn</label>
+            <input type="text" pInputText [(ngModel)]="floorForm.Name" class="w-full" placeholder="Ví dụ: Tầng 1, Sân thượng" />
+        </div>
+        <div>
+            <label class="block font-bold mb-1 text-sm">Mô tả</label>
+            <textarea pInputText [(ngModel)]="floorForm.Description" class="w-full" rows="3" placeholder="Mô tả chi tiết (tùy chọn)"></textarea>
+        </div>
+    </div>
+    
+    <ng-template pTemplate="footer">
+        <p-button label="Hủy bỏ" icon="pi pi-times" [outlined]="true" severity="secondary" (onClick)="floorDialogVisible = false"></p-button>
+        <p-button label="Xác nhận" icon="pi pi-check" severity="primary" [loading]="submittingFloor" (onClick)="saveFloor()"></p-button>
+    </ng-template>
+</p-dialog>

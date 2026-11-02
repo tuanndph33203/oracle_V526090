@@ -1,0 +1,258 @@
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-slate-50 dark:bg-surface-950 p-6 flex flex-col gap-6">
+    <!-- Header Title & Filters in 1 Row Toolbar -->
+    <app-page-header
+        title="BÁO CÁO CHI TIẾT DOANH THU"
+        description="Xem thống kê doanh thu phân cấp chi tiết theo từng hóa đơn và món ăn bán ra"
+        icon="pi pi-file">
+        <div class="flex flex-wrap items-end gap-3">
+            <!-- Chi nhánh -->
+            <div class="flex flex-col gap-1 min-w-[180px]" *ngIf="rawBranchesLength() > 1">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Chi nhánh</label>
+                <p-select [options]="branches()" [ngModel]="selectedBranchId()"
+                    (ngModelChange)="selectedBranchId.set($event); onFilterChange()" optionLabel="label" optionValue="value"
+                    placeholder="Chọn chi nhánh" styleClass="w-full text-xs" [filter]="true">
+                </p-select>
+            </div>
+
+            <!-- Từ ngày -->
+            <div class="flex flex-col gap-1 min-w-[140px]">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Từ ngày</label>
+                <p-datepicker [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event); onFilterChange()"
+                    dateFormat="dd/mm/yy" [showIcon]="true" placeholder="Từ ngày">
+                </p-datepicker>
+            </div>
+
+            <!-- Đến ngày -->
+            <div class="flex flex-col gap-1 min-w-[140px]">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Đến ngày</label>
+                <p-datepicker [ngModel]="toDate()" (ngModelChange)="toDate.set($event); onFilterChange()"
+                    dateFormat="dd/mm/yy" [showIcon]="true" placeholder="Đến ngày">
+                </p-datepicker>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button pButton label="Đồng bộ dữ liệu" icon="pi pi-refresh" [loading]="isSyncing()" (click)="triggerSync()"
+                    class="p-button-outlined p-button-info text-xs py-2 px-3 rounded-lg h-9">
+                </button>
+                <button pButton label="Xuất Excel" icon="pi pi-file-excel" [loading]="isExporting()" (click)="exportExcel()"
+                    class="p-button-success text-xs py-2 px-3 rounded-lg h-9">
+                </button>
+            </div>
+        </div>
+    </app-page-header>
+
+    <!-- Table Section -->
+    <main
+        class="bg-white dark:bg-surface-900 rounded-2xl shadow-sm border border-surface-200 dark:border-surface-800 flex flex-col">
+        <!-- Scrollable Table Container -->
+        <div class="overflow-x-auto relative">
+
+            <!-- Loading Indicator overlay -->
+            @if (isLoading()) {
+            <div
+                class="absolute inset-0 bg-white/70 dark:bg-surface-950/70 z-30 flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500 mb-2"></div>
+                <span class="text-xs font-semibold text-surface-600">Đang tải báo cáo chi tiết...</span>
+            </div>
+            }
+
+            <table
+                class="w-full border-collapse text-left text-xs border border-surface-200 dark:border-surface-700 min-w-max">
+                <thead>
+                    <!-- Row 1: Group Headers -->
+                    <tr
+                        class="bg-surface-100 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-20 font-bold text-center text-surface-800 dark:text-surface-200">
+                        <th rowspan="2"
+                            class="p-2 border-r border-surface-200 dark:border-surface-700 whitespace-nowrap">Ngày</th>
+                        <th rowspan="2"
+                            class="p-2 border-r border-surface-200 dark:border-surface-700 whitespace-nowrap">Giờ vào - ra</th>
+                        <th rowspan="2"
+                            class="p-2 border-r border-surface-200 dark:border-surface-700 whitespace-nowrap" title="Kích đúp xem chi tiết">
+                            Số hóa đơn
+                        </th>
+                        <th rowspan="2"
+                            class="p-2 border-r border-surface-200 dark:border-surface-700 whitespace-nowrap">Mã món</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[200px]">Tên món</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center whitespace-nowrap">ĐVT</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[90px] whitespace-nowrap">SL bán</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[110px] whitespace-nowrap">Đơn giá</th>
+                        
+                        <!-- Doanh thu Group -->
+                        <th colspan="5"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center bg-primary/20 dark:bg-primary-950/60 text-primary-950 dark:text-primary-100 font-extrabold">
+                            Doanh thu
+                        </th>
+
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[130px]" title="Loại nhóm thực đơn">Loại mặt hàng</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[130px]">Nhóm thực đơn</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[140px]">Khách hàng</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center min-w-[90px] whitespace-nowrap">Số người</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center min-w-[120px] whitespace-nowrap">Hình thức PV</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[120px] whitespace-nowrap">Khu vực</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[110px] whitespace-nowrap">Bàn</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center min-w-[90px] whitespace-nowrap">Ca</th>
+                        <th rowspan="2"
+                            class="p-2.5 border-r border-surface-200 dark:border-surface-700 min-w-[130px]">Thu ngân</th>
+                        <th rowspan="2"
+                            class="p-2.5 min-w-[130px]">Phục vụ</th>
+                    </tr>
+
+                    <!-- Row 2: Doanh thu Sub-headers -->
+                    <tr
+                        class="bg-surface-100 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-9 z-20 font-bold text-center text-surface-800 dark:text-surface-200">
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Tổng</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Tiền hàng<br/>trước thuế</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Tiền thuế<br/>GTGT</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Khuyến mại<br/>trước thuế</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[120px]">Thuế suất<br/>GTGT</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (invoice of invoices(); track invoice.OrderId) {
+                        <!-- 1. DÒNG TỔNG HỢP (Master Row - Chữ in đậm, Nền Primary nhẹ) -->
+                        <tr class="bg-primary/10 dark:bg-primary-950/30 font-bold border-b border-primary/20 text-surface-900 dark:text-surface-50">
+                            <td class="p-2.5 border-r border-primary/20 whitespace-nowrap">{{ invoice.OrderDate | date:'dd/MM/yyyy' }}</td>
+                            <td class="p-2.5 border-r border-primary/20 whitespace-nowrap">
+                                {{ invoice.OpenTime | date:'HH:mm' }} - {{ invoice.PaymentTime ? (invoice.PaymentTime | date:'HH:mm') : '' }}
+                            </td>
+                            <td class="p-2.5 border-r border-primary/20 font-extrabold text-primary cursor-pointer hover:underline select-none whitespace-nowrap"
+                                (click)="showInvoiceDetails(invoice.OrderCode)" title="Bấm để xem chi tiết hóa đơn">
+                                {{ invoice.OrderCode }}
+                            </td>
+                            <!-- Mã món, Tên món, ĐVT, SL bán, Đơn giá = null -->
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+
+                            <!-- Doanh thu Tổng hợp -->
+                            <td class="p-2.5 border-r border-primary/20 text-right font-black text-primary-700 dark:text-primary-300 whitespace-nowrap">
+                                {{ (invoice.TotalAmount || 0) | number:'1.0-0' }}đ
+                            </td>
+                            <td class="p-2.5 border-r border-primary/20 text-right font-bold whitespace-nowrap">
+                                {{ (invoice.PreTaxAmount || 0) | number:'1.0-0' }}đ
+                            </td>
+                            <td class="p-2.5 border-r border-primary/20 text-right font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">
+                                {{ (invoice.TaxAmount || 0) | number:'1.0-0' }}đ
+                            </td>
+                            <td class="p-2.5 border-r border-primary/20 text-right font-bold text-red-600 dark:text-red-400 whitespace-nowrap">
+                                {{ (invoice.DiscountPreTaxAmount || invoice.DiscountAmount || 0) | number:'1.0-0' }}đ
+                            </td>
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+
+                            <!-- Meta -->
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+                            <td class="p-2.5 border-r border-primary/20 text-surface-400 text-center">—</td>
+                            <td class="p-2.5 border-r border-primary/20 whitespace-nowrap">{{ invoice.CustomerName || invoice.CustomerInfo || '—' }}</td>
+                            <td class="p-2.5 border-r border-primary/20 text-center whitespace-nowrap">{{ (invoice.CustomerCount || 0) | number:'1.4-4' }}</td>
+                            <td class="p-2.5 border-r border-primary/20 text-center whitespace-nowrap">
+                                {{ invoice.ServiceType === 'DineIn' ? 'Ngồi tại bàn' : (invoice.ServiceType === 'TakeAway' ? 'Mang về' : 'Giao hàng') }}
+                            </td>
+                            <td class="p-2.5 border-r border-primary/20 whitespace-nowrap">{{ invoice.FloorName || invoice.AreaName || '—' }}</td>
+                            <td class="p-2.5 border-r border-primary/20 whitespace-nowrap">{{ invoice.TableName || invoice.TableInfo || '—' }}</td>
+                            <td class="p-2.5 border-r border-primary/20 text-center whitespace-nowrap">{{ invoice.ShiftName || '—' }}</td>
+                            <td class="p-2.5 border-r border-primary/20 whitespace-nowrap">{{ invoice.CashierName || '—' }}</td>
+                            <td class="p-2.5 whitespace-nowrap">{{ invoice.ServerName || invoice.WaiterName || '—' }}</td>
+                        </tr>
+
+                        <!-- 2. DÒNG CHI TIẾT HÓA ĐƠN (Detail Rows - Chữ thường, Nền trắng) -->
+                        @for (detail of (invoice.Details || invoice.details || []); track detail.ItemCode + $index) {
+                            <tr class="bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800 text-surface-800 dark:text-surface-200 hover:bg-slate-50 dark:hover:bg-surface-850 transition-colors">
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ invoice.OrderDate | date:'dd/MM/yyyy' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">
+                                    {{ invoice.OpenTime | date:'HH:mm' }} - {{ invoice.PaymentTime ? (invoice.PaymentTime | date:'HH:mm') : '' }}
+                                </td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap font-medium text-surface-600 dark:text-surface-400">
+                                    {{ invoice.OrderCode }}
+                                </td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 font-mono font-semibold text-surface-700 dark:text-surface-300 whitespace-nowrap">{{ detail.ItemCode }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 font-medium whitespace-nowrap">{{ detail.ItemName }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">{{ detail.UnitName || '—' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right font-medium whitespace-nowrap">{{ (detail.Quantity || 0) | number:'1.0-4' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (detail.UnitPrice || 0) | number:'1.0-0' }}đ</td>
+
+                                <!-- Doanh thu Chi tiết -->
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right font-semibold whitespace-nowrap">{{ (detail.TotalAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (detail.PreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-primary-600 dark:text-primary-400 whitespace-nowrap">{{ (detail.TaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-red-500 whitespace-nowrap">{{ (detail.DiscountPreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center font-medium whitespace-nowrap">{{ detail.TaxRate != null && detail.TaxRate > 0 ? (detail.TaxRate + ' %') : '0 %' }}</td>
+
+                                <!-- Meta món -->
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ detail.ItemType || 'Món ăn' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ detail.MenuGroup || '—' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-surface-400 text-center">—</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">0.0000</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">
+                                    {{ invoice.ServiceType === 'DineIn' ? 'Ngồi tại bàn' : (invoice.ServiceType === 'TakeAway' ? 'Mang về' : 'Giao hàng') }}
+                                </td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-surface-400 text-center">—</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ invoice.TableName || invoice.TableInfo || '—' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">{{ invoice.ShiftName || '—' }}</td>
+                                <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ invoice.CashierName || '—' }}</td>
+                                <td class="p-2.5 text-surface-400 text-center">—</td>
+                            </tr>
+                        }
+                    } @empty {
+                        @if (!isLoading()) {
+                        <tr>
+                            <td colspan="23"
+                                class="p-12 text-center text-surface-400 dark:text-surface-600 bg-white dark:bg-surface-900">
+                                Không tìm thấy dữ liệu báo cáo doanh thu phù hợp với bộ lọc đã chọn.
+                            </td>
+                        </tr>
+                        }
+                    }
+                </tbody>
+
+                <!-- Global Footer Totals -->
+                <tfoot>
+                    <tr
+                        class="bg-primary/15 dark:bg-primary-950/40 font-black text-primary-950 dark:text-primary-100 text-xs border-t-2 border-primary/30">
+                        <td colspan="8" class="p-3 text-left pl-4 font-black tracking-wider uppercase">TỔNG CỘNG HÓA ĐƠN</td>
+                        <td class="p-3 text-right font-black text-primary-700 dark:text-primary-300 whitespace-nowrap">{{ (summary().TotalTotalAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-extrabold whitespace-nowrap">{{ (summary().TotalPreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-extrabold whitespace-nowrap">{{ (summary().TotalTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-extrabold text-red-600 dark:text-red-400 whitespace-nowrap">{{ (summary().TotalDiscountPreTaxAmount || summary().TotalDiscountAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td colspan="11" class="p-3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Pagination Bar -->
+        <div
+            class="bg-white dark:bg-surface-900 p-4 border-t border-surface-200 dark:border-surface-800 flex items-center justify-between rounded-b-2xl shadow-sm">
+            <span class="text-xs font-semibold text-surface-500">
+                Hiển thị trang {{ pageNumber() }} / {{ Math.ceil(summary().TotalRecords / pageSize()) || 1 }} (Tổng số
+                {{ summary().TotalRecords }} hóa đơn)
+            </span>
+            <p-paginator [first]="(pageNumber() - 1) * pageSize()" [rows]="pageSize()"
+                [totalRecords]="summary().TotalRecords" [rowsPerPageOptions]="[10, 20, 50]"
+                (onPageChange)="onPageChange($event)" styleClass="text-xs p-0 border-0 bg-transparent">
+            </p-paginator>
+        </div>
+    </main>
+</div>
+
+<!-- Invoice Detail Popup -->
+<app-invoice-detail-popup [visible]="isDetailPopupVisible()" (visibleChange)="isDetailPopupVisible.set($event)"
+    [invoiceNo]="selectedInvoiceNo()">
+</app-invoice-detail-popup>

@@ -1,0 +1,30 @@
+<div class="flex w-full flex-wrap items-center justify-between gap-2">
+    @if(showTotal()) {
+    <span class="hidden md:inline text-primary font-medium">Tổng số {{totalRecords()}} bản ghi</span>
+    } @if(showNavigation()) {
+    <div class="flex items-center gap-0.5 sm:gap-1 select-none flex-wrap">
+        <button class="pg-icon tw-icon cursor-pointer hidden sm:inline-flex" [class.opacity-40]="isFirstPage()" [class.pointer-events-none]="isFirstPage()" (click)="!isFirstPage() && goFirst()">
+            <i class="pi pi-angle-double-left"></i>
+        </button>
+
+        <button class="pg-icon tw-icon cursor-pointer" [class.opacity-40]="isFirstPage()" [class.pointer-events-none]="isFirstPage()" (click)="!isFirstPage() && prev()">
+            <i class="pi pi-angle-left"></i>
+        </button>
+
+        @for (p of pages(); track p) { @if (p !== '...') {
+        <button class="pg-btn tw-page rounded-full cursor-pointer" [class.tw-active]="p === currentPageDisplay()" [class.pointer-events-none]="p === currentPageDisplay()" (click)="p !== currentPageDisplay() && goTo(p)">{{ p }}</button>
+        } @else {
+        <span class="tw-ellipsis">…</span>
+        } }
+        <button class="pg-icon tw-icon cursor-pointer" [class.opacity-40]="isLastPage()" [class.pointer-events-none]="isLastPage()" (click)="!isLastPage() && next()">
+            <i class="pi pi-angle-right"></i>
+        </button>
+
+        <button class="pg-icon tw-icon cursor-pointer hidden sm:inline-flex" [class.opacity-40]="isLastPage()" [class.pointer-events-none]="isLastPage()" (click)="!isLastPage() && goLast()">
+            <i class="pi pi-angle-double-right"></i>
+        </button>
+    </div>
+    } @if(showSize()) {
+    <p-select [options]="optionPanigations" [(ngModel)]="selectedSize" (onChange)="onChange()" appendTo="body" />
+    }
+</div>

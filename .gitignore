@@ -1,0 +1,26 @@
+# .NET
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+*.log
+*.tmp
+*.temp
+publish/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+.npm/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,43 @@
+.canvas-workspace {
+    position: relative;
+    width: 100%;
+    min-height: 550px;
+    background-color: #f8fafc;
+    background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    overflow: auto;
+}
+
+:host ::ng-deep {
+    .p-select {
+        width: 100%;
+    }
+    .p-dialog {
+        border-radius: 8px;
+        .p-dialog-header {
+            padding: 1.25rem;
+            font-weight: 700;
+        }
+        .p-dialog-content {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+    }
+    p-inputnumber {
+        width: 100%;
+        display: inline-flex;
+    }
+    .p-inputnumber {
+        width: 100%;
+    }
+    .p-inputnumber-input {
+        width: 100%;
+    }
+    .input-sm {
+        .p-inputnumber-input {
+            padding: 0.5rem;
+            font-size: 1rem !important;
+        }
+    }
+}

@@ -1,0 +1,212 @@
+<div [ngStyle]="{ height: scrollHeight() }">
+    <p-table #dt [value]="dataTable()" [columns]="columnsTable()" [globalFilterFields]="globalFilterFields()"
+        [scrollable]="true" scrollHeight="flex" [virtualScroll]="virtualScroll()"
+        [virtualScrollItemSize]="virtualScrollItemSize()" [exportHeader]="'customExportHeader'" stripedRows
+        showGridlines class="w-full"
+        [styleClass]="(showLoading() && loading() ||  dataTable().length === 0) ? 'loading-body' : ''">
+        <ng-template pTemplate="header">
+            <tr>
+                @if (showCheckboxToggle()) {
+                <th>
+                    <p-checkbox [binary]="true" [ngModel]="allSelected"
+                        (onChange)="toggleSelectAll($event)"></p-checkbox>
+                </th>
+                } @for (item of columnsTable(); track item.field) { @if (item.visible) { @if (item.type !== 'action') {
+                <th [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'left'" [pSortableColumn]="item.sortable ? item.field : ''"
+                    [class.cursor-pointer]="item.sortable">
+                    <div class="flex items-center gap-1" [class.justify-end]="(item.align || 'left') === 'right'"
+                        [class.justify-center]="(item.align || 'left') === 'center'">
+                        <span class="font-bold">{{ item.label }}</span>
+                        @if(item.sortable){
+                        <p-sortIcon [field]="item.field" />
+                        }
+                    </div>
+                </th>
+                } @else {
+                <th pFrozenColumn [alignFrozen]="'right'" [frozen]="true"
+                    class="!px-4 font-bold !bg-surface-300 dark:!bg-surface-600"
+                    [style]="{ minWidth: item.minWidth, maxWidth: item.maxWidth, width: item.width }">{{ item.label }}
+                </th>
+                } } }
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr (dblclick)="onActionDubleClick(data)" [class.cursor-pointer]="hasActionDbClick()"
+                [ngClass]="getRowClass(data)">
+                @if (showCheckboxToggle()) {
+                <td [style]="{
+                    textAlign: 'center',
+                  }">
+                    <p-checkbox *ngIf="data.CanSelect == null ? true : data.CanSelect" [binary]="true"
+                        [ngModel]="selectedRows.has(data)" (onChange)="toggleRow(data, $event)"> </p-checkbox>
+                </td>
+                } @for (item of columnsTable(); track item.field) { @if (item.visible) { @switch (item.type) { @case
+                ('index') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'center'">
+                    <span>{{ getIndex(rowIndex) }}</span>
+                </td>
+                } @case ('text') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'left'"
+                    pTooltip="{{ item.tooltip && data[item.tooltipField ?? ''] }}" [ngClass]="[
+                  ]" tooltipPosition="top">
+                    <span class="line-clamp" [ngClass]="item.lineClamp ? 'line-clamp-' + item.lineClamp : ''">{{
+                        data[item.field] }}</span>
+                </td>
+                } @case ('image') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'center'" class="bg-white flex justify-center">
+                    @if (data[item.field]) {
+                    <p-image appendTo="body" [src]="data[item.field]" alt="Image" [preview]="true" priority
+                        class="aspect-square object-cover object-center rounded w-full h-full"
+                        [style]="{ width: item.width }" />
+                    }
+                </td>
+                } @case ('transform') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'center'" [style.whiteSpace]="item.lineClamp ? 'normal' : 'nowrap'"
+                    pTooltip="{{ item.tooltip && data[item.tooltipField ?? ''] }}">
+                    @if (!item.truncate) {
+                    <span [ngClass]="item.lineClamp ? 'line-clamp-' + item.lineClamp : ''"
+                        [innerHTML]="item | renderCell : data[item.field] : data"></span>
+                    } @else { @for (col of data[item.field].slice(0, item.truncate); track $index) {
+                    <span [ngClass]="item.lineClamp ? 'line-clamp-' + item.lineClamp : ''"
+                        [innerHTML]="item | renderCell : col : data"></span>
+                    } @if (data[item.field].length > item.truncate) {
+                    <p-badge class="ml-1" [pTooltip]="truncateTpl"
+                        [value]="`+ ${data[item.field].length - item.truncate}`" severity="secondary" />
+                    <ng-template #truncateTpl>
+                        <div class="flex flex-col gap-1">
+                            @for (col of data[item.field].slice(item.truncate); track $index) {
+                            <span [ngClass]="item.lineClamp ? 'line-clamp-' + item.lineClamp : ''"
+                                [innerHTML]="item | renderCell : col : data"></span>
+                            }
+                        </div>
+                    </ng-template>
+                    } }
+                </td>
+                } @case ('currency') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'right'">
+                    <span>{{ data[item.field] | number : '1.0-0' : 'vi-VN' }}</span>
+                </td>
+                } @case ('date') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'center'">
+                    <span> {{ data[item.field] | date: 'dd-MM-yyyy' }} </span>
+                </td>
+                } @case ('dateHour') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'center'">
+                    <span> {{ data[item.field] | parseDate | date:'HH:mm dd/MM/yyyy' }} </span>
+                </td>
+                } @case ('number') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'right'">
+                    <span>{{ data[item.field] | number : '' : 'vi-VN' }}</span>
+                </td>
+
+                } @case ('severity') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'center'">
+                    @if (item.severity && item.severity[booleanToInt(data[item.field])]) {
+                    <p-badge [value]="item.severity[booleanToInt(data[item.field])].label ?? ''"
+                        [severity]="item.severity[booleanToInt(data[item.field])].severity ?? 'success'" />
+                    } @else if (data[item.field]) {
+                    <span>{{ data[item.field] }}</span>
+                    } @else {
+                    <span>-</span>
+                    }
+                </td>
+                } @case ('action') {
+                <td pFrozenColumn [frozen]="true" [alignFrozen]="'right'" class="!px-4" [style.maxWidth]="item.maxWidth"
+                    [style.width]="item.width">
+                    <div class="flex">
+                        @for (btn of item.actionButtons; track $index) { @if (hasViewAction(btn.permission,
+                        getActionConfig(btn, data, item)) && isActionVisible(btn, data, item)) {
+                        <button pButton [severity]="btn?.severity ?? 'secondary'" type="button" size="small"
+                            [pTooltip]="getActionTooltip(btn, data, item)" tooltipPosition="top"
+                            class="flex justify-center items-center gap-1 px-2 py-1 rounded text-sm cursor-pointer ml-2"
+                            (click)="
+                            btn.children ? toggleMenu($event, menu) : onActionClick(btn, data)
+                          ">
+                            @if (btn.icon) {
+                            <i style="font-size: 0.75rem" [class]="getActionIcon(btn, data, item)"></i>
+                            } @if (btn.label) {
+                            <span class="w-fit"> {{ btn.label }} </span>
+                            }
+                        </button>
+                        <p-popover #menu>
+                            @for (btnChild of btn.children; track $index) {
+                            <button type="button" [pTooltip]="getActionTooltip(btnChild, data, item)" tooltipPosition="top"
+                                class="flex items-center justify-center gap-1 px-2 py-1 rounded text-sm cursor-pointer"
+                                (click)="onActionClick(btnChild, data)">
+                                @if (btnChild.icon) {
+                                <i style="font-size: 1.2rem" [class]="getActionIcon(btnChild, data, item)"></i>
+                                } @if (btnChild.label) {
+                                <span class="w-fit"> {{ btn.label }} </span>
+                                }
+                            </button>
+                            }
+                        </p-popover>
+                        } }
+                    </div>
+                </td>
+                } @default {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'left'">
+                    <span>{{ data[item.field] }}</span>
+                </td>
+                } } } }
+            </tr>
+        </ng-template>
+        @if(showFooter() ){
+        <ng-template pTemplate="footer">
+            @if(dataTable().length) {
+            <tr class="font-bold text-[15px]">
+                @if (showCheckboxToggle()) {
+                <td></td>
+                } @for (item of columnsTable(); track item.field) { @if (item.visible) { @if (item.type !== 'action') {
+                <td [style.minWidth]="item.minWidth" [style.maxWidth]="item.maxWidth" [style.width]="item.width"
+                    [style.textAlign]="item.align || 'left'" [ngClass]="item.footer?.class || ''">
+                    <span>{{ getFooterValue(item) }}</span>
+                </td>
+                } @else {
+                <td pFrozenColumn [alignFrozen]="'right'" [frozen]="true"
+                    class="!px-4 font-bold !bg-surface-300 dark:!bg-surface-600"
+                    [style]="{ minWidth: item.minWidth, maxWidth: item.maxWidth, width: item.width }">
+                    <span>{{ getFooterValue(item) }}</span>
+                </td>
+                } } }
+            </tr>
+            }
+        </ng-template>
+        } @if (showNodata()) {
+        <ng-template pTemplate="emptymessage">
+            <div [style]="{
+            height: `${rowHeight() * pageSize() - 48}px`,
+          }" class="flex items-center justify-center"></div>
+            @if (showLoading() && loading()) {
+            <app-loading [strokeWidth]="'5'" [animationDuration]="'1s'" />
+            } @else {
+            <app-no-data />
+            }
+        </ng-template>
+        }
+    </p-table>
+</div>
+@if(pageSize() && totalData()){
+<div class="flex flex-wrap items-center justify-between gap-2 pt-4">
+    <div class="w-full sm:w-auto">
+        @if(showToggleColumn() ){
+        <app-column-toggle [columns]="columns()" (change)="onColumnChange($event)" />
+        }
+    </div>
+    <div class="w-full sm:w-auto flex justify-end">
+        <app-paginator-meta [rows]="pageSize()" [totalRecords]="totalData()" [currentPage]="currentPage()"
+            (onPageChange)="onPageChange($event)" />
+    </div>
+</div>
+}

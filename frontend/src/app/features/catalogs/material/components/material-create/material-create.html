@@ -1,0 +1,36 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa' : 'Thêm mới'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-y-3 gap-x-5 p-4" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label for="code" class="font-medium">Mã nguyên vật liệu <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="code" formControlName="Code" placeholder="Nhập mã nguyên vật liệu" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="name" class="font-medium">Tên nguyên vật liệu <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="name" formControlName="Name" placeholder="Nhập tên nguyên vật liệu" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Nhóm NVL <span class="text-red-500">*</span></label>
+            <p-select [options]="MaterialGroupCodeOptions()" optionValue="Code" optionLabel="Name" formControlName="MaterialGroupCode" placeholder="Chọn nhóm nvl" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Đơn vị tính <span class="text-red-500">*</span></label>
+            <p-select [options]="UnitCodeOptions()" optionValue="Code" optionLabel="Name" formControlName="UnitCode" placeholder="Chọn đơn vị tính" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="purchaseprice" class="font-medium">Giá mua</label>
+            <input pInputText type="number" autocomplete="off" class="min-w-[270px]" id="purchaseprice" formControlName="PurchasePrice" placeholder="Nhập giá mua" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="sellingprice" class="font-medium">Giá bán</label>
+            <input pInputText type="number" autocomplete="off" class="min-w-[270px]" id="sellingprice" formControlName="SellingPrice" placeholder="Nhập giá bán" />
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status" placeholder="Chọn trạng thái" />
+        </div>
+
+        <div class="flex justify-end pt-6 gap-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{edition() ? "Cập nhật" : "Thêm mới"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

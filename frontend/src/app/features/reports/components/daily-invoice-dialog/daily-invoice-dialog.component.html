@@ -1,0 +1,105 @@
+<p-dialog
+    [header]="'Bảng kê hóa đơn ngày: ' + (reportDate | date:'dd/MM/yyyy')"
+    [(visible)]="visible"
+    [modal]="true"
+    [style]="{ width: '80vw', minWidth: '750px' }"
+    [maximizable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="close()">
+
+    <div class="p-4 bg-surface-50 dark:bg-surface-950">
+        <!-- Loading -->
+        @if (isLoading()) {
+            <div class="flex flex-col items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500 mb-2"></div>
+                <span class="text-sm text-surface-500">Đang tải danh sách hóa đơn...</span>
+            </div>
+        }
+        <!-- Table -->
+        @if (!isLoading()) {
+            <div class="border border-surface-200 dark:border-surface-800 rounded-lg overflow-hidden bg-white dark:bg-surface-900 shadow-sm">
+                <p-table
+                    [value]="invoices()"
+                    [scrollable]="true"
+                    scrollHeight="420px"
+                    styleClass="p-datatable-sm"
+                    [responsiveLayout]="'scroll'">
+
+                    <ng-template pTemplate="header">
+                        <tr class="bg-surface-100 dark:bg-surface-800 text-xs">
+                            <th class="p-3 text-center font-bold text-surface-700 dark:text-surface-300 w-12">STT</th>
+                            <th class="p-3 text-left font-bold text-surface-700 dark:text-surface-300">Mã hóa đơn</th>
+                            <th class="p-3 text-left font-bold text-surface-700 dark:text-surface-300">Giờ vào</th>
+                            <th class="p-3 text-left font-bold text-surface-700 dark:text-surface-300">Bàn / Khu vực</th>
+                            <th class="p-3 text-left font-bold text-surface-700 dark:text-surface-300">Hình thức</th>
+                            <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300">Tiền hàng</th>
+                            <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300">Giảm giá</th>
+                            <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300">Thuế GTGT</th>
+                            <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300">Thành tiền</th>
+                            <th class="p-3 text-left font-bold text-surface-700 dark:text-surface-300">Thu ngân</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-inv let-rowIndex="rowIndex">
+                        <tr class="border-b border-surface-100 dark:border-surface-800 text-xs hover:bg-primary-50/40 dark:hover:bg-primary-950/30 transition-colors">
+                            <td class="p-3 text-center text-surface-500 dark:text-surface-400">{{ rowIndex + 1 }}</td>
+                            <td class="p-3 font-semibold text-primary-600 dark:text-primary-400 cursor-pointer hover:underline select-none"
+                                (click)="showInvoiceDetails(inv.OrderCode)"
+                                title="Bấm để xem chi tiết hóa đơn">
+                                {{ inv.OrderCode }}
+                            </td>
+                            <td class="p-3 text-surface-600 dark:text-surface-400">{{ inv.OrderDate | date:'HH:mm:ss' }}</td>
+                            <td class="p-3 text-surface-800 dark:text-surface-200">{{ inv.TableName }}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                                      [ngClass]="{
+                                          'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300': inv.ServiceType === 'DineIn',
+                                          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300': inv.ServiceType === 'TakeAway',
+                                          'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300': inv.ServiceType === 'Delivery'
+                                      }">
+                                    {{ inv.ServiceType === 'DineIn' ? 'Tại bàn' : inv.ServiceType === 'TakeAway' ? 'Mang về' : 'Giao hàng' }}
+                                </span>
+                            </td>
+                            <td class="p-3 text-right text-surface-800 dark:text-surface-200">{{ inv.SubTotal | number:'1.0-0' }}đ</td>
+                            <td class="p-3 text-right text-red-500 font-medium">{{ inv.DiscountAmount | number:'1.0-0' }}đ</td>
+                            <td class="p-3 text-right text-amber-600 dark:text-amber-400">{{ inv.VatAmount | number:'1.0-0' }}đ</td>
+                            <td class="p-3 text-right font-bold text-surface-900 dark:text-surface-50">{{ inv.TotalAmount | number:'1.0-0' }}đ</td>
+                            <td class="p-3 text-surface-600 dark:text-surface-400">{{ inv.CashierUserName || '—' }}</td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="10" class="p-10 text-center text-surface-400 dark:text-surface-600">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i class="pi pi-inbox text-3xl opacity-30"></i>
+                                    <span>Không có hóa đơn nào trong ngày này.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+
+            <!-- Footer tổng -->
+            @if (invoices().length > 0) {
+                <div class="mt-3 flex items-center justify-between text-xs text-surface-500">
+                    <span>Tổng: <strong class="text-surface-800 dark:text-surface-100">{{ invoices().length }}</strong> hóa đơn</span>
+                    <span>Tổng doanh thu:
+                        <strong class="text-lg text-primary-600 dark:text-primary-400 ml-1">
+                            {{ totalRevenue | number:'1.0-0' }}đ
+                        </strong>
+                    </span>
+                </div>
+            }
+        }
+    </div>
+</p-dialog>
+
+<!-- Invoice Detail Popup -->
+<app-invoice-detail-popup 
+    [visible]="isDetailPopupVisible()"
+    (visibleChange)="isDetailPopupVisible.set($event)"
+    [invoiceNo]="selectedInvoiceNo()">
+</app-invoice-detail-popup>

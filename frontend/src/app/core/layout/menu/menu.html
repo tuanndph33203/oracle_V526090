@@ -1,0 +1,7 @@
+<ul class="layout-menu">
+    @if (menu()) { @for (item of menu(); track item.id; let i = $index) { @if (!item.separator) {
+    <li app-menuitem [item]="item" [index]="i" [root]="true"></li>
+    } @else {
+    <li class="menu-separator"></li>
+    } } }
+</ul>

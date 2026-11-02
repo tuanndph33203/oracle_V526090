@@ -1,0 +1,44 @@
+<div class="flex flex-col p-5 gap-4">
+    <form [formGroup]="form" class="grid grid-cols-2 gap-x-4 gap-y-2">
+        <div class="flex flex-col gap-1">
+            <label>Tiền thanh toán <span class="text-red-500">*</span></label>
+            <p-inputnumber formControlName="AmountDue" inputClass="w-full" [min]="0" [useGrouping]="true" placeholder="Nhập số tiền" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="">Chi nhánh<span class="text-red-500">*</span></label>
+            <p-select appendTo="body" formControlName="BranchCode" placeholder="Chọn chi nhánh" class="w-full" [options]="branchUser()" optionValue="Code">
+                <ng-template #selectedItem let-selectedOption>
+                    <div class="flex items-center gap-2">
+                        <span class="">{{ selectedOption.Code }}</span>
+                        <span>- {{ selectedOption.Name }}</span>
+                    </div>
+                </ng-template>
+                <ng-template let-item pTemplate="item">
+                    <div class="flex items-center gap-2">
+                        <span>{{ item.Code }}</span>
+                        <span>- {{ item.Name }}</span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="empty">
+                    <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                </ng-template></p-select
+            >
+        </div>
+        <div class="flex flex-col gap-4 col-span-2">
+            <div class="flex flex-col gap-1">
+                <label class="">Ghi chú</label>
+                <textarea pInputTextarea formControlName="Notes" rows="2" autoResize="true" placeholder="Nhập ghi chú"></textarea>
+            </div>
+        </div>
+    </form>
+    <button pButton label="Tạo QR" severity="primary" [raised]="true" [disabled]="form.get('AmountDue')?.value === 0" (click)="createQR()"></button>
+    <div class="flex justify-center mt-2">
+        <div class="border-2 border-gray-400 rounded-lg p-3">
+            @if(!qrUrl) {
+            <p-skeleton width="300px" height="300px" styleClass="absolute inset-0"> </p-skeleton>
+            }@else {
+            <img [src]="qrUrl" class="w-[300px] h-[300px] object-contain" alt="QR thanh toan" />
+            }
+        </div>
+    </div>
+</div>

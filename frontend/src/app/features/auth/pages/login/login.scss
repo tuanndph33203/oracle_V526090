@@ -1,0 +1,13 @@
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-password input {
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+:host ::ng-deep .p-button {
+  border-radius: 10px;
+}
+
+:host ::ng-deep .p-password {
+  width: 100%;
+}

@@ -1,0 +1,28 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa' : 'Thêm mới'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-y-3 gap-x-5 p-4 w-[450px]" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label for="code" class="font-medium">Mã nhóm <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" id="code" formControlName="Code" placeholder="Nhập mã nhóm" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="name" class="font-medium">Tên nhóm <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" id="name" formControlName="Name" placeholder="Nhập tên nhóm" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Loại nhóm <span class="text-red-500">*</span></label>
+            <p-select [options]="groupTypeOptions" optionValue="value" optionLabel="label" formControlName="GroupTypes" placeholder="Chọn loại nhóm" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="description" class="font-medium">Mô tả</label>
+            <textarea pTextarea autocomplete="off" id="description" formControlName="Description" placeholder="Nhập mô tả"></textarea>
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status" placeholder="Chọn trạng thái" />
+        </div>
+
+        <div class="flex justify-end pt-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid || isSubmitting()" [loading]="isSubmitting()" size="large">{{edition() ? "Cập nhật" : "Thêm mới"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

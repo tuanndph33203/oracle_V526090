@@ -1,0 +1,45 @@
+/* ─── Page Header Component ─────────────────────────────────────── */
+:host {
+    display: block;
+}
+
+/* Card wrapper - primary tinted background */
+.page-header-wrapper {
+    background-color: var(--p-primary-50);
+    border: 1px solid var(--p-primary-200);
+    border-left: 4px solid var(--p-primary-500);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-radius: 1rem;
+}
+
+/* Dark mode card */
+:host-context(.dark) .page-header-wrapper {
+    background-color: var(--p-primary-950);
+    border-color: var(--p-primary-800);
+    border-left-color: var(--p-primary-400);
+}
+
+/* Icon box */
+.page-header-icon {
+    background: var(--p-primary-500);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Title text */
+.page-header-title {
+    color: var(--p-primary-900);
+}
+
+:host-context(.dark) .page-header-title {
+    color: var(--p-primary-100);
+}
+
+/* Description text */
+.page-header-desc {
+    color: var(--p-primary-700);
+    font-weight: 500;
+}
+
+:host-context(.dark) .page-header-desc {
+    color: var(--p-primary-300);
+}

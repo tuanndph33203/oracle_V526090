@@ -1,0 +1,794 @@
+.pos-option-heading { display: flex; flex-direction: column; gap: 3px; }
+.pos-option-heading strong { color: #172b24; font-size: 16px; line-height: 1.3; }
+.pos-option-heading small { color: #697b72; font-size: 12px; font-weight: 400; }
+.pos-option-group { padding: 5px 0 14px; }
+.pos-option-group + .pos-option-group { padding-top: 22px; border-top: 1px dashed #d7e2dd; }
+.pos-option-title { color: #1d2923; font-size: 14px; font-weight: 700; line-height: 1.35; }
+.pos-option-hint { margin-top: 4px; margin-bottom: 10px; color: #83908a; font-size: 12px; }
+.pos-option-hint.required { color: #1680df; }
+.pos-option-row { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 10px 0; cursor: pointer; color: #35433a; font-size: 13px; font-weight: 400; line-height: 1.4; }
+.pos-option-row input { width: 18px; height: 18px; flex: none; margin: 0; accent-color: #068b45; cursor: pointer; }
+.pos-option-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.pos-option-price { margin-left: auto; flex: none; white-space: nowrap; color: #34423b; font-weight: 600; }
+.pos-option-price small { display: block; margin-top: 2px; color: #83908a; font-size: 11px; font-weight: 400; }
+
+.canvas-workspace {
+    position: relative;
+    width: 100%;
+    background-color: #f8fafc;
+    background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.status-filter-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.1rem;
+    appearance: none;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    background: #ffffff;
+    color: #475569;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1;
+    outline: none;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.status-filter-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-filter-chip-active {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08);
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+
+.status-filter-chip-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid currentColor;
+    background: currentColor;
+    flex: 0 0 auto;
+}
+
+.status-filter-chip-all {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+}
+
+.status-filter-chip-all.status-filter-chip-active {
+    border-color: #64748b;
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.status-filter-chip-empty {
+    border-color: #cbd5e1;
+    background: #ffffff;
+    color: #64748b;
+}
+
+.status-filter-chip-empty.status-filter-chip-active {
+    border-color: #94a3b8;
+    background: #f8fafc;
+    color: #334155;
+}
+
+.status-filter-chip-waiting-service {
+    border-color: #fdba74;
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.status-filter-chip-waiting-service.status-filter-chip-active {
+    border-color: #fb923c;
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.status-filter-chip-serving {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.status-filter-chip-serving.status-filter-chip-active {
+    border-color: #60a5fa;
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-filter-chip-reserved {
+    border-color: #d8b4fe;
+    background: #faf5ff;
+    color: #9333ea;
+}
+
+.status-filter-chip-reserved.status-filter-chip-active {
+    border-color: #c084fc;
+    background: #f3e8ff;
+    color: #7e22ce;
+}
+
+.status-filter-chip-waiting-payment {
+    border-color: #fcd34d;
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.status-filter-chip-waiting-payment.status-filter-chip-active {
+    border-color: #fbbf24;
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-filter-chip-waiting-confirm {
+    border-color: #fdba74;
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.status-filter-chip-waiting-confirm.status-filter-chip-active {
+    border-color: #f97316;
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.status-filter-chip-takeaway {
+    border-color: #86efac;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.status-filter-chip-takeaway.status-filter-chip-active {
+    border-color: #4ade80;
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-filter-chip-delivery {
+    border-color: #fda4af;
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.status-filter-chip-delivery.status-filter-chip-active {
+    border-color: #fb7185;
+    background: #ffe4e6;
+    color: #9f1239;
+}
+
+:host ::ng-deep {
+    .canvas-workspace {
+        border-radius: 0px;
+    }
+
+    .p-select {
+        width: 100%;
+    }
+
+    .p-dialog {
+        border-radius: 8px;
+
+        .p-dialog-header {
+            padding: 1.25rem;
+            font-weight: 700;
+        }
+
+        .p-dialog-content {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+    }
+
+    .btn-payment-purple {
+        background: #a855f7 !important;
+        /* purple-500 */
+        border-color: #a855f7 !important;
+        color: #ffffff !important;
+        font-weight: 700;
+
+        &:hover:not(:disabled) {
+            background: #9333ea !important;
+            /* purple-600 */
+            border-color: #9333ea !important;
+        }
+
+        &:disabled,
+        &.p-disabled {
+            background: #e2e8f0 !important;
+            border-color: #e2e8f0 !important;
+            color: #94a3b8 !important;
+            opacity: 0.6 !important;
+            cursor: not-allowed !important;
+        }
+    }
+
+    /* Drawer header styles */
+
+    /* ─── Table Card redesign ───────────────────────────── */
+
+    /* Root card: hover scale & container query support */
+    .table-card-root {
+        overflow: visible !important;
+        container-type: size;
+
+        &:hover {
+            filter: brightness(0.97);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 5;
+        }
+
+        .table-guest-time-info {
+            font-size: 0.75rem;
+
+            @media (min-width: 640px) {
+                font-size: 0.875rem;
+            }
+
+            .table-guest-info,
+            .table-time-info {
+                display: flex;
+                align-items: center;
+
+                i {
+                    font-size: 0.75rem;
+
+                    @media (min-width: 640px) {
+                        font-size: 0.875rem;
+                    }
+                }
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table-status-text {
+                display: none !important;
+            }
+
+            .table-countdown-timer {
+                font-size: 11px !important;
+
+                span {
+                    font-size: 11px !important;
+                }
+            }
+
+            .table-guest-time-info {
+                font-size: 0.74rem !important;
+                line-height: 1.15 !important;
+
+                .table-guest-info,
+                .table-time-info {
+                    font-size: 0.74rem !important;
+                    gap: 2px !important;
+
+                    span,
+                    i {
+                        font-size: 0.74rem !important;
+                    }
+                }
+            }
+        }
+
+        @container (max-width: 147px), (max-height: 147px) {
+            .table-countdown-timer {
+                font-size: 11px !important;
+
+                span {
+                    font-size: 11px !important;
+                }
+            }
+
+            .table-status-text {
+                display: none !important;
+            }
+
+            .table-guest-time-info {
+                font-size: 0.7rem !important;
+                line-height: 1.1 !important;
+
+                .table-guest-info,
+                .table-time-info {
+                    font-size: 0.7rem !important;
+                    gap: 2px !important;
+
+                    span,
+                    i {
+                        font-size: 0.7rem !important;
+                    }
+                }
+            }
+        }
+
+        &.table-card-small {
+            .table-countdown-timer {
+                font-size: 10px !important;
+                line-height: 1 !important;
+                padding: 1px 2px !important;
+
+                span {
+                    font-size: 10px !important;
+                }
+            }
+
+            .table-status-text {
+                display: none !important;
+            }
+
+            .table-guest-time-info {
+                font-size: 0.68rem !important;
+                line-height: 1.1 !important;
+
+                .table-guest-info,
+                .table-time-info {
+                    font-size: 0.68rem !important;
+                    gap: 2px !important;
+
+                    span,
+                    i {
+                        font-size: 0.68rem !important;
+                    }
+                }
+            }
+        }
+    }
+
+    /* Floating fork-knife icon badge – top-left */
+    .table-icon-badge {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+        z-index: 20;
+        transition: transform 0.15s ease;
+        pointer-events: none;
+
+        &.icon-badge-empty {
+            background: #64748b;
+            color: #fff;
+        }
+
+        &.icon-badge-serving {
+            background: #0ea5e9;
+            color: #fff;
+        }
+
+        &.icon-badge-waiting-payment {
+            background: #f59e0b;
+            color: #fff;
+        }
+
+        &.icon-badge-waiting-service {
+            background: #f97316;
+            color: #fff;
+        }
+
+        &.icon-badge-reserved {
+            background: #a855f7;
+            color: #fff;
+        }
+
+        &.icon-badge-checked {
+            background: #22c55e;
+            color: #fff;
+        }
+    }
+
+    /* Divider line between header and body */
+    .table-card-divider {
+        height: 1px;
+        background: currentColor;
+        opacity: 0.15;
+    }
+
+    /* Header region inherits card text color */
+    .table-card-header {
+        border-bottom: none;
+    }
+
+    /* ─── Table status colors using native PrimeNG variables ─── */
+    .table-status-serving {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                color-mix(in srgb, var(--primary-color) 3%, white) 50%,
+                color-mix(in srgb, var(--primary-color) 7%, white) 100%);
+        border-color: color-mix(in srgb, var(--primary-color) 40%, var(--p-surface-200, #e2e8f0)) !important;
+        color: var(--primary-color) !important;
+
+        &:hover {
+            border-color: var(--primary-color) !important;
+        }
+
+        .text-table-code {
+            color: var(--primary-color) !important;
+        }
+    }
+
+    .table-status-waiting-service {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                color-mix(in srgb, var(--p-orange-400, #fb923c) 3%, white) 50%,
+                color-mix(in srgb, var(--p-orange-400, #fb923c) 7%, white) 100%) !important;
+        border-color: var(--p-orange-200, #fed7aa) !important;
+        color: var(--p-orange-700, #c2410c) !important;
+
+        &:hover {
+            border-color: var(--p-orange-400, #fb923c) !important;
+        }
+
+        .text-table-code {
+            color: var(--p-orange-700, #c2410c) !important;
+        }
+    }
+
+    .table-status-waiting-payment {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                #fffdf5 50%,
+                #fff8e6 100%) !important;
+        border-color: var(--p-amber-200, #fde68a) !important;
+        color: var(--p-amber-700, #b45309) !important;
+
+        &:hover {
+            border-color: var(--p-amber-400, #fbbf24) !important;
+        }
+
+        .text-table-code {
+            color: var(--p-amber-700, #b45309) !important;
+        }
+    }
+
+    .table-status-reserved {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                #fcfaff 50%,
+                #f6efff 100%) !important;
+        border-color: var(--p-purple-200, #e9d5ff) !important;
+        color: var(--p-purple-700, #7e22ce) !important;
+
+        &:hover {
+            border-color: var(--p-purple-400, #c084fc) !important;
+        }
+
+        .text-table-code {
+            color: var(--p-purple-700, #7e22ce) !important;
+        }
+    }
+
+    .table-status-checked {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                #f8fff9 50%,
+                #eefcf2 100%) !important;
+        border-color: var(--p-emerald-200, #bbf7d0) !important;
+        color: var(--p-emerald-700, #15803d) !important;
+
+        &:hover {
+            border-color: var(--p-emerald-400, #4ade80) !important;
+        }
+
+        .text-table-code {
+            color: var(--p-emerald-700, #15803d) !important;
+        }
+    }
+
+    .table-status-waiting-confirm {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                #fff5f5 50%,
+                #fee2e2 100%) !important;
+        border-color: var(--p-red-200, #fecaca) !important;
+        color: var(--p-red-700, #b91c1c) !important;
+
+        &:hover {
+            border-color: var(--p-red-400, #f87171) !important;
+        }
+
+        .text-table-code {
+            color: var(--p-red-700, #b91c1c) !important;
+        }
+    }
+
+    .table-status-empty {
+        background: linear-gradient(180deg,
+                #ffffff 0%,
+                #f8fbff 45%,
+                #eef6ff 100%) !important;
+
+        border-color: var(--p-blue-200, #bfdbfe) !important;
+        color: var(--p-blue-700, #1d4ed8) !important;
+
+        &:hover {
+            border-color: var(--p-blue-400, #60a5fa) !important;
+        }
+
+        .text-table-code {
+            color: var(--p-blue-700, #1d4ed8) !important;
+        }
+    }
+
+    .text-table-amount {
+        color: var(--p-purple-700, #7e22ce) !important;
+        font-weight: 900 !important;
+        font-size: 1.1rem !important;
+        letter-spacing: -0.01em;
+    }
+
+    .text-table-service {
+        color: var(--p-text-color, #334155) !important;
+        font-weight: 800 !important;
+        font-size: 0.95rem !important;
+    }
+
+
+    /* Status pill colors mapped via data-status attribute */
+    .table-status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    /* ── Empty ── */
+    .table-status-pill[data-status="Empty"] {
+        background: rgba(100, 116, 139, 0.15);
+        color: #475569;
+    }
+
+    /* ── Serving ── */
+    .table-status-pill[data-status="Serving"] {
+        background: rgba(14, 165, 233, 0.18);
+        color: #0369a1;
+    }
+
+    /* ── WaitingPayment ── */
+    .table-status-pill[data-status="WaitingPayment"] {
+        background: rgba(245, 158, 11, 0.2);
+        color: #92400e;
+    }
+
+    /* ── WaitingService ── */
+    .table-status-pill[data-status="WaitingService"] {
+        background: rgba(249, 115, 22, 0.18);
+        color: #9a3412;
+    }
+
+    /* ── Reserved ── */
+    .table-status-pill[data-status="Reserved"] {
+        background: rgba(168, 85, 247, 0.18);
+        color: #7e22ce;
+    }
+
+    /* ── Checked ── */
+    .table-status-pill[data-status="Checked"] {
+        background: rgba(34, 197, 94, 0.18);
+        color: #166534;
+    }
+}
+
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+
+    /* Firefox */
+    &::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
+}
+
+/* Premium styling overrides for the Food Selection Fullscreen Dialog */
+:host ::ng-deep {
+    .food-select-dialog-fullscreen.p-dialog {
+        background-color: var(--p-surface-50, #f8fafc) !important;
+        font-size: 1rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        // Use JS-measured real viewport height to account for mobile browser chrome
+        height: var(--real-vh, 100dvh) !important;
+        max-height: var(--real-vh, 100dvh) !important;
+
+        // Force form components to scale up to 1rem (16px) for legibility on desktop
+        // On mobile (< 640px), let Tailwind text-xs/text-sm classes control size naturally
+        @media (min-width: 640px) {
+
+            .p-select-label,
+            .p-select-placeholder,
+            .p-select-item,
+            .p-inputtext,
+            .p-inputnumber,
+            input,
+            label {
+                font-size: 1rem !important;
+                /* 16px */
+            }
+        }
+
+        // Keep headers larger
+        .text-lg,
+        h3,
+        .p-dialog-title {
+            font-size: 1.125rem !important;
+            /* 18px */
+        }
+
+        .text-xl,
+        h2 {
+            font-size: 1.25rem !important;
+            /* 20px */
+        }
+
+        .text-2xl,
+        .text-3xl {
+            font-size: 1.5rem !important;
+            /* 24px */
+        }
+
+        .p-dialog-header {
+            background-color: var(--p-surface-0, #ffffff) !important;
+            border-bottom: 1.5px solid var(--p-surface-150, #f1f5f9) !important;
+            padding: 1.25rem 2rem !important;
+            box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.06);
+
+            .p-dialog-title {
+                font-size: 1.35rem !important;
+                font-weight: 900 !important;
+                text-transform: uppercase;
+                letter-spacing: -0.02em;
+                color: var(--p-surface-900, #0f172a) !important;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                &::before {
+                    content: "🍽️";
+                    font-size: 1.5rem;
+                }
+            }
+
+            .p-dialog-header-actions {
+                gap: 0.5rem;
+
+                .p-dialog-close-button {
+                    width: 2.25rem;
+                    height: 2.25rem;
+                    border-radius: 50% !important;
+                    background-color: var(--p-surface-100, #f1f5f9) !important;
+                    color: var(--p-surface-600, #475569) !important;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background-color: var(--p-red-100, #fee2e2) !important;
+                        color: var(--p-red-600, #dc2626) !important;
+                    }
+                }
+            }
+        }
+
+        .p-dialog-content {
+            padding: 0 !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        // Mobile: compact header to save screen space
+        @media (max-width: 639px) {
+            .p-dialog-header {
+                padding: 0.6rem 1rem !important;
+
+                .p-dialog-title {
+                    font-size: 1rem !important;
+
+                    &::before {
+                        font-size: 1.1rem;
+                    }
+                }
+            }
+        }
+
+        /* Action Buttons Grid Uniformity overrides */
+        .dialog-action-grid {
+            p-button {
+                width: 100% !important;
+                display: block !important;
+            }
+
+            .p-button {
+                width: 100% !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+                border-radius: 0.75rem !important;
+
+                .p-button-label {
+                    font-size: 0.95rem !important;
+                    font-weight: 800 !important;
+                }
+
+                .p-button-icon {
+                    font-size: 0.95rem !important;
+                }
+            }
+        }
+    }
+}
+
+/* ==================================================== */
+/* Kitchen Send Loading Overlay & Animation */
+/* ==================================================== */
+.kitchen-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: fadeInKitchenOverlay 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+    .kitchen-loading-card {
+        animation: scaleUpKitchenCard 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    ::ng-deep .p-progressspinner {
+        .p-progressspinner-circle {
+            stroke: var(--p-primary-color, #0284c7) !important;
+        }
+    }
+}
+
+@keyframes fadeInKitchenOverlay {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUpKitchenCard {
+    from {
+        opacity: 0;
+        transform: scale(0.88) translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.food-placeholder-image {
+    width: 120%;
+    height: 120%;
+    object-fit: contain;
+    background-color: #f4f7f0;
+}

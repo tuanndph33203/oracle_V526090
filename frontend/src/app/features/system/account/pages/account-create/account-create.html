@@ -1,0 +1,236 @@
+<div class="bg-surface-0 dark:bg-surface-800 h-[calc(100vh-135px)] xl:h-[calc(100vh-235px)] overflow-auto rounded-md">
+    <div class="p-4 mx-auto space-y-4">
+        <h4 class="text-lg font-semibold">{{ edition() ? 'Chỉnh sửa tài khoản' : 'Thêm mới tài khoản' }}</h4>
+        <div class="bg-surface-50 dark:bg-surface-700 p-6 rounded-md">
+            <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="submit()">
+                <span class="lg:col-span-2 font-medium"><i class="pi pi-user"></i> THÔNG TIN NGƯỜI DÙNG :</span>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Email <span class="text-red-500">*</span></label>
+                        <input pInputText formControlName="Email" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Mật khẩu <span class="text-red-500">*</span></label>
+                        <p-password formControlName="Password" [toggleMask]="true" styleClass="mb-1" [fluid]="true" [feedback]="false" autocomplete="off"></p-password>
+                        <small class="text-red-500" *ngIf="!!this.form.get('Employee') && form.get('Password')?.touched && form.get('Password')?.invalid"> Mật khẩu tối thiểu 6 ký tự </small>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Xác nhận mật khẩu <span class="text-red-500">*</span></label>
+                        <p-password formControlName="PasswordConfirm" [toggleMask]="true" styleClass="mb-1" [fluid]="true" [feedback]="false"></p-password>
+                        <small class="text-red-500" *ngIf="!!this.form.get('Employee') && form.get('PasswordConfirm')?.touched && form.get('PasswordConfirm')?.invalid"> Mật khẩu tối thiểu 6 ký tự </small>
+                        <small
+                            class="text-red-500"
+                            *ngIf="
+                                form.get('PasswordConfirm')?.touched &&
+                                form.get('Password')?.value !== form.get('PasswordConfirm')?.value
+                            "
+                        >
+                            Mật khẩu xác nhận không trùng khớp !
+                        </small>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Vai trò <span class="text-red-500">*</span></label>
+                        <p-multiselect
+                            appendTo="body"
+                            [options]="roles()"
+                            formControlName="RoleIds"
+                            optionLabel="name"
+                            dataKey="code"
+                            [showHeader]="false"
+                            placeholder="Chọn nhiều vai trò"
+                            selectedItemsLabel="+{0} vai trò"
+                            [maxSelectedLabels]="1"
+                            class="w-full"
+                        >
+                            <ng-template pTemplate="empty">
+                                <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                            </ng-template></p-multiselect
+                        >
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Trạng thái</label>
+                        <p-select [options]="statusOptions" optionLabel="label" optionValue="value" formControlName="Active" />
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Nhân viên</label>
+                        <p-autocomplete
+                            openOnClick
+                            appendTo="body"
+                            formControlName="Employee"
+                            [suggestions]="personnels()"
+                            [dropdown]="true"
+                            showClear
+                            [forceSelection]="true"
+                            dataKey="CustomerCode"
+                            [optionLabel]="getCustomerLabel"
+                            placeholder="Chọn nhân sự"
+                            (completeMethod)="searchAutoComplete($event, personnelService, personnels)"
+                            (onSelect)="onEmployeeChange($event)"
+                            (onClear)="onEmployeeChange(null)"
+                        >
+                            <ng-template let-item pTemplate="item">
+                                <div class="flex items gap-2">
+                                    <span class="font-medium">{{ item.CustomerCode }}</span>
+                                    <span>- {{ item.CustomerName }}</span>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="empty">
+                                <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                            </ng-template>
+                        </p-autocomplete>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-medium">Chi nhánh áp dụng <span class="text-red-500">*</span></label>
+                        <p-multiselect
+                            appendTo="body"
+                            [options]="branchMultiOptions()"
+                            formControlName="ApplyBranchCodes"
+                            optionLabel="Name"
+                            optionValue="Code"
+                            filterBy="Code,Name"
+                            placeholder="Chọn nhiều chi nhánh"
+                            selectedItemsLabel="+{0} chi nhánh"
+                            [maxSelectedLabels]="0"
+                            class="w-full"
+                            (onFocus)="focusMultiSelect(branchService, branchMultiOptions)"
+                            (onFilter)="searchMultiSelect($event.filter, branchService, branchMultiOptions)"
+                        />
+                    </div>
+                </div>
+                <span class="lg:col-span-2 font-medium"><i class="pi pi-user"></i> THÔNG TIN NHÂN VIÊN :</span>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Mã nhân viên <span class="text-red-500">*</span></label>
+                            <input pInputText formControlName="UserCode" [readOnly]="this.form.get('Employee')?.value" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Họ tên</label>
+                            <input pInputText formControlName="UserName" />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Ngày sinh</label>
+                            <p-datepicker appendTo="body" formControlName="DateOfBirth" [showIcon]="true" placeholder="Chọn ngày sinh" />
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Giới tính</label>
+                            <div class="flex gap-3">
+                                <p-radioButton [value]="true" formControlName="Gender"></p-radioButton>
+                                <label class="font-medium">Nam</label>
+                                <p-radioButton [value]="false" formControlName="Gender"></p-radioButton>
+                                <label class="font-medium">Nữ</label>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Số điện thoại </label>
+                            <p-inputmask mask="9999 999 999" [showClear]="true" class="w-full" formControlName="PhoneNumber" placeholder="Nhập số điện thoại" />
+                            <small class="text-red-500" *ngIf="err('PhoneNumber','pattern')"> SĐT không hợp lệ (0/+84 + 9 số) </small>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">CCCD</label>
+                            <input pInputText formControlName="NumberId" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Quốc gia</label>
+                            <input pInputText formControlName="country" class="w-full" readonly />
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Tỉnh / Thành</label>
+                            <p-autocomplete
+                                openOnClick
+                                appendTo="body"
+                                formControlName="CityCode"
+                                placeholder="Chọn tỉnh/thành"
+                                [suggestions]="cityOptions()"
+                                optionLabel="Name"
+                                [dropdown]="true"
+                                [forceSelection]="true"
+                                dataKey="Code"
+                                (completeMethod)="searchAutoComplete($event, cityService, cityOptions)"
+                            >
+                                <ng-template pTemplate="empty">
+                                    <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                                </ng-template></p-autocomplete
+                            >
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Quận / Huyện</label>
+                            <p-autocomplete
+                                openOnClick
+                                appendTo="body"
+                                formControlName="DistrictCode"
+                                placeholder="Chọn quận/huyện"
+                                [suggestions]="districtOptions()"
+                                optionLabel="Name"
+                                [dropdown]="true"
+                                [forceSelection]="true"
+                                dataKey="Code"
+                                (completeMethod)="searchAutoComplete($event, districtService, districtOptions, {CityId : form.get('CityCode')?.value.Id ?? '' })"
+                            >
+                                <ng-template pTemplate="empty">
+                                    <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                                </ng-template></p-autocomplete
+                            >
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="font-medium">Phường / Xã</label>
+                            <p-autocomplete
+                                openOnClick
+                                appendTo="body"
+                                formControlName="WardCode"
+                                placeholder="Chọn phường/xã"
+                                [suggestions]="wardOptions()"
+                                optionLabel="Name"
+                                [dropdown]="true"
+                                [forceSelection]="true"
+                                dataKey="Code"
+                                (completeMethod)="searchAutoComplete($event, wardService, wardOptions, {CityId : form.get('CityCode')?.value.Id ?? '' })"
+                            >
+                                <ng-template pTemplate="empty">
+                                    <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                                </ng-template></p-autocomplete
+                            >
+                        </div>
+                        <div class="flex flex-col gap-1 lg:col-span-2">
+                            <label class="font-medium">Địa chỉ</label>
+                            <input pInputText formControlName="Address" />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium">Vị trí</label>
+
+                    <div class="flex gap-4">
+                        <p-checkbox formControlName="IsEmployee" binary="true"></p-checkbox>
+                        <label class="font-medium">Bán hàng</label>
+
+                        <p-checkbox formControlName="IsEmployee" binary="true"></p-checkbox>
+                        <label class="font-medium">Thu ngân</label>
+
+                        <p-checkbox formControlName="IsDelivery" binary="true"></p-checkbox>
+                        <label class="font-medium">Vận chuyển</label>
+
+                        <p-checkbox formControlName="IsWarehouse" binary="true"></p-checkbox>
+                        <label class="font-medium">Thủ kho</label>
+
+                        <p-checkbox formControlName="IsTechnician" binary="true"></p-checkbox>
+                        <label class="font-medium">Kĩ thuật</label>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-4 pt-6">
+                    <button pButton type="button" severity="contrast" label="Quay lại" icon="pi pi-undo" (click)="goBack()"></button>
+
+                    <button pButton type="submit" label="Lưu" icon="pi pi-save" [disabled]="form.invalid"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

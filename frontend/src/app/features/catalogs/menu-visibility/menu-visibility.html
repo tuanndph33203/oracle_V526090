@@ -1,0 +1,108 @@
+﻿<p-toast position="top-right" />
+<div class="bg-surface-0 dark:bg-surface-800 p-4 rounded-md space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <p-button label="Thêm mới" icon="pi pi-plus" severity="primary" (onClick)="start()" [disabled]="loading || saving || !selectedBranches.length" />
+            <p-button label="Thực đơn" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" routerLink="/catalogs/menu-items" />
+        </div>
+        <div class="flex flex-wrap items-center justify-end gap-3 ml-auto">
+            <p-select [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="statusFilter" (ngModelChange)="page = 1" placeholder="Trạng thái: Tất cả" [showClear]="true" class="w-full sm:w-48" ariaLabel="Lọc trạng thái" />
+            <p-iconfield class="w-full sm:w-auto">
+                <p-inputicon class="pi pi-search" />
+                <input pInputText [(ngModel)]="textFilter" (ngModelChange)="page = 1" placeholder="Tìm tên hoặc mã món" aria-label="Tìm món" class="w-full" />
+            </p-iconfield>
+        </div>
+    </div>
+    @if (success) { <p-message severity="success" styleClass="w-full">{{ success }}</p-message> }
+    <app-table-meta [dataTable]="tableRows" [columns]="columns" [showNodata]="true" [showLoading]="true"
+        [loading]="loading" [currentPage]="currentPage" [pageSize]="pageSize" [totalData]="filteredRules.length"
+        [scrollHeight]="'min(60vh, 640px)'" (actionClick)="onAction($event)" (actionPageChange)="onPageChange($event)" />
+    <small class="block text-muted-color pt-4">Áp dụng cho bán hàng và menu QR · Giờ Việt Nam (UTC+7)</small>
+</div>
+
+<p-dialog [visible]="!!draft" (visibleChange)="!$event && back()" [modal]="true" [showHeader]="false"
+    [closable]="false" [closeOnEscape]="!saving" [draggable]="false" [resizable]="false"
+    [style]="{ width: '900px', maxWidth: '96vw' }" [contentStyle]="{ padding: '0' }">
+    @if (draft) {
+        <app-dialog-wrap [title]="draft.Id ? 'Chỉnh sửa cấu hình hiển thị món' : 'Thêm mới cấu hình hiển thị món'" (close)="back()">
+            <div class="space-y-5 p-2 sm:p-4">
+                @if (itemError) { <p-message severity="error" styleClass="w-full"><span>{{ itemError }}</span><p-button label="Thử lại" icon="pi pi-refresh" severity="secondary" [text]="true" (onClick)="retryItems()" [disabled]="loadingItems" /></p-message> }
+                <div class="flex flex-col gap-1 max-w-sm">
+                    <label for="visibility-branch" class="font-medium text-sm">Chi nhánh <span class="text-red-500">*</span></label>
+                    <p-select inputId="visibility-branch" [options]="selectedBranches" optionLabel="Name" optionValue="Code"
+                        [(ngModel)]="draft.BranchCode" (ngModelChange)="changeBranch()" placeholder="Chọn chi nhánh"
+                        [filter]="true" [disabled]="saving" [invalid]="submitted && !draft.BranchCode" class="w-full" appendTo="body" />
+                    @if (submitted && !draft.BranchCode) { <small class="text-red-500">Vui lòng chọn chi nhánh.</small> }
+                    <small class="text-muted-color">Danh sách món được lọc theo chi nhánh đã chọn.</small>
+                </div>
+                <section class="space-y-3">
+                    <h3 class="text-sm font-semibold m-0">Nhóm hoặc món cần ẩn <span class="text-red-500">*</span></h3>
+                    @if (availableGroups.length) {
+                        <div class="flex flex-col gap-1 max-w-sm">
+                            <label for="visibility-group" class="font-medium text-sm">Nhóm thực đơn</label>
+                            <p-select inputId="visibility-group" [options]="availableGroups" optionLabel="Name" optionValue="Id"
+                                [ngModel]="selectedGroupId" (ngModelChange)="changeGroup($event)" placeholder="Tất cả nhóm"
+                                [showClear]="true" [filter]="true" [disabled]="saving" class="w-full" appendTo="body" />
+                            <small class="text-muted-color">Chọn nhóm để lọc món. Để trống danh sách món sẽ ẩn cả nhóm.</small>
+                        </div>
+                    }
+                    <div class="flex flex-wrap items-center gap-3">
+                        <p-iconfield class="w-full sm:w-80"><p-inputicon class="pi pi-search" /><input pInputText id="visibility-search" placeholder="Tìm tên hoặc mã món" aria-label="Tìm món cần ẩn" [(ngModel)]="itemSearch" [disabled]="saving" class="w-full" /></p-iconfield>
+                        <small class="text-muted-color">Đã chọn {{ draft.MenuItemIds.length }} món</small>
+                    </div>
+                    <div class="border border-surface-200 dark:border-surface-700 rounded-md overflow-hidden">
+                        <div class="flex items-center gap-2 px-3 py-2 bg-surface-100 dark:bg-surface-900 border-b border-surface-200 dark:border-surface-700">
+                            <p-checkbox inputId="visibility-all" [binary]="true" [ngModel]="allSelected" [disabled]="saving || !visibleItems.length" (onChange)="toggleAll($event.checked)" />
+                            <label for="visibility-all" class="font-medium text-sm cursor-pointer">Chọn tất cả món đang hiển thị</label>
+                        </div>
+                        <div class="max-h-52 overflow-y-auto">
+                            @for (item of visibleItems; track item.Id) {
+                                <div class="flex items-center gap-2 px-3 py-2 border-b last:border-b-0 border-surface-100 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-900">
+                                    <p-checkbox [inputId]="'item-' + item.Id" [binary]="true" [ngModel]="draft.MenuItemIds.includes(item.Id)" [disabled]="saving" (onChange)="toggleItem(item.Id, $event.checked)" />
+                                    <label [for]="'item-' + item.Id" class="text-sm cursor-pointer">{{ item.Name }} <span class="text-muted-color">({{ item.Code }})</span></label>
+                                </div>
+                            } @empty { <p class="text-center text-muted-color text-sm p-4">{{ loadingItems ? 'Đang tải món ăn...' : 'Không có món phù hợp.' }}</p> }
+                        </div>
+                    </div>
+                    @if (submitted && !draft.MenuItemIds.length && !draft.MenuGroupIds.length) { <small class="text-red-500">Vui lòng chọn ít nhất một món hoặc nhóm thực đơn cần ẩn.</small> }
+                </section>
+                <section class="space-y-3">
+                    <h3 class="text-sm font-semibold m-0">Thiết lập lịch ẩn món</h3>
+                    @if (submitted && !draft.Schedules.length) { <small class="text-red-500">Vui lòng thêm ít nhất một lịch ẩn.</small> }
+                    @for (schedule of draft.Schedules; track schedule; let index = $index) {
+                        <div class="border border-surface-200 dark:border-surface-700 rounded-md p-4 space-y-4 bg-surface-0 dark:bg-surface-800">
+                            <div class="flex items-center justify-between gap-3"><h4 class="text-sm font-medium m-0">Lịch ẩn #{{ index + 1 }}</h4><p-button icon="pi pi-trash" label="Xóa lịch" severity="danger" [text]="true" size="small" [disabled]="saving" (onClick)="draft.Schedules.splice(index, 1)" /></div>
+                            <div class="flex flex-col gap-1 max-w-sm"><label [for]="'kind-' + index" class="font-medium text-sm">Loại lịch ẩn</label><p-select [inputId]="'kind-' + index" [options]="scheduleOptions" optionLabel="label" optionValue="value" [(ngModel)]="schedule.Kind" [disabled]="saving" class="w-full" appendTo="body" /></div>
+                            @if (schedule.Kind === 'Weekdays') {
+                                <div class="space-y-2"><span class="font-medium text-sm">Ngày ẩn <span class="text-red-500">*</span></span><div class="flex flex-wrap gap-x-5 gap-y-3">@for (day of days; track day.value) { <div class="flex items-center gap-2"><p-checkbox [inputId]="'day-' + index + '-' + day.value" [binary]="true" [ngModel]="schedule.Days.includes(day.value)" [disabled]="saving" (onChange)="toggleDay(schedule, day.value, $event.checked)" /><label [for]="'day-' + index + '-' + day.value" class="text-sm cursor-pointer">{{ day.label }}</label></div> }</div>@if (submitted && !schedule.Days.length) { <small class="text-red-500">Vui lòng chọn ít nhất một ngày ẩn.</small> }</div>
+                            } @else {
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div class="flex flex-col gap-1"><label [for]="'start-' + index" class="font-medium text-sm">Từ ngày <span class="text-red-500">*</span></label><input pInputText type="date" [id]="'start-' + index" [(ngModel)]="schedule.StartDate" [disabled]="saving" /></div><div class="flex flex-col gap-1"><label [for]="'end-' + index" class="font-medium text-sm">Đến ngày <span class="text-red-500">*</span></label><input pInputText type="date" [id]="'end-' + index" [(ngModel)]="schedule.EndDate" [min]="schedule.StartDate" [disabled]="saving" /></div></div>
+                                @if (dateError(schedule)) { <small class="text-red-500">{{ dateError(schedule) }}</small> }
+                            }
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                                <div class="flex flex-col gap-1"><label [for]="'from-' + index" class="font-medium text-sm">Từ giờ</label><input pInputText type="time" [id]="'from-' + index" [(ngModel)]="schedule.draftFrom" [disabled]="saving" class="cursor-pointer" (click)="openTimePicker($event)" /></div>
+                                <div class="flex flex-col gap-1"><label [for]="'to-' + index" class="font-medium text-sm">Đến giờ</label><input pInputText type="time" [id]="'to-' + index" [(ngModel)]="schedule.draftTo" [disabled]="saving" class="cursor-pointer" (click)="openTimePicker($event)" /></div>
+                                <p-button icon="pi pi-plus" label="Thêm khung giờ" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="addTime(schedule)" />
+                            </div>
+                            @if (timeError(schedule)) { <small class="text-red-500">{{ timeError(schedule) }}</small> }
+                            <div class="flex flex-wrap items-center gap-2">@for (time of schedule.TimeRanges; track $index; let ti = $index) {
+                                <div class="inline-flex items-center gap-2 rounded-md bg-surface-100 dark:bg-surface-900 pl-3 text-sm"><span>{{ time.From }} – {{ time.To }} {{ time.From > time.To ? '(hôm sau)' : '' }}</span><p-button icon="pi pi-times" ariaLabel="Xóa khung giờ" severity="secondary" [text]="true" size="small" [disabled]="saving" (onClick)="schedule.TimeRanges.splice(ti, 1)" /></div>
+                            } @empty { <small class="text-muted-color">Chưa thêm khung giờ: ẩn cả ngày đã chọn.</small> }</div>
+                        </div>
+                    }
+                    <p-button icon="pi pi-plus" label="Thêm lịch ẩn" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="addSchedule()" />
+                    <p class="text-muted-color text-xs m-0">Các món đã chọn dùng chung các lịch trên. Giờ Việt Nam (UTC+7).</p>
+                </section>
+                <div class="flex justify-end gap-3 pt-4 border-t border-surface-200 dark:border-surface-700">
+                    <p-button label="Hủy bỏ" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="back()" />
+                    <p-button [label]="draft.Id ? 'Cập nhật' : 'Thêm mới'" icon="pi pi-save" [loading]="saving" [disabled]="saving || loadingItems || !!itemError" (onClick)="save()" />
+                </div>
+            </div>
+        </app-dialog-wrap>
+    }
+</p-dialog>
+
+<p-dialog header="Xóa cấu hình hiển thị món" [visible]="!!pendingDelete" (visibleChange)="!$event && !saving && (pendingDelete = null)" [modal]="true" [closable]="!saving" [closeOnEscape]="!saving" [draggable]="false" [resizable]="false" [style]="{ width: '440px', maxWidth: '96vw' }">
+    @if (pendingDelete) { <div class="flex items-start gap-3"><i class="pi pi-exclamation-triangle text-orange-500 text-2xl"></i><p class="m-0">Bạn có chắc muốn xóa cấu hình của {{ branchName(pendingDelete.BranchCode) }}?</p></div> }
+    <ng-template #footer><p-button label="Hủy bỏ" icon="pi pi-times" severity="secondary" [outlined]="true" [disabled]="saving" (onClick)="pendingDelete = null" /><p-button label="Xóa" icon="pi pi-trash" severity="danger" [loading]="saving" [disabled]="saving" (onClick)="remove()" /></ng-template>
+</p-dialog>

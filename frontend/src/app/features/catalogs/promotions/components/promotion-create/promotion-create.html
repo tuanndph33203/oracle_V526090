@@ -1,0 +1,272 @@
+<app-dialog-wrap [title]="edition() ? 'Cập nhật chương trình khuyến mại' : 'Thêm chương trình khuyến mại'" (close)="closeDialog()">
+    <form [formGroup]="form" class="space-y-6 max-h-[80vh] overflow-y-auto px-4 py-2">
+        
+        <!-- 1. THÔNG TIN CHUNG -->
+        <div class="bg-surface-50 dark:bg-surface-900 p-4 rounded-lg border border-surface-200 dark:border-surface-700">
+            <h3 class="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+                <i class="pi pi-info-circle text-primary"></i> Thông tin chung
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Mã chương trình <span class="text-red-500">*</span></label>
+                    <input type="text" pInputText formControlName="Code" placeholder="Ví dụ: KM_HE_2026" class="w-full" [disabled]="edition()"/>
+                    <small class="text-red-500" *ngIf="form.get('Code')?.touched && form.get('Code')?.errors?.['required']">Mã chương trình là bắt buộc.</small>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Tên chương trình <span class="text-red-500">*</span></label>
+                    <input type="text" pInputText formControlName="Name" placeholder="Tên chương trình ưu đãi" class="w-full"/>
+                    <small class="text-red-500" *ngIf="form.get('Name')?.touched && form.get('Name')?.errors?.['required']">Tên chương trình là bắt buộc.</small>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Ngày bắt đầu <span class="text-red-500">*</span></label>
+                    <p-datepicker formControlName="StartDate" dateFormat="dd/mm/yy" [showIcon]="true" class="w-full"></p-datepicker>
+                    <small class="text-red-500" *ngIf="form.get('StartDate')?.touched && form.get('StartDate')?.errors?.['required']">Ngày bắt đầu là bắt buộc.</small>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Ngày kết thúc <span class="text-red-500">*</span></label>
+                    <p-datepicker formControlName="EndDate" dateFormat="dd/mm/yy" [showIcon]="true" class="w-full"></p-datepicker>
+                    <small class="text-red-500" *ngIf="form.get('EndDate')?.touched && form.get('EndDate')?.errors?.['required']">Ngày kết thúc là bắt buộc.</small>
+                </div>
+
+                <div class="flex flex-col gap-2 md:col-span-2">
+                    <label class="font-medium text-sm">Mô tả</label>
+                    <textarea pInputText formControlName="Description" placeholder="Mô tả chi tiết chương trình ưu đãi" class="w-full min-h-[80px] p-2 border rounded-md"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ĐIỀU KIỆN ÁP DỤNG -->
+        <div class="bg-surface-50 dark:bg-surface-900 p-4 rounded-lg border border-surface-200 dark:border-surface-700">
+            <h3 class="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+                <i class="pi pi-filter text-primary"></i> Điều kiện áp dụng
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Chi nhánh áp dụng <span class="text-red-500">*</span></label>
+                    <p-multiselect [options]="branches()" optionLabel="Name" optionValue="Id" formControlName="BranchIds" placeholder="Chọn chi nhánh" class="w-full"></p-multiselect>
+                    <small class="text-red-500" *ngIf="form.get('BranchIds')?.touched && form.get('BranchIds')?.errors?.['required']">Vui lòng chọn ít nhất một chi nhánh.</small>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Nhóm khách hàng áp dụng</label>
+                    <p-multiselect [options]="customerGroups()" optionLabel="Name" optionValue="Id" formControlName="CustomerGroupIds" placeholder="Tất cả nhóm khách hàng" class="w-full"></p-multiselect>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="font-medium text-sm">Thứ áp dụng trong tuần</label>
+                    <p-multiselect [options]="weekDays" optionLabel="label" optionValue="value" formControlName="DaysOfWeek" placeholder="Áp dụng tất cả các ngày" class="w-full"></p-multiselect>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-medium text-sm">Giờ bắt đầu <span class="text-red-500">*</span></label>
+                        <input type="text" pInputText formControlName="StartTime" placeholder="00:00" class="w-full"/>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-medium text-sm">Giờ kết thúc <span class="text-red-500">*</span></label>
+                        <input type="text" pInputText formControlName="EndTime" placeholder="23:59" class="w-full"/>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mt-4 md:col-span-2">
+                    <p-checkbox formControlName="IsActive" [binary]="true" inputId="isActive"></p-checkbox>
+                    <label for="isActive" class="font-medium text-sm cursor-pointer">Kích hoạt chương trình khuyến mại ngay lập tức</label>
+                </div>
+
+                <div class="flex items-center gap-2 mt-2 md:col-span-2">
+                    <p-checkbox formControlName="RequireTherapyVoucher" [binary]="true" inputId="requireTherapyVoucher"></p-checkbox>
+                    <label for="requireTherapyVoucher" class="font-medium text-sm cursor-pointer">Áp dụng phiếu trị liệu</label>
+                </div>
+
+                <div class="flex items-center gap-2 mt-2 md:col-span-2">
+                    <p-checkbox formControlName="ApplyOnlyToQrOrders" [binary]="true" inputId="applyOnlyToQrOrders"></p-checkbox>
+                    <label for="applyOnlyToQrOrders" class="font-medium text-sm cursor-pointer">Chỉ áp dụng khi đặt đơn qua QR bàn (toàn bộ hoặc một phần)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. HÌNH THỨC ƯU ĐÃI -->
+        <div class="bg-surface-50 dark:bg-surface-900 p-4 rounded-lg border border-surface-200 dark:border-surface-700">
+            <h3 class="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+                <i class="pi pi-gift text-primary"></i> Hình thức ưu đãi & Cấu hình
+            </h3>
+
+            <div class="flex flex-col gap-2 mb-6">
+                <label class="font-semibold text-sm">Hình thức ưu đãi</label>
+                <p-select [options]="promotionTypes" optionLabel="label" optionValue="value" formControlName="PromotionType" class="w-full md:w-64"></p-select>
+            </div>
+
+            <!-- 3.1 CẤU HÌNH GIẢM GIÁ (PromotionType = 1) -->
+            <div *ngIf="form.get('PromotionType')?.value === 1" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-medium text-sm">Phạm vi áp dụng</label>
+                        <p-select [options]="discountScopes" optionLabel="label" optionValue="value" formControlName="DiscountScope" class="w-full"></p-select>
+                    </div>
+
+                    <div class="flex flex-col gap-2" *ngIf="form.get('DiscountScope')?.value === 1">
+                        <label class="font-medium text-sm">Số tiền tối thiểu đơn hàng đạt được (đ)</label>
+                        <p-inputnumber formControlName="MinOrderAmount" [min]="0" placeholder="0" class="w-full"></p-inputnumber>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-medium text-sm">Giảm giá theo phần trăm (%)</label>
+                        <p-inputnumber formControlName="DiscountPercent" [min]="0" [max]="100" placeholder="0" [suffix]="' %'" class="w-full"></p-inputnumber>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-medium text-sm">
+                            {{ form.get('DiscountScope')?.value === 2 ? 'Giảm cố định mỗi món đủ điều kiện (đ/món)' : 'Giảm giá theo số tiền cố định (đ)' }}
+                        </label>
+                        <p-inputnumber formControlName="DiscountAmount" [min]="0" placeholder="0" class="w-full"></p-inputnumber>
+                    </div>
+                </div>
+
+                <div *ngIf="form.get('ApplyOnlyToQrOrders')?.value && form.get('DiscountScope')?.value === 2"
+                    class="flex flex-col gap-2 md:w-1/2 rounded-md border border-primary-200 bg-primary-50/50 p-3 dark:border-primary-800 dark:bg-primary-950/20">
+                    <label for="qrOrderDiscountAmount" class="font-medium text-sm">Giảm thêm trên tổng đơn QR (đ)</label>
+                    <p-inputnumber inputId="qrOrderDiscountAmount" formControlName="QrOrderDiscountAmount" [min]="0"
+                        placeholder="0" class="w-full"></p-inputnumber>
+                    <small class="text-surface-500">Khoản giảm thêm cho toàn đơn có món ăn đủ điều kiện CTKM.</small>
+                </div>
+
+                <!-- GIẢM GIÁ TRÊN MÓN ĂN -->
+                <div *ngIf="form.get('DiscountScope')?.value === 2" class="mt-4 space-y-4">
+                    <div class="flex flex-col gap-2 border-t pt-4">
+                        <label class="font-semibold text-sm text-primary">Danh sách món ăn được giảm giá</label>
+                        <div class="flex gap-2">
+                            <p-select [options]="menuItems()" optionLabel="Name" optionValue="Id" [(ngModel)]="tempDiscountItemId" [ngModelOptions]="{standalone: true}" placeholder="Chọn món ăn cần giảm giá" [filter]="true" class="w-full md:w-96"></p-select>
+                            <p-button label="Thêm món" icon="pi pi-plus" [type]="'button'" (click)="addDiscountItem()"></p-button>
+                        </div>
+                    </div>
+
+                    <!-- BẢNG MÓN GIẢM GIÁ -->
+                    <div class="overflow-x-auto border border-surface-200 dark:border-surface-700 rounded-md">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-medium">
+                                <tr>
+                                    <th class="p-3">Mã món</th>
+                                    <th class="p-3">Tên món</th>
+                                    <th class="p-3" style="width: 150px;">SL tối thiểu</th>
+                                    <th class="p-3" style="width: 180px;">Số tiền tối thiểu (đ)</th>
+                                    <th class="p-3 text-center" style="width: 80px;">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-200 dark:divide-surface-700">
+                                <tr *ngFor="let item of selectedDiscountItems()">
+                                    <td class="p-3 font-mono text-xs">{{ item.MenuItemCode }}</td>
+                                    <td class="p-3 font-medium">{{ item.MenuItemName }}</td>
+                                    <td class="p-3">
+                                        <p-inputnumber [(ngModel)]="item.MinQuantity" [ngModelOptions]="{standalone: true}" [min]="1" class="w-full p-fluid"></p-inputnumber>
+                                    </td>
+                                    <td class="p-3">
+                                        <p-inputnumber [(ngModel)]="item.MinAmount" [ngModelOptions]="{standalone: true}" [min]="0" class="w-full p-fluid"></p-inputnumber>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [type]="'button'" (click)="removeDiscountItem(item.MenuItemId)"></p-button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="selectedDiscountItems().length === 0">
+                                    <td colspan="5" class="p-4 text-center text-surface-500">Chưa có món ăn nào được chọn.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3.2 CẤU HÌNH TẶNG MÓN (PromotionType = 2) -->
+            <div *ngIf="form.get('PromotionType')?.value === 2" class="space-y-6">
+                <!-- PHẦN 1: MÓN MUA ĐIỀU KIỆN -->
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-2 border-t pt-4">
+                        <label class="font-semibold text-sm text-primary">1. Điều kiện mua (Món ăn cần đạt)</label>
+                        <div class="flex gap-2">
+                            <p-select [options]="menuItems()" optionLabel="Name" optionValue="Id" [(ngModel)]="tempGiftConditionId" [ngModelOptions]="{standalone: true}" placeholder="Chọn món ăn mua điều kiện" [filter]="true" class="w-full md:w-96"></p-select>
+                            <p-button label="Thêm" icon="pi pi-plus" [type]="'button'" (click)="addGiftCondition()"></p-button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-surface-200 dark:border-surface-700 rounded-md">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-medium">
+                                <tr>
+                                    <th class="p-3">Mã món</th>
+                                    <th class="p-3">Tên món mua</th>
+                                    <th class="p-3" style="width: 180px;">Số lượng tối thiểu</th>
+                                    <th class="p-3 text-center" style="width: 80px;">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-200 dark:divide-surface-700">
+                                <tr *ngFor="let cond of selectedGiftConditions()">
+                                    <td class="p-3 font-mono text-xs">{{ cond.MenuItemCode }}</td>
+                                    <td class="p-3 font-medium">{{ cond.MenuItemName }}</td>
+                                    <td class="p-3">
+                                        <p-inputnumber [(ngModel)]="cond.RequiredQuantity" [ngModelOptions]="{standalone: true}" [min]="1" class="w-full"></p-inputnumber>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [type]="'button'" (click)="removeGiftCondition(cond.MenuItemId)"></p-button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="selectedGiftConditions().length === 0">
+                                    <td colspan="4" class="p-4 text-center text-surface-500">Chưa cấu hình món ăn mua điều kiện.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PHẦN 2: MÓN TẶNG KÈM -->
+                <div class="space-y-4 pt-4 border-t">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-sm text-primary">2. Món được tặng (Miễn phí 100%)</label>
+                        <div class="flex gap-2">
+                            <p-select [options]="menuItems()" optionLabel="Name" optionValue="Id" [(ngModel)]="tempGiftItemId" [ngModelOptions]="{standalone: true}" placeholder="Chọn món được tặng" [filter]="true" class="w-full md:w-96"></p-select>
+                            <p-button label="Thêm" icon="pi pi-plus" [type]="'button'" (click)="addGiftItem()"></p-button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-surface-200 dark:border-surface-700 rounded-md">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 font-medium">
+                                <tr>
+                                    <th class="p-3">Mã món</th>
+                                    <th class="p-3">Tên món tặng</th>
+                                    <th class="p-3" style="width: 180px;">Số lượng tặng</th>
+                                    <th class="p-3 text-center" style="width: 80px;">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-200 dark:divide-surface-700">
+                                <tr *ngFor="let gift of selectedGiftItems()">
+                                    <td class="p-3 font-mono text-xs">{{ gift.MenuItemCode }}</td>
+                                    <td class="p-3 font-medium">{{ gift.MenuItemName }}</td>
+                                    <td class="p-3">
+                                        <p-inputnumber [(ngModel)]="gift.GiftQuantity" [ngModelOptions]="{standalone: true}" [min]="1" class="w-full"></p-inputnumber>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [type]="'button'" (click)="removeGiftItem(gift.MenuItemId)"></p-button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="selectedGiftItems().length === 0">
+                                    <td colspan="4" class="p-4 text-center text-surface-500">Chưa cấu hình món được tặng.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t">
+            <p-button label="Hủy bỏ" icon="pi pi-times" severity="secondary" [outlined]="true" (click)="closeDialog()"></p-button>
+            <p-button label="Lưu lại" icon="pi pi-check" severity="primary" (click)="submit()"></p-button>
+        </div>
+    </form>
+</app-dialog-wrap>

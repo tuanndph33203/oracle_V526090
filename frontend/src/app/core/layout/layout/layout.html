@@ -1,0 +1,20 @@
+<div class="layout-wrapper" [ngClass]="containerClass" [class.layout-pos-active]="layoutService.showPosSwitcher()">
+    <app-topbar></app-topbar>
+    <app-sidebar></app-sidebar>
+    <div class="layout-main-container flex flex-col">
+        <div class="layout-main">
+            <!-- @if(!hideBreadcrumb) {
+            <app-header-breadcumb [title]="currentPageTitle()?.label ?? ''" [items]="breadcrumbItems()" [home]="home"></app-header-breadcumb>
+            } -->
+
+            <router-outlet></router-outlet>
+        </div>
+        <app-footer></app-footer>
+    </div>
+    <div class="layout-mask animate-fadein" (click)="hideMenu()"></div>
+</div>
+@if (layoutService.loadingState()) {
+<div class="fixed inset-0 flex flex-col items-center justify-center bg-surface-50 z-[9999]">
+    <app-loading></app-loading>
+</div>
+}

@@ -1,0 +1,73 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa nhân viên' : 'Thêm mới nhân viên'" (close)="closeDialog()">
+    <form [formGroup]="form" class="grid grid-cols-2 gap-x-5 gap-y-3 p-4 w-[650px]" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Mã nhân viên <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" formControlName="Code" placeholder="Nhập mã nhân viên" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Họ tên nhân viên <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" formControlName="Name" placeholder="Nhập họ tên nhân viên" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Số điện thoại</label>
+            <input pInputText autocomplete="off" formControlName="Phone" placeholder="Nhập số điện thoại" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Email</label>
+            <input pInputText autocomplete="off" formControlName="Email" placeholder="Nhập email" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="font-medium">Tài khoản SSO</label>
+            <p-select [options]="ssoUserOptions()" optionValue="Id" optionLabel="UserName" formControlName="UserId" placeholder="Liên kết tài khoản SSO" [showClear]="true" />
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status" placeholder="Chọn trạng thái" />
+        </div>
+        <div class="flex flex-col gap-1 col-span-2">
+            <label class="font-medium">Chi nhánh áp dụng</label>
+            <p-multiselect
+                appendTo="body"
+                [options]="branchMultiOptions()"
+                formControlName="ApplyBranchCodes"
+                optionLabel="Name"
+                optionValue="Code"
+                filterBy="Code,Name"
+                placeholder="Chọn nhiều chi nhánh"
+                selectedItemsLabel="+{0} chi nhánh"
+                [maxSelectedLabels]="1"
+                class="w-full"
+            />
+        </div>
+
+        <div class="flex flex-col gap-2 col-span-2 py-2">
+            <label class="font-medium">Vai trò vận hành</label>
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center gap-2">
+                    <p-checkbox formControlName="IsSales" [binary]="true" [trueValue]="1" [falseValue]="0" inputId="isSales" />
+                    <label for="isSales" class="font-medium">Bán hàng</label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <p-checkbox formControlName="IsCashier" [binary]="true" [trueValue]="1" [falseValue]="0" inputId="isCashier" />
+                    <label for="isCashier" class="font-medium">Thu ngân</label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <p-checkbox formControlName="IsDelivery" [binary]="true" [trueValue]="1" [falseValue]="0" inputId="isDelivery" />
+                    <label for="isDelivery" class="font-medium">Vận chuyển</label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <p-checkbox formControlName="IsWarehouse" [binary]="true" [trueValue]="1" [falseValue]="0" inputId="isWarehouse" />
+                    <label for="isWarehouse" class="font-medium">Thủ kho</label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <p-checkbox formControlName="IsTechnician" [binary]="true" [trueValue]="1" [falseValue]="0" inputId="isTechnician" />
+                    <label for="isTechnician" class="font-medium">Kỹ thuật</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end col-span-2 pt-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{edition() ? "Cập nhật" : "Lưu"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

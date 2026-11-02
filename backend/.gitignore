@@ -1,0 +1,36 @@
+# Bỏ thư mục bin trong ApiUtils
+src/BuildingBlocks/Utils/ApiUtils/bin/
+src/BuildingBlocks/Utils/ApiUtils/obj/
+src/BuildingBlocks/Utils/CommonUtils/obj/
+src/BuildingBlocks/Utils/DataUtils/obj/
+MA.Core.API/ExportFiles/
+# Bỏ qua thư mục Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Bỏ qua thư mục build
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+MA.Core.API/Logs/
+# Bỏ qua các file cấu hình người dùng Visual Studio
+*.user
+*.suo
+
+# Bỏ qua log
+*.log
+Logs/
+# Bỏ qua file tạm
+*.tmp
+*.temp
+README_AI.md
+# Bỏ qua thư mục publish
+publish/
+.dotnet/
+recovery/
+# Bỏ qua file backup
+*~

@@ -1,0 +1,20 @@
+:host ::ng-deep {
+    .p-datatable {
+        position: relative;
+        .p-datatable-tbody,
+        .p-datatable-tfoot {
+            tr > td {
+                height: 36px;
+                padding: 6px;
+                white-space: nowrap;
+            }
+        }
+        .p-datatable-thead > tr > th {
+            padding: 3px 6px;
+            background: var(--code-ground);
+            color: var(--primary-color);
+            border-left: 1px solid var(--surface-ground);
+        }
+    }
+
+}

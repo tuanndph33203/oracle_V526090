@@ -1,0 +1,63 @@
+<div class="bg-surface-0 dark:bg-surface-800 h-[calc(100vh-135px)] xl:h-[calc(100vh-235px)] overflow-auto rounded-md">
+    <div class="p-4 mx-auto space-y-4">
+        <h4 class="text-lg font-semibold">{{ edition() ? 'Cập nhật nhóm quyền' : 'Thêm mới nhóm quyền' }}</h4>
+        <div class="bg-surface-50 dark:bg-surface-700 p-6 rounded-md">
+            <form [formGroup]="form" (ngSubmit)="submit()">
+                <div class="grid grid-cols-12 gap-8 h-full">
+                    <div class="col-span-4 flex flex-col gap-5">
+                        <div class="flex flex-col gap-2">
+                            <label class="font-medium"> Mã nhóm quyền <span class="text-red-500">*</span> </label>
+                            <input pInputText autocomplete="off" formControlName="code" placeholder="VD: ADMIN" class="w-full" />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="font-medium"> Tên nhóm quyền <span class="text-red-500">*</span> </label>
+                            <input pInputText autocomplete="off" formControlName="name" placeholder="Tên nhóm quyền" class="w-full" />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="font-medium">Mô tả</label>
+                            <textarea pTextarea rows="4" formControlName="description" placeholder="Mô tả nhóm quyền" class="w-full"></textarea>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-medium">Kế thừa</label>
+                            <p-autocomplete
+                                openOnClick
+                                appendTo="body"
+                                [suggestions]="roles()"
+                                [dropdown]="true"
+                                [forceSelection]="true"
+                                dataKey="id"
+                                [multiple]="true"
+                                optionLabel="name"
+                                placeholder="Chọn vai trò"
+                                (completeMethod)="searchAutoComplete($event, roleService, roles)"
+                            >
+                            </p-autocomplete>
+                        </div>
+                    </div>
+                    <div class="col-span-8 flex flex-col gap-2 h-full">
+                        <label class="font-medium"> Danh sách quyền <span class="text-red-500">*</span> </label>
+                        <p-tree
+                            #tree
+                            [value]="permissionsTree()"
+                            selectionMode="checkbox"
+                            [(selection)]="selectionKeys"
+                            [filter]="true"
+                            filterBy="label"
+                            filterMode="lenient"
+                            filterPlaceholder="Tìm quyền..."
+                            [trackBy]="trackByNode"
+                            styleClass="w-full *:*:h-[90%] h-[calc(100vh-335px)] xl:h-[calc(100vh-435px)] overflow-auto border border-surface-300 dark:border-surface-600 rounded-md p-2"
+                            emptyMessage="Không tìm thấy quyền nào"
+                        >
+                        </p-tree>
+                    </div>
+                </div>
+                <div class="flex justify-end pt-6 gap-3">
+                    <button pButton type="button" severity="contrast" label="Quay lại" icon="pi pi-undo" (click)="goBack()"></button>
+                    <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" label="{{ edition() ? 'Cập nhật' : 'Thêm mới' }}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<div class="bg-surface-0 dark:bg-surface-800 p-4 rounded-md space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <p-button  label="Thêm" icon="pi pi-plus" severity="primary" (click)="onCreate()"></p-button>
+        </div>
+    </div>
+    <app-tree-table-meta [data]="data()" [columns]="colsTemp()" [showNodata]="true" [showLoading]="loading()" (actionClick)="handleAction($event)" [virtualScroll]="false" [scrollHeight]="`${37 * itemViewport() + 37 * 2}px`" />
+</div>

@@ -1,0 +1,33 @@
+:host ::ng-deep {
+    .p-treetable {
+        position: relative;
+        .p-treetable-scrollable-header {
+            background: var(--code-ground);
+        }
+        .p-treetable-thead > tr > th {
+            height: 35px;
+            min-height: 35px;
+            max-height: 41px;
+            padding: 6px;
+            background: var(--code-ground);
+            color: var(--primary-color);
+            border-left: 1px solid var(--surface-ground);
+        }
+        .p-treetable-scrollable-body {
+            overflow-y: scroll !important;
+        }
+        .p-treetable-tbody > tr > td {
+            height: 37px !important;
+            padding: 6px;
+            min-height: 35px !important;
+            max-height: 35px !important;
+            font-weight: 600;
+        }
+        .p-treetable-tbody > tr:hover {
+            background: var(--surface-hover);
+        }
+        .p-treetable-tbody > tr:nth-child(even) {
+            background-color: var(--table-ground);
+        }
+    }
+}

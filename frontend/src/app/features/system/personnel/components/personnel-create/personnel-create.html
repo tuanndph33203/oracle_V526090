@@ -1,0 +1,192 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa nhân sự' : 'Thêm nhân sự'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col px-2 xl:px-4 gap-4" (ngSubmit)="submit()">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-2">
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Mã NV <span class="text-red-500">*</span></label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" formControlName="Code" placeholder="VD: NV001" />
+                <small class="text-red-500" *ngIf="err('Code','required')">Bắt buộc</small>
+                <small class="text-red-500" *ngIf="err('Code','maxlength')">Tối đa 20 ký tự</small>
+            </div>
+
+            <div class="flex flex-col gap-1 xl:col-span-2">
+                <label class="font-medium">Tên NV <span class="text-red-500">*</span></label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" formControlName="Name" placeholder="Nhập tên nhân viên" />
+                <small class="text-red-500" *ngIf="err('Name','required')">Bắt buộc</small>
+                <small class="text-red-500" *ngIf="err('Name','maxlength')">Tối đa 255 ký tự</small>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Mã số thuế</label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" formControlName="TaxCode" placeholder="Nhập mã số thuế" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Ngày sinh</label>
+                <p-datepicker appendTo="body" formControlName="DateOfBirth" [showIcon]="true" placeholder="Chọn ngày sinh" />
+                <small class="text-red-500" *ngIf="err('DateOfBirth','required')">Bắt buộc</small>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Giới tính <span class="text-red-500">*</span></label>
+                <p-selectbutton formControlName="Gender" [options]="genderOptions" optionLabel="label" optionValue="value" />
+                <small class="text-red-500" *ngIf="err('Gender','required')">Bắt buộc</small>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">SĐT </label>
+                <p-inputmask mask="9999 999 999" [showClear]="true" class="w-full min-w-[270px]" formControlName="PhoneNumber" placeholder="Nhập số điện thoại" />
+                <small class="text-red-500" *ngIf="err('PhoneNumber','pattern')"> SĐT không hợp lệ (0/+84 + 9 số) </small>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Email</label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" type="email" formControlName="Email" placeholder="VD: abc@email.com" />
+                <small class="text-red-500" *ngIf="err('Email','email')">Email không hợp lệ</small>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Số CMT/CCCD</label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" formControlName="IdentityNumber" placeholder="Nhập số CMT/CCCD" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Ngân hàng</label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" formControlName="BankName" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Chi nhánh<span class="text-red-500">*</span></label>
+                <p-autocomplete
+                    openOnClick
+                    appendTo="body"
+                    formControlName="BranchCode"
+                    placeholder="Chọn chi nhánh"
+                    [suggestions]="branchOptions()"
+                    [optionLabel]="getBranchLabel"
+                    [dropdown]="true"
+                    [forceSelection]="true"
+                    dataKey="Code"
+                    (completeMethod)="searchAutoComplete($event, branchService, branchOptions)"
+                >
+                    <ng-template let-item pTemplate="item">
+                        <div class="flex items-center gap-2">
+                            <span>{{ item.Code }}</span>
+                            <span class="text-gray-500">- {{ item.Name }}</span>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="empty">
+                        <div class="text-sm text-gray-500">Không tìm thấy kết quả phù hợp</div>
+                    </ng-template></p-autocomplete
+                >
+                <small class="text-red-500" *ngIf="err('BranchCode','required')">Bắt buộc</small>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="font-medium">Trưởng nhóm</label>
+                <p-autocomplete
+                    openOnClick
+                    appendTo="body"
+                    formControlName="LeaderCode"
+                    placeholder="Chọn trưởng nhóm"
+                    [suggestions]="leaderOptions()"
+                    optionLabel="Name"
+                    [dropdown]="true"
+                    [forceSelection]="true"
+                    dataKey="Code"
+                    (completeMethod)="searchAutoComplete($event, employeeService, leaderOptions)"
+                />
+            </div>
+
+
+        </div>
+
+        <div>
+            <p class="text-lg font-semibold pt-4 mb-2">Thông tin khác</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-3">
+                <div class="flex flex-col gap-1">
+                    <label class="font-medium">Tỉnh / Thành</label>
+                    <p-autocomplete
+                        openOnClick
+                        appendTo="body"
+                        formControlName="CityCode"
+                        placeholder="Chọn tỉnh/thành"
+                        [suggestions]="cityOptions()"
+                        optionLabel="Name"
+                        [dropdown]="true"
+                        [forceSelection]="true"
+                        dataKey="Code"
+                        (completeMethod)="searchAutoComplete($event, cityService, cityOptions)"
+                    />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-medium">Quận / Huyện</label>
+                    <p-autocomplete
+                        openOnClick
+                        appendTo="body"
+                        formControlName="DistrictCode"
+                        placeholder="Chọn quận/huyện"
+                        [suggestions]="districtOptions()"
+                        optionLabel="Name"
+                        [dropdown]="true"
+                        [disabled]="!form.get('CityCode')?.value"
+                        [forceSelection]="true"
+                        dataKey="Code"
+                        (completeMethod)="searchAutoComplete($event, districtService, districtOptions, {CityId : form.get('CityCode')?.value.Id ?? '' })"
+                    />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-medium">Phường / Xã</label>
+                    <p-autocomplete
+                        openOnClick
+                        appendTo="body"
+                        formControlName="WardCode"
+                        placeholder="Chọn phường/xã"
+                        [suggestions]="wardOptions()"
+                        optionLabel="Name"
+                        [dropdown]="true"
+                        [disabled]="!form.get('CityCode')?.value"
+                        [forceSelection]="true"
+                        dataKey="Code"
+                        (completeMethod)="searchAutoComplete($event, wardService, wardOptions, {CityId : form.get('CityCode')?.value.Id ?? '' })"
+                    />
+                </div>
+
+                <div class="flex flex-col gap-1 xl:col-span-3">
+                    <label class="font-medium">Địa chỉ</label>
+                    <input pInputText autocomplete="off" class="min-w-[270px]" formControlName="Address" placeholder="Số nhà, đường..." />
+                </div>
+
+                <div class="flex flex-col gap-1 xl:col-span-3">
+                    <label class="font-medium">Ghi chú</label>
+                    <textarea pInputTextarea rows="3" formControlName="Notes"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-xl border p-2 mt-4">
+            <p class="font-semibold">Vai trò</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+                <label class="flex items-center gap-2">
+                    <p-toggleswitch formControlName="IsCustomer" />
+                    <span>Khách hàng</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <p-toggleswitch formControlName="IsSupplier" />
+                    <span>Nhà cung cấp</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <p-toggleswitch formControlName="IsEmployee" />
+                    <span>Nhân viên</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <p-toggleswitch formControlName="IsCollaborator" />
+                    <span>Cộng tác viên</span>
+                </label>
+            </div>
+        </div>
+        <div class="flex justify-end pt-6 gap-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{ edition() ? 'Cập nhật' : 'Thêm mới' }}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

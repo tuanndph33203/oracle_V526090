@@ -1,0 +1,32 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa' : 'Thêm mới'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-y-3 gap-x-5 p-4" (ngSubmit)="submit()">
+        <div class="flex flex-col gap-1">
+            <label for="code" class="font-medium">Mã chi nhánh <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="code" formControlName="Code" placeholder="Nhập mã chi nhánh" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="name" class="font-medium">Tên chi nhánh <span class="text-red-500">*</span></label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="name" formControlName="Name" placeholder="Nhập tên chi nhánh" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="address" class="font-medium">Địa chỉ</label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="address" formControlName="Address" placeholder="Nhập địa chỉ" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="mapUrl" class="font-medium">Link Google Maps</label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="mapUrl" formControlName="MapUrl" placeholder="https://maps.app.goo.gl/... hoặc https://google.com/maps/..." />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label for="phone" class="font-medium">Số điện thoại</label>
+            <input pInputText autocomplete="off" class="min-w-[270px]" id="phone" formControlName="Phone" placeholder="Nhập số điện thoại" />
+        </div>
+        <div class="flex flex-col gap-1" *ngIf="edition()">
+            <label class="font-medium">Trạng thái <span class="text-red-500">*</span></label>
+            <p-select [options]="statusOptions" optionValue="value" optionLabel="label" formControlName="Status" placeholder="Chọn trạng thái" />
+        </div>
+
+        <div class="flex justify-end pt-6 gap-6">
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{edition() ? "Cập nhật" : "Thêm mới"}}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

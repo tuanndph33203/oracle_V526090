@@ -1,0 +1,17 @@
+<div class="bg-surface-0 dark:bg-surface-800 p-4 rounded-md space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <p-button *hasPermission="'SYSTEM_PERMISSION_CREATE'" label="Thêm" icon="pi pi-plus" severity="primary" (click)="onCreate()"></p-button>
+        </div>
+        <form [formGroup]="formSearch" class="flex items-center gap-3 ml-auto">
+            <p-floatlabel variant="on">
+                <p-iconfield>
+                    <p-inputicon class="pi pi-search" />
+                    <input type="text" pInputText formControlName="TextSearch" />
+                </p-iconfield>
+                <label>Tìm kiếm</label>
+            </p-floatlabel>
+        </form>
+    </div>
+    <app-tree-table-meta [data]="dataTree()" [columns]="colsTemp()" [showNodata]="true" [showLoading]="loading()" (actionClick)="handleAction($event)" [virtualScroll]="true" [scrollHeight]="`${37 * itemViewport() + 37 * 2}px`" />
+</div>

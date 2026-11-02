@@ -1,0 +1,85 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4 p-2 text-slate-800">
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-semibold text-slate-700">Mã cấu hình <span class="text-red-500">*</span></label>
+    <input
+      pInputText
+      type="text"
+      class="w-full p-2.5 text-sm rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+      formControlName="Code"
+    />
+    <small *ngIf="err('Code', 'required')" class="text-xs text-red-500">Mã cấu hình là bắt buộc</small>
+    <small *ngIf="form.get('Code')?.hasError('pattern')" class="text-xs text-red-500">Mã cấu hình chỉ cho phép chữ cái, chữ số, dấu gạch ngang (-) và gạch dưới (_)</small>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-semibold text-slate-700">Tên cấu hình <span class="text-red-500">*</span></label>
+    <input
+      pInputText
+      type="text"
+      formControlName="Name"
+    />
+    <small *ngIf="err('Name', 'required')" class="text-xs text-red-500">Tên cấu hình là bắt buộc</small>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-slate-700">Kiểu dữ liệu <span class="text-red-500">*</span></label>
+      <p-select
+        [options]="dataTypeOptions"
+        optionLabel="label"
+        optionValue="value"
+        class="w-full"
+        formControlName="DataType"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-semibold text-slate-700">Module phân hệ <span class="text-red-500">*</span></label>
+      <p-select
+        [options]="moduleOptions"
+        optionLabel="label"
+        optionValue="value"
+        class="w-full"
+        formControlName="Module"
+      />
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-semibold text-slate-700">Giá trị mặc định <span class="text-red-500">*</span></label>
+    <input
+      pInputText
+      type="text"
+      class="w-full p-2.5 text-sm rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+      placeholder="Ví dụ: true hoặc false"
+      formControlName="Value"
+    />
+    <small *ngIf="err('Value', 'required')" class="text-xs text-red-500">Giá trị mặc định là bắt buộc</small>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-semibold text-slate-700">Mô tả cấu hình</label>
+    <textarea
+      rows="3"
+      class="w-full p-2.5 text-sm rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors resize-none"
+      placeholder="Nhập ghi chú hoặc mô tả chi tiết chức năng..."
+      formControlName="Description"
+    ></textarea>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+    <p-button
+      type="button"
+      label="Hủy bỏ"
+      severity="secondary"
+      [outlined]="true"
+      (click)="cancel()"
+    ></p-button>
+    <p-button
+      type="submit"
+      [label]="isEdit ? 'Cập nhật cấu hình' : 'Tạo cấu hình'"
+      severity="warn"
+      [loading]="isSubmitting()"
+    ></p-button>
+  </div>
+</form>

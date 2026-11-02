@@ -1,0 +1,259 @@
+<div class="flex flex-col gap-4 text-surface-950 dark:text-surface-50 text-base p-5">
+    <div *ngIf="order" class="space-y-4 pb-2">
+        <!-- 1. General Order Info & Status in a Clean Card -->
+        <div
+            class="bg-surface-50 dark:bg-surface-800/80 border border-surface-200 dark:border-surface-700 rounded-xl p-3.5 grid grid-cols-2 gap-x-6 gap-y-2.5 text-base">
+            <!-- Column 1: Order Details -->
+            <div class="space-y-2.5">
+                <div class="flex justify-between items-center pb-2 border-b border-surface-200 dark:border-surface-700">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Loại đơn hàng:</span>
+                    <span class="font-black text-surface-950 dark:text-surface-0 flex items-center gap-1.5 text-base">
+                        <span *ngIf="order.ServiceType === 'TakeAway'"
+                            class="text-green-700 dark:text-green-400 font-black flex items-center gap-1.5"><i
+                                class="pi pi-shopping-bag text-base"></i> Mang về</span>
+                        <span *ngIf="order.ServiceType === 'Delivery'"
+                            class="text-blue-700 dark:text-blue-400 font-black flex items-center gap-1.5"><i
+                                class="pi pi-truck text-base"></i> Giao hàng</span>
+                        <span *ngIf="order.ServiceType !== 'TakeAway' && order.ServiceType !== 'Delivery'"
+                            class="text-emerald-700 dark:text-emerald-300 font-black flex items-center gap-1.5"><i
+                                class="pi pi-home text-base"></i> Ăn tại chỗ</span>
+                    </span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-surface-200 dark:border-surface-700"
+                    *ngIf="order.ServiceType !== 'TakeAway' && order.ServiceType !== 'Delivery'">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Bàn ăn:</span>
+                    <span
+                        class="font-black text-emerald-900 bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-200 px-3 py-1 rounded-lg text-base border border-emerald-300 dark:border-emerald-700">{{
+                        order.TableNames || '-' }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-surface-200 dark:border-surface-700">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Nhân viên phục vụ:</span>
+                    <span class="font-black text-surface-950 dark:text-surface-0 text-base">{{ order.WaiterName || '-'
+                        }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-surface-200 dark:border-surface-700">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Khách hàng:</span>
+                    <span class="font-black text-surface-950 dark:text-surface-0 text-base">{{ order.CustomerCode && order.CustomerCode !== 'GUEST' ? order.CustomerCode + ' - ' + (order.CustomerName || '') : (order.CustomerName || 'Khách lẻ') }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Số lượng khách:</span>
+                    <span class="font-black text-surface-950 dark:text-surface-0 text-base font-mono">{{
+                        order.CustomerCount }} khách</span>
+                </div>
+            </div>
+
+            <!-- Column 2: Status & Time -->
+            <div class="space-y-2.5">
+                <div class="flex justify-between items-center pb-2 border-b border-surface-200 dark:border-surface-700">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Trạng thái:</span>
+                    <span class="px-3 py-1 rounded-lg text-base font-black select-none shadow-2xs"
+                        [ngClass]="getStatusBadgeClass(order.Status)">
+                        {{ getStatusText(order.Status) }}
+                    </span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-surface-200 dark:border-surface-700">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Giờ vào:</span>
+                    <span class="font-mono font-black text-surface-950 dark:text-surface-50 text-base">{{ order.OpenTime
+                        | date:'HH:mm:ss (dd/MM/yyyy)' }}</span>
+                </div>
+                <div class="flex justify-between items-center" *ngIf="order.PaymentTime">
+                    <span class="text-surface-900 dark:text-surface-100 font-extrabold">Giờ thanh toán:</span>
+                    <span class="font-mono font-black text-emerald-700 dark:text-emerald-300 text-base">{{
+                        order.PaymentTime | date:'HH:mm:ss (dd/MM/yyyy)' }}</span>
+                </div>
+            </div>
+
+            <!-- Full-width Row: Order Note -->
+            <div class="col-span-2 pt-2 border-t border-surface-200 dark:border-surface-700 flex justify-between items-center text-base"
+                *ngIf="order.Note">
+                <span class="text-surface-900 dark:text-surface-100 font-extrabold flex items-center gap-1.5"><i
+                        class="pi pi-info-circle text-amber-600 dark:text-amber-400"></i> Ghi chú đơn:</span>
+                <span class="font-black text-amber-800 dark:text-amber-300 text-base italic">{{ order.Note }}</span>
+            </div>
+        </div>
+
+        <!-- If Cancelled: Show Cancel Box -->
+        <div *ngIf="order.Status === 'Cancelled' || order.Status === 'ApprovedCancelled'"
+            class="p-3.5 bg-red-100 dark:bg-red-950/40 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800 text-base rounded-xl flex items-start gap-3 shadow-2xs">
+            <i class="pi pi-exclamation-triangle text-xl text-red-600 mt-0.5 animate-pulse"></i>
+            <div class="space-y-0.5 flex-1">
+                <strong class="font-black uppercase tracking-wider block text-base text-red-700 dark:text-red-300">Thông
+                    tin hủy hóa đơn</strong>
+                <span class="font-extrabold">Lý do hủy: <span
+                        class="italic font-black text-red-900 dark:text-red-100">{{ order.CancelReason || 'Không có lý
+                        do hủy' }}</span></span>
+            </div>
+        </div>
+
+        <!-- 2. Detailed items list -->
+        <div class="flex flex-col gap-2">
+            <h4
+                class="text-base font-black text-surface-950 dark:text-surface-0 uppercase tracking-wider flex items-center gap-1.5 m-0">
+                <i class="pi pi-list text-base text-primary"></i> DANH SÁCH MÓN ĂN
+            </h4>
+            <div
+                class="border border-surface-300 dark:border-surface-700 rounded-xl overflow-hidden shadow-2xs bg-surface-0 dark:bg-surface-800/30">
+                <table class="w-full text-left text-base border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-surface-200 dark:bg-surface-700 border-b border-surface-300 dark:border-surface-600 font-black text-black dark:text-white text-base uppercase tracking-wider">
+                            <th class="py-3 px-4">Tên món</th>
+                            <th class="py-3 px-4 text-right" style="width: 140px;">Đơn giá</th>
+                            <th class="py-3 px-4 text-center" style="width: 90px;">SL</th>
+                            <th class="py-3 px-4 text-right" style="width: 160px;">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let item of order.Items">
+                        <tr
+                            class="border-b border-surface-200 dark:border-surface-700 last:border-0 hover:bg-surface-100 dark:hover:bg-surface-800/60 transition-colors"
+                            [ngClass]="{'bg-red-50/50 dark:bg-red-950/20': isItemCancelled(item)}">
+                            <td class="py-3 px-4">
+                                <div
+                                    class="font-extrabold text-surface-950 dark:text-surface-0 text-base flex items-center gap-2 flex-wrap">
+                                    <span
+                                        [ngClass]="{'line-through text-red-600 dark:text-red-400': isItemCancelled(item)}">{{
+                                        item.ItemName }}</span>
+                                    <span *ngIf="item.IsCancelled === 1 || isItemCancelled(item)"
+                                        class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-md font-bold whitespace-nowrap shadow-2xs">Đã
+                                        hủy</span>
+                                    <span
+                                        *ngIf="requireKitchenSend() && item.SoldOutQty > 0 && item.IsCancelled !== 1 && !isItemCancelled(item)"
+                                        class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-md font-bold whitespace-nowrap shadow-2xs">Bếp
+                                        hết: {{ item.SoldOutQty }}</span>
+                                    <span
+                                        *ngIf="requireKitchenSend() && item.ReturnedQuantity > 0 && item.IsCancelled !== 1 && !isItemCancelled(item)"
+                                        class="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-md font-bold whitespace-nowrap shadow-2xs">Khách
+                                        trả: {{ item.ReturnedQuantity }}</span>
+                                </div>
+                                <div class="text-base text-surface-800 dark:text-surface-200 italic font-medium mt-0.5 flex items-center gap-1"
+                                    *ngIf="item.Note">
+                                    <i class="pi pi-info-circle text-base text-surface-600"></i> Ghi chú: {{ item.Note
+                                    }}
+                                </div>
+                            </td>
+                            <td
+                                class="py-3 px-4 text-right font-mono font-bold text-surface-900 dark:text-surface-100 text-base">
+                                {{ getBaseUnitPrice(item) | number:'1.0-0' }}đ</td>
+                            <td
+                                class="py-3 px-4 text-center font-mono font-black text-black dark:text-white text-lg bg-surface-100/60 dark:bg-surface-800/80">
+                                {{ item.Quantity }}</td>
+                            <td class="py-3 px-4 text-right font-mono font-black text-lg"
+                                [ngClass]="isItemCancelled(item) ? 'text-red-600 dark:text-red-400 line-through' : 'text-emerald-700 dark:text-emerald-300'">
+                                {{ getItemTotalAmount(item) | number:'1.0-0' }}đ
+                                <div *ngIf="item.VatAmount > 0" class="mt-1 text-[11px] font-normal text-surface-500 dark:text-surface-400">
+                                    Đã gồm thuế {{ item.VatAmount | number:'1.0-0' }}đ
+                                </div>
+                                <div *ngIf="item.DiscountAmount > 0" class="text-[11px] font-normal text-surface-500 dark:text-surface-400">
+                                    Đã trừ giảm giá {{ item.DiscountAmount | number:'1.0-0' }}đ
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngFor="let group of getSelectedOptionGroups(item)"
+                            class="bg-emerald-50/50 dark:bg-emerald-950/20 text-xs text-emerald-900 dark:text-emerald-200">
+                            <td class="py-1.5 pl-8 pr-4"><strong>{{ group.name }}:</strong> {{ group.values.join(', ') }}</td>
+                            <td class="py-1.5 px-4 text-right font-mono font-semibold">+{{ group.extraCharge | number:'1.0-0' }}đ</td>
+                            <td></td><td></td>
+                        </tr>
+                        </ng-container>
+                        <tr *ngIf="!order.Items?.length">
+                            <td colspan="4" class="p-6 text-center text-surface-600 dark:text-surface-400 italic">
+                                <div class="flex flex-col items-center gap-1.5 py-2">
+                                    <i class="pi pi-inbox text-3xl opacity-60"></i>
+                                    <span class="text-base font-bold">Hóa đơn không có món ăn nào.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. Payments & Summary Side-by-Side -->
+        <div class="grid grid-cols-2 gap-4 pt-0.5">
+            <!-- Payment info Card -->
+            <div class="flex flex-col gap-2">
+                <h4
+                    class="text-base font-black text-surface-950 dark:text-surface-0 uppercase tracking-wider flex items-center gap-1.5 m-0">
+                    <i class="pi pi-credit-card text-base text-primary"></i> CHI TIẾT THANH TOÁN
+                </h4>
+                <div
+                    class="bg-surface-0 dark:bg-surface-800/60 border border-surface-200 dark:border-surface-700 rounded-xl p-3.5 text-base min-h-[120px] flex flex-col justify-center gap-2.5 shadow-2xs">
+                    <ng-container *ngIf="order.Payments?.length > 0; else noPayments">
+                        <div *ngFor="let pay of order.Payments"
+                            class="flex justify-between items-center border-b border-surface-200 dark:border-surface-700 last:border-0 pb-2 last:pb-0">
+                            <span class="flex flex-col gap-0.5">
+                                <span
+                                    class="font-black text-surface-950 dark:text-surface-0 flex items-center gap-1.5 text-base">
+                                    <i class="pi pi-wallet text-base text-primary"></i>
+                                    {{ getPaymentTypeName(pay) }}
+                                </span>
+                                <span class="text-base text-surface-700 dark:text-surface-300 font-mono font-bold"
+                                    *ngIf="pay.TransactionId">Mã GD: {{ pay.TransactionId }}</span>
+                            </span>
+                            <span class="font-mono font-black text-emerald-700 dark:text-emerald-300 text-lg">{{
+                                pay.PaymentAmount | number:'1.0-0' }}đ</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #noPayments>
+                        <div
+                            class="flex flex-col items-center justify-center text-surface-600 dark:text-surface-400 italic gap-1.5 py-3">
+                            <i class="pi pi-ban text-2xl opacity-60"></i>
+                            <span class="text-base font-bold">Chưa thực hiện thanh toán.</span>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+
+            <!-- Summary Terms Card -->
+            <div class="flex flex-col gap-2">
+                <h4
+                    class="text-base font-black text-surface-950 dark:text-surface-0 uppercase tracking-wider flex items-center gap-1.5 m-0">
+                    <i class="pi pi-calculator text-base text-primary"></i> TỔNG CỘNG THANH TOÁN
+                </h4>
+                <div
+                    class="space-y-2.5 bg-surface-0 dark:bg-surface-800/60 p-3.5 rounded-xl border border-surface-200 dark:border-surface-700 text-base text-surface-900 dark:text-surface-100 shadow-2xs">
+                    <div class="flex justify-between items-center">
+                        <span class="text-surface-900 dark:text-surface-100 font-bold">Tiền hàng:</span>
+                        <span class="font-mono font-black text-surface-950 dark:text-surface-0 text-base">{{
+                            order.SubTotal | number:'1.0-0' }}đ</span>
+                    </div>
+                    <div class="flex justify-between items-center text-blue-700 dark:text-blue-400 font-bold"
+                        *ngIf="order.ServiceType === 'Delivery' && getShippingFee() > 0">
+                        <span>Phí giao hàng:</span>
+                        <span class="font-mono font-black text-base">+{{ getShippingFee() | number:'1.0-0' }}đ</span>
+                    </div>
+                    <div class="flex justify-between items-center text-red-700 dark:text-red-400 font-bold"
+                        *ngIf="order.DiscountAmount > 0">
+                        <span>Chiết khấu:</span>
+                        <span class="font-mono font-black text-base">-{{ order.DiscountAmount | number:'1.0-0'
+                            }}đ</span>
+                    </div>
+                    <div class="flex justify-between items-center" *ngIf="order.VatAmount > 0">
+                        <span class="text-surface-900 dark:text-surface-100 font-bold">Thuế VAT:</span>
+                        <span class="font-mono font-black text-surface-950 dark:text-surface-0 text-base">{{
+                            order.VatAmount | number:'1.0-0' }}đ</span>
+                    </div>
+                    <hr class="border-surface-200 dark:border-surface-700 my-1" />
+                    <div
+                        class="flex justify-between items-center text-base text-surface-950 dark:text-surface-0 pt-0.5">
+                        <span>Tổng cộng:</span>
+                        <span class="text-3xl font-mono font-extrabold text-emerald-700 dark:text-emerald-300">{{
+                            getOrderTotalAmount() | number:'1.0-0' }}đ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Footer Action Buttons -->
+        <div class="flex justify-end items-center gap-3 pt-3 border-t border-surface-200 dark:border-surface-700">
+            <p-button label="In tạm tính" icon="pi pi-print" severity="secondary" [raised]="true"
+                [loading]="isPrinting()" (onClick)="startPrintProcess(false)"
+                styleClass="px-4 py-2 font-bold text-sm shadow-xs"></p-button>
+            <p-button label="Đóng" icon="pi pi-times" [outlined]="true" severity="secondary" (onClick)="close()"
+                styleClass="px-4 py-2 font-bold text-sm"></p-button>
+        </div>
+    </div>
+</div>
+
+

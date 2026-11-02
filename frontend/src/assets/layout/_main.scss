@@ -1,0 +1,38 @@
+.layout-main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+    padding: 7rem 1.5rem 1.5rem 1.5rem;
+    transition: margin-left var(--layout-section-transition-duration);
+}
+
+.layout-main {
+    flex: 1 1 auto;
+    min-height: calc(100vh - 8rem);
+    width: 100%;
+}
+
+.layout-page {
+    width: 100%;
+    min-height: 100%;
+}
+
+.layout-page-shell {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    width: 100%;
+    min-height: calc(100vh - 6.5rem);
+}
+
+.layout-page-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}

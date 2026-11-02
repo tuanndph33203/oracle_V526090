@@ -1,0 +1,36 @@
+<div class="bg-surface-0 dark:bg-surface-800 p-4 rounded-md space-y-4">
+    <form [formGroup]="formSearch" class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <p-button *hasPermission="'SalesCatalog.MenuItem.Create'" label="Thêm" icon="pi pi-plus" severity="primary" (click)="onCreate()"></p-button>
+            <p-button label="Xuất Excel" icon="pi pi-file-excel" severity="success" [loading]="loadingExport()" (click)="exportExcel()"></p-button>
+            <p-button *hasPermission="'SalesCatalog.MenuItem.Create'" label="Nạp lại định mức" icon="pi pi-refresh" severity="secondary" [outlined]="true" [loading]="loadingReset()" (click)="onResetAvailability()"></p-button>
+        </div>
+        <div class="flex flex-wrap items-center justify-end gap-3 ml-auto">
+            <p-multiselect [options]="menuGroupOptions()" optionLabel="Name" optionValue="Id" formControlName="MenuGroupIds" placeholder="Nhóm thực đơn: Tất cả" [filter]="true" [showClear]="true" [maxSelectedLabels]="1" selectedItemsLabel="{0} nhóm đã chọn" class="min-w-48" />
+            <p-select [options]="statusOptions" optionLabel="label" optionValue="value" formControlName="IsInactive" placeholder="Trạng thái: Tất cả" [showClear]="true" class="min-w-44" />
+            <p-select [options]="availabilityOptions" optionLabel="label" optionValue="value" formControlName="IsAvailable" placeholder="Hiển thị: Tất cả" [showClear]="true" class="min-w-44" />
+            <span class="relative">
+                <p-iconfield>
+                    <p-inputicon class="pi pi-search" />
+                    <input type="text" pInputText placeholder="Tìm kiếm" formControlName="TextSearch" />
+                </p-iconfield>
+            </span>
+        </div>
+    </form>
+    <app-table-meta
+        [dataTable]="data()"
+        [columns]="colsTemp()"
+        [showNodata]="true"
+        [showLoading]="loading()"
+        [currentPage]="searchQuery().page"
+        [totalData]="total()"
+        [pageSize]="searchQuery().size"
+        [loading]="loading()"
+        [virtualScroll]="true"
+        [scrollHeight]="`${37 * itemViewport() + 48}px`"
+        (actionClick)="handleAction($event)"
+        (actionPageChange)="onPageChange($event)"
+        [showCheckboxToggle]="true"
+        (actionChangeCheckbox)="onCheckboxChange($event)"
+    />
+</div>

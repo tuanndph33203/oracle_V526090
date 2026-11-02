@@ -1,0 +1,29 @@
+<div class="bg-surface-0 dark:bg-surface-800 p-4 rounded-md space-y-4">
+    <form [formGroup]="formSearch" class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <p-button *hasPermission="'SalesCatalog.Branch.Create'" label="Thêm" icon="pi pi-plus" severity="primary" (click)="onCreate()"></p-button>
+        </div>
+        <div class="flex items-center gap-3 ml-auto">
+            <span class="relative">
+                <p-iconfield>
+                    <p-inputicon class="pi pi-search" />
+                    <input type="text" pInputText placeholder="Tìm kiếm" formControlName="TextSearch" />
+                </p-iconfield>
+            </span>
+        </div>
+    </form>
+    <app-table-meta
+        [dataTable]="data()"
+        [columns]="colsTemp()"
+        [showNodata]="true"
+        [showLoading]="loading()"
+        (actionClick)="handleAction($event)"
+        [pageSize]="searchQuery().size"
+        [loading]="loading()"
+        [virtualScroll]="true"
+        [scrollHeight]="`${37 * itemViewport() + 48}px`"
+    />
+    <div class="flex justify-end pt-4">
+        <app-paginator-meta [rows]="searchQuery().size" [totalRecords]="total()" (onPageChange)="onPageChange($event)" />
+    </div>
+</div>

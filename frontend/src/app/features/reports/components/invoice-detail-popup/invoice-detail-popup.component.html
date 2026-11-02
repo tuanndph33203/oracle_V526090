@@ -1,0 +1,134 @@
+<p-dialog 
+    [header]="'Chi tiết hóa đơn: ' + invoiceNo" 
+    [(visible)]="visible" 
+    [modal]="true" 
+    [style]="{ width: '70vw', minWidth: '650px' }" 
+    [maximizable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="close()">
+    
+    <div class="p-5 bg-slate-50 dark:bg-surface-950 text-xs">
+        <!-- Loading State -->
+        @if (isLoading()) {
+            <div class="flex flex-col items-center justify-center py-16">
+                <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500 mb-2"></div>
+                <span class="text-sm text-surface-500">Đang tải thông tin hóa đơn...</span>
+            </div>
+        }
+
+        <!-- Content -->
+        @if (!isLoading() && invoice()) {
+            <div class="flex flex-col gap-5">
+                <!-- Info Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-surface-900 p-4 rounded-xl shadow-sm border border-surface-200 dark:border-surface-800">
+                    <div>
+                        <span class="text-surface-400 block mb-0.5 font-medium">Giờ lập đơn</span>
+                        <strong class="text-surface-800 dark:text-surface-100">{{ invoice().OrderDate | date:'dd/MM/yyyy HH:mm:ss' }}</strong>
+                    </div>
+                    <div>
+                        <span class="text-surface-400 block mb-0.5 font-medium">Bàn / Khu vực</span>
+                        <strong class="text-surface-800 dark:text-surface-100">{{ invoice().TableNames || 'Mang về/Giao hàng' }}</strong>
+                    </div>
+                    <div>
+                        <span class="text-surface-400 block mb-0.5 font-medium">Hình thức PV</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                              [ngClass]="{
+                                  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300': invoice().ServiceType === 'DineIn',
+                                  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300': invoice().ServiceType === 'TakeAway',
+                                  'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300': invoice().ServiceType === 'Delivery'
+                              }">
+                            {{ invoice().ServiceType === 'DineIn' ? 'Tại bàn' : invoice().ServiceType === 'TakeAway' ? 'Mang về' : 'Giao hàng' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-surface-400 block mb-0.5 font-medium">Thu ngân</span>
+                        <strong class="text-surface-800 dark:text-surface-100">{{ invoice().CashierName || 'System' }}</strong>
+                    </div>
+                    <div class="md:col-span-2">
+                        <span class="text-surface-400 block mb-0.5 font-medium">Ghi chú</span>
+                        <span class="text-surface-800 dark:text-surface-100 italic">{{ invoice().Note || 'Không có ghi chú' }}</span>
+                    </div>
+                </div>
+
+                <!-- Items Section -->
+                <div class="border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden bg-white dark:bg-surface-900 shadow-sm">
+                    <p-table 
+                        [value]="invoice().Items" 
+                        [scrollable]="true" 
+                        scrollHeight="250px" 
+                        styleClass="p-datatable-sm"
+                        [responsiveLayout]="'scroll'">
+                        
+                        <ng-template pTemplate="header">
+                            <tr class="bg-surface-100 dark:bg-surface-800 text-xs">
+                                <th class="p-3 text-left font-bold text-surface-700 dark:text-surface-300">Tên món</th>
+                                <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300 w-20">SL</th>
+                                <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300 w-28">Đơn giá</th>
+                                <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300 w-28">Khuyến mại</th>
+                                <th class="p-3 text-right font-bold text-surface-700 dark:text-surface-300 w-32">Thành tiền</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-item>
+                            <tr class="invoice-item-row border-b border-surface-100 dark:border-surface-800 text-xs">
+                                <td class="p-3 invoice-item-name">{{ item.ItemName }}</td>
+                                <td class="p-3 text-right invoice-item-quantity">{{ item.Quantity | number:'1.0-2' }}</td>
+                                <td class="p-3 text-right invoice-item-price">{{ getBaseUnitPrice(item) | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right text-red-500 font-medium">{{ item.DiscountAmount | number:'1.0-0' }}đ</td>
+                                <td class="p-3 text-right invoice-item-total">{{ item.TotalAmount | number:'1.0-0' }}đ
+                                    <small *ngIf="item.VatAmount > 0" class="block mt-1 text-[10px] font-normal text-surface-500">Đã gồm thuế {{ item.VatAmount | number:'1.0-0' }}đ</small>
+                                </td>
+                            </tr>
+                            <tr *ngFor="let group of getSelectedOptionGroups(item)" class="invoice-option-row text-xs">
+                                <td class="py-1.5 pl-6 pr-3"><strong>{{ group.name }}:</strong> {{ group.values.join(', ') }}</td>
+                                <td></td>
+                                <td class="py-1.5 px-3 text-right font-semibold">{{ group.extraCharge > 0 ? '+' : '' }}{{ group.extraCharge | number:'1.0-0' }}đ</td>
+                                <td></td><td></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                <!-- Footer Summary Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Payments details -->
+                    <div class="bg-white dark:bg-surface-900 p-4 rounded-xl shadow-sm border border-surface-200 dark:border-surface-800 flex flex-col gap-2">
+                        <h3 class="font-bold text-surface-700 dark:text-surface-300 border-b border-surface-100 dark:border-surface-800 pb-1.5 mb-1.5">Hình thức thanh toán</h3>
+                        @for (pay of invoice().Payments; track pay.PaymentType) {
+                            <div class="flex justify-between items-center text-surface-700 dark:text-surface-300">
+                                <span>{{ pay.PaymentType === 'Cash' ? 'Tiền mặt' : (pay.PaymentType === 'Transfer' || pay.PaymentType === 'QR' || pay.PaymentType === 'Bank') ? 'Chuyển khoản' : (pay.PaymentType === 'CreditCard' || pay.PaymentType === 'Card') ? 'Thẻ tín dụng' : (pay.PaymentType === 'Tiền khuyến mãi' || pay.PaymentType === 'Discount' || pay.PaymentType === 'DiscountAmount' || pay.PaymentType === 'Tiền chiết khấu' || pay.PaymentAmount < 0) ? 'Tiền chiết khấu' : pay.PaymentType }}</span>
+                                <strong class="text-surface-900 dark:text-surface-50">{{ pay.PaymentAmount | number:'1.0-0' }}đ</strong>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Totals details -->
+                    <div class="bg-white dark:bg-surface-900 p-4 rounded-xl shadow-sm border border-surface-200 dark:border-surface-800 flex flex-col gap-2">
+                        <h3 class="font-bold text-surface-700 dark:text-surface-300 border-b border-surface-100 dark:border-surface-800 pb-1.5 mb-1.5">Tổng cộng</h3>
+                        <div class="flex justify-between items-center text-surface-600 dark:text-surface-400">
+                            <span>Tiền hàng (chưa thuế)</span>
+                            <span>{{ invoice().SubTotal | number:'1.0-0' }}đ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-blue-600 dark:text-blue-400 font-medium" *ngIf="invoice().ServiceType === 'Delivery' && getShippingFee(invoice()) > 0">
+                            <span>Phí giao hàng</span>
+                            <span>+{{ getShippingFee(invoice()) | number:'1.0-0' }}đ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-surface-600 dark:text-surface-400">
+                            <span>Thuế GTGT (VAT)</span>
+                            <span>{{ invoice().VatAmount | number:'1.0-0' }}đ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-red-500 font-medium" *ngIf="invoice().DiscountAmount > 0">
+                            <span>Khuyến mại chiết khấu</span>
+                            <span>-{{ invoice().DiscountAmount | number:'1.0-0' }}đ</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-surface-200 dark:border-surface-800 text-sm">
+                            <span class="font-bold text-surface-900 dark:text-surface-50">Thành tiền thực thu</span>
+                            <strong class="text-primary-600 dark:text-primary-400 text-lg">{{ getInvoiceTotal(invoice()) | number:'1.0-0' }}đ</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</p-dialog>

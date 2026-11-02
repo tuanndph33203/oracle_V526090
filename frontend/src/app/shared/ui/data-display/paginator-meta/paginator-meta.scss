@@ -1,0 +1,24 @@
+:host {
+    --pg-size: 2.25rem;
+}
+
+.pg-btn,
+.pg-icon {
+    width: var(--pg-size);
+    height: var(--pg-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tw-active {
+    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    color: var(--primary-color);
+    box-shadow: var(--focus-ring);
+}
+
+@media (max-width: 576px) {
+    :host {
+        --pg-size: 1.9rem;
+    }
+}

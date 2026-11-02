@@ -1,0 +1,35 @@
+/* Custom styles for Invoice List Report component */
+table {
+    border-spacing: 0;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
+}
+
+th, td {
+    border-bottom: 1px solid rgba(226, 232, 240, 1);
+    border-right: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+:host-context(.dark) th, :host-context(.dark) td {
+    border-bottom: 1px solid #334155;
+    border-right: 1px solid #334155;
+}
+
+:host ::ng-deep .p-select {
+    display: flex;
+    align-items: center;
+}
+
+:host ::ng-deep .p-datepicker {
+    display: flex;
+    width: 100%;
+}
+
+:host ::ng-deep .p-datepicker,
+:host ::ng-deep .p-datepicker-input,
+:host ::ng-deep .p-datepicker-trigger,
+:host ::ng-deep .p-datepicker .p-inputtext,
+:host ::ng-deep .p-datepicker .p-datepicker-trigger,
+:host ::ng-deep .p-datepicker button,
+:host ::ng-deep .p-datepicker .p-button {
+    border-radius: 0px !important;
+}

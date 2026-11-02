@@ -1,0 +1,66 @@
+<app-dialog-wrap [title]="edition() ? 'Chỉnh sửa quyền' : 'Thêm quyền'" (close)="closeDialog()">
+    <form [formGroup]="form" class="flex flex-col gap-y-2 gap-x-5 p-4" (ngSubmit)="submit()">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-y-2 gap-x-5">
+            <div class="flex flex-col gap-1 w-full">
+                <label for="code" class="font-medium">Mã quyền <span class="text-red-500">*</span></label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="code" formControlName="code"
+                    placeholder="VD: USER_CREATE" />
+
+                <div *ngIf="form.get('code')?.touched && form.get('code')?.invalid">
+                    <small *ngIf="form.get('code')?.errors?.['required']" class="text-red-500"> Mã quyền là bắt buộc
+                    </small>
+                    <small *ngIf="
+                        form.get('code')?.errors?.['minlength'] ||
+                        form.get('code')?.errors?.['maxlength']
+                    " class="text-red-500">
+                        Mã quyền không hợp lệ
+                    </small>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 w-full">
+                <label for="group" class="font-medium">Mã nhóm quyền <span class="text-red-500">*</span></label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="group"
+                    formControlName="categoryPermission" placeholder="VD: USER" />
+
+                <div *ngIf="form.get('categoryPermission')?.touched && form.get('categoryPermission')?.invalid">
+                    <small *ngIf="form.get('categoryPermission')?.errors?.['required']" class="text-red-500"> Mã quyền
+                        là bắt buộc </small>
+                    <small *ngIf="
+                        form.get('categoryPermission')?.errors?.['minlength'] ||
+                        form.get('categoryPermission')?.errors?.['maxlength']
+                    " class="text-red-500">
+                        Mã nhóm quyền không hợp lệ
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-y-2 gap-x-5">
+            <div class="flex flex-col gap-1">
+                <label for="name" class="font-medium">Tên quyền <span class="text-red-500">*</span></label>
+                <input pInputText autocomplete="off" class="min-w-[270px]" id="name" formControlName="name"
+                    placeholder="Nhập tên permission" />
+
+                <small *ngIf="form.get('name')?.touched && form.get('name')?.invalid" class="text-red-500"> Tên quyền là
+                    bắt buộc </small>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label for="isView" class=" whitespace-nowrap">Quyền điều hướng</label>
+                <p-selectbutton [options]="stateOptions" formControlName="isView" optionLabel="label"
+                    optionValue="value" aria-labelledby="basic" />
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <label for="desc" class="font-medium">Mô tả</label>
+            <input pTextarea class="min-w-[270px]" id="desc" formControlName="description"
+                placeholder="Mô tả permission" />
+        </div>
+        <div class="flex justify-end pt-6 gap-6">
+            <!-- <button pButton type="button" icon="pi pi-times" label="Đóng" severity="contrast" outlined="true" (click)="dialogRef?.close()" size="large"></button> -->
+
+            <button pButton type="submit" icon="pi pi-save" [disabled]="form.invalid" size="large">{{ edition() ? 'Cập
+                nhật' : 'Thêm mới' }}</button>
+        </div>
+    </form>
+</app-dialog-wrap>

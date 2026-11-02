@@ -1,0 +1,206 @@
+<div class="space-y-1.5 sm:space-y-3.5">
+    <!-- Top metadata summary (Text line, not inputs) -->
+    <div *ngIf="showMetadataHeader"
+        class="flex justify-between items-center text-xs sm:text-[15px] font-semibold text-surface-600 dark:text-surface-400 border-b border-surface-200 dark:border-surface-700 pb-1.5 sm:pb-2.5 mb-1 sm:mb-1.5">
+        <div class="flex items-center gap-1">
+            <i class="pi pi-tag text-primary text-xs flex-shrink-0"></i>
+            <span>Loại đơn: <strong class="text-surface-850 dark:text-surface-150 font-extrabold">{{
+                    getServiceTypeLabel(serviceType) }}</strong></span>
+        </div>
+        <div class="flex items-center gap-1 truncate">
+            <i class="pi pi-map-marker text-primary text-xs flex-shrink-0"></i>
+            <span class="truncate">Bàn: <strong class="text-surface-850 dark:text-surface-150 font-extrabold">{{
+                    tableName || 'Không có bàn' }}</strong></span>
+        </div>
+    </div>
+
+    <!-- Table Selector (Optional Table) -->
+    <div *ngIf="showTableSelector && (serviceType === 'DineIn' || !serviceType)" class="flex flex-col gap-0.5 sm:gap-1">
+        <label class="text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1 block">
+            Bàn <span class="text-surface-400 font-normal text-xs sm:text-sm">(không bắt buộc)</span>
+        </label>
+        <div class="relative w-full">
+            <p-select [options]="availableTables" [ngModel]="tableId" (ngModelChange)="onSelectTable($event)"
+                optionLabel="DisplayLabel" optionValue="TableId" placeholder="Chọn bàn..."
+                class="w-full text-xs sm:text-base font-semibold" [filter]="true" filterBy="DisplayLabel"
+                [showClear]="true" (onClear)="clearTable()" [disabled]="!!billId && !isBillEditUnlocked">
+            </p-select>
+        </div>
+        <span class="text-[11px] sm:text-xs text-surface-400 italic">
+            Có thể chọn bàn trống hoặc bàn đã có người. Tìm theo tên bàn, ví dụ: N1, T0...
+        </span>
+    </div>
+
+    <!-- Row: Therapy Voucher Code (DineIn & TakeAway) & Ngày hoá đơn (All services if enabled) -->
+    <div *ngIf="(serviceType === 'DineIn' || serviceType === 'TakeAway') || showInvoiceDate"
+        class="grid gap-1.5 sm:gap-2"
+        [ngClass]="((serviceType === 'DineIn' || serviceType === 'TakeAway') && showInvoiceDate) ? 'grid-cols-2' : 'grid-cols-1'">
+        <div *ngIf="serviceType === 'DineIn' || serviceType === 'TakeAway'">
+            <label class="text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1 block">
+                Mã phiếu trị liệu
+            </label>
+            <div class="relative w-full">
+                <input type="text" [ngModel]="therapyVoucherCode" (ngModelChange)="onTherapyCodeChange($event)"
+                    (keyup.enter)="onValidateTherapyCode()" placeholder="Nhập thủ công hoặc quét mã vạch..."
+                    class="w-full h-[30px] sm:h-[38px] px-2.5 py-1 text-xs sm:text-base rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-900 text-surface-900 dark:text-surface-100 font-semibold outline-none focus:border-primary shadow-2xs box-border"
+                    [disabled]="!!billId && !isBillEditUnlocked" />
+                <i *ngIf="therapyVoucherCode" (click)="clearTherapyCode()"
+                    class="pi pi-times absolute right-2.5 top-2 sm:top-2.5 cursor-pointer text-surface-400 hover:text-red-500 text-xs sm:text-sm">
+                </i>
+            </div>
+        </div>
+
+        <div *ngIf="showInvoiceDate">
+            <label class="text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1 block">
+                Ngày hoá đơn
+            </label>
+            <p-datepicker [ngModel]="openTime" (ngModelChange)="onOpenTimeChange($event)"
+                [showTime]="true" hourFormat="24" dateFormat="dd/mm/yy" [showIcon]="true" [showOnFocus]="false"
+                [showOtherMonths]="true" [selectOtherMonths]="true" [showButtonBar]="true"
+                appendTo="body" placeholder="HH:mm dd/mm/yyyy"
+                class="w-full text-xs sm:text-base font-semibold block" styleClass="w-full"
+                [disabled]="!!billId && !isBillEditUnlocked">
+            </p-datepicker>
+        </div>
+    </div>
+
+    <!-- Therapy Voucher Services Dropdown (if returned from AnPOS) -->
+    <div *ngIf="(serviceType === 'DineIn' || serviceType === 'TakeAway') && therapyServices && therapyServices.length > 0"
+        class="flex flex-col gap-0.5 sm:gap-1">
+        <label class="text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1 block">
+            Dịch vụ theo phiếu <span class="text-emerald-600 dark:text-emerald-400 font-semibold text-xs">({{ therapyServices.length }} dịch vụ)</span>
+        </label>
+        <p-select [options]="therapyServices" [ngModel]="selectedTherapyServiceCode" (ngModelChange)="onSelectTherapyService($event)"
+            optionLabel="DisplayLabel" optionValue="ServiceCode" placeholder="-- Chọn dịch vụ --"
+            class="w-full text-xs sm:text-base font-semibold" [filter]="true" filterBy="DisplayLabel"
+            [showClear]="true" [disabled]="!!billId && !isBillEditUnlocked">
+        </p-select>
+    </div>
+
+    <!-- Row 2: Waiter & Customer (Always side-by-side 50%-50%) -->
+    <div class="grid grid-cols-2 gap-1.5 sm:gap-2">
+        <div>
+            <label
+                class="text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1 block">Nhân
+                viên phục vụ</label>
+            <p-select [options]="waiters" [ngModel]="waiterId" (ngModelChange)="waiterIdChange.emit($event)"
+                optionLabel="DisplayLabel" optionValue="Id" placeholder="Chọn nhân viên"
+                class="w-full text-xs sm:text-base font-semibold" [filter]="true" filterBy="DisplayLabel"
+                (onFilter)="waiterSearch.emit($event)" [showClear]="true"
+                [disabled]="!!billId && !isBillEditUnlocked">
+            </p-select>
+        </div>
+        <div>
+            <label
+                class="block text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1">Khách
+                hàng</label>
+            <p-select [options]="customers" [ngModel]="customerId"
+                (ngModelChange)="customerIdChange.emit($event); customerChange.emit()" optionLabel="DisplayLabel"
+                optionValue="Id" placeholder="Khách lẻ (mặc định)" class="w-full text-xs sm:text-base font-semibold"
+                [filter]="true" filterBy="DisplayLabel" (onFilter)="customerSearch.emit($event)"
+                [showClear]="true"
+                [disabled]="!!billId && !isBillEditUnlocked">
+            </p-select>
+        </div>
+    </div>
+
+    <!-- Row 3: Guest Count & Order Note (Hidden for Delivery to prevent duplicate note fields) -->
+    <div *ngIf="serviceType !== 'Delivery'" class="grid gap-1.5 sm:gap-2"
+        [ngClass]="serviceType === 'DineIn' ? 'grid-cols-[90px_1fr] sm:grid-cols-[115px_1fr]' : 'grid-cols-1'">
+        <div *ngIf="serviceType === 'DineIn'">
+            <label
+                class="block text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1 truncate"
+                title="Số khách">Số khách</label>
+            <div
+                class="flex items-center bg-surface-50 dark:bg-surface-900 rounded-lg border border-surface-300 dark:border-surface-600 overflow-hidden shadow-2xs h-[30px] sm:h-[38px]">
+                <button [disabled]="customerCount <= 1 || (!!billId && !isBillEditUnlocked)" type="button"
+                    (click)="updateCustomerCount(customerCount - 1)"
+                    title="Giảm số khách"
+                    class="w-7 sm:w-8 h-full flex items-center justify-center text-surface-600 dark:text-surface-300 hover:bg-surface-150 dark:hover:bg-surface-800 disabled:opacity-50 disabled:hover:bg-transparent border-0 bg-transparent outline-none cursor-pointer">
+                    <i class="pi pi-minus text-[10px] sm:text-xs"></i>
+                </button>
+                <input *ngIf="!billId || isBillEditUnlocked; else readOnlyCustomerCount"
+                    type="number"
+                    [ngModel]="customerCount"
+                    (focus)="$any($event.target).select()"
+                    (change)="onCustomerCountInputChange($event)"
+                    (blur)="onCustomerCountInputChange($event)"
+                    (keydown.enter)="$any($event.target).blur()"
+                    min="1"
+                    title="Nhập số khách"
+                    class="font-mono font-bold text-slate-900 dark:text-surface-100 text-xs sm:text-base flex-1 min-w-0 h-full text-center bg-transparent border-0 outline-none p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                <ng-template #readOnlyCustomerCount>
+                    <span
+                        class="font-mono font-bold text-slate-900 dark:text-surface-100 text-xs sm:text-base flex-1 text-center select-none">{{
+                        customerCount }}</span>
+                </ng-template>
+                <button [disabled]="!!billId && !isBillEditUnlocked" type="button"
+                    (click)="updateCustomerCount(customerCount + 1)"
+                    title="Tăng số khách"
+                    class="w-7 sm:w-8 h-full flex items-center justify-center text-surface-600 dark:text-surface-300 hover:bg-surface-150 dark:hover:bg-surface-800 disabled:opacity-50 disabled:hover:bg-transparent border-0 bg-transparent outline-none cursor-pointer">
+                    <i class="pi pi-plus text-[10px] sm:text-xs"></i>
+                </button>
+            </div>
+        </div>
+        <div>
+            <label
+                class="block text-xs sm:text-base font-bold text-surface-700 dark:text-surface-300 mb-0.5 sm:mb-1">Ghi
+                chú đơn hàng</label>
+            <input type="text" [ngModel]="note" (ngModelChange)="noteChange.emit($event)"
+                placeholder="Nhập ghi chú cho đơn hàng..."
+                class="w-full h-[30px] sm:h-[38px] px-2.5 py-1 text-xs sm:text-base rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-900 text-surface-900 dark:text-surface-100 font-semibold outline-none focus:border-primary shadow-2xs box-border"
+                [disabled]="!!billId && !isBillEditUnlocked" />
+        </div>
+    </div>
+
+    <!-- Delivery Info block (Collapsible, shown if Delivery type is active) -->
+    <div *ngIf="serviceType === 'Delivery'"
+        class="p-2.5 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/60 rounded-xl text-xs shadow-2xs">
+        <div class="flex items-center justify-between cursor-pointer select-none" (click)="toggleDeliveryInfo.emit()">
+            <h4
+                class="font-bold !my-0 text-xs text-blue-800 dark:text-blue-300 uppercase tracking-wide flex items-center gap-1.5">
+                <i class="pi pi-truck"></i> Thông tin giao hàng
+            </h4>
+            <i class="pi text-blue-800 dark:text-blue-300 text-xs"
+                [ngClass]="isDeliveryInfoCollapsed ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
+        </div>
+        <div *ngIf="!isDeliveryInfoCollapsed" class="grid grid-cols-2 gap-2 mt-2">
+            <div>
+                <label class="block text-xs font-bold text-surface-700 dark:text-surface-300 mb-0.5">Số điện thoại <span
+                        class="text-red-500">*</span></label>
+                <input type="text" [ngModel]="phoneNumber" (ngModelChange)="phoneNumberChange.emit($event)"
+                    placeholder="Nhập số điện thoại"
+                    class="w-full px-2.5 py-1 h-[34px] text-xs rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800 font-semibold focus:outline-none focus:border-primary"
+                    [disabled]="!!billId && !isBillEditUnlocked" />
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-surface-700 dark:text-surface-300 mb-0.5">Phí giao hàng (Ghi
+                    chú)</label>
+                <input type="text" [ngModel]="shippingFeeNote" (ngModelChange)="shippingFeeNoteChange.emit($event)"
+                    placeholder="Ví dụ: 30k (Thu ngoài)"
+                    class="w-full px-2.5 py-1 h-[34px] text-xs rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800 font-semibold focus:outline-none focus:border-primary"
+                    [disabled]="!!billId && !isBillEditUnlocked" />
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-surface-700 dark:text-surface-300 mb-0.5">Địa chỉ giao hàng
+                    <span class="text-red-500">*</span></label>
+                <input type="text" [ngModel]="deliveryAddress" (ngModelChange)="deliveryAddressChange.emit($event)"
+                    placeholder="Nhập địa chỉ giao hàng"
+                    class="w-full px-2.5 py-1 h-[34px] text-xs rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800 font-semibold focus:outline-none focus:border-primary"
+                    [disabled]="!!billId && !isBillEditUnlocked" />
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-surface-700 dark:text-surface-300 mb-0.5">Ghi chú giao
+                    hàng</label>
+                <input type="text" [ngModel]="deliveryNote" (ngModelChange)="deliveryNoteChange.emit($event)"
+                    placeholder="Ghi chú người vận chuyển..."
+                    class="w-full px-2.5 py-1 h-[34px] text-xs rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800 font-semibold focus:outline-none focus:border-primary"
+                    [disabled]="!!billId && !isBillEditUnlocked" />
+            </div>
+            <div class="col-span-2">
+                <span class="text-[10px] text-surface-500 block italic">* Note: Kế toán hiện chưa xử lý hóa đơn có phí
+                    vận chuyển.</span>
+            </div>
+        </div>
+    </div>
+</div>

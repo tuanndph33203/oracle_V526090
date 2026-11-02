@@ -1,0 +1,12 @@
+<div class="flex items-center gap-2">
+    <p-datepicker #startPicker appendTo="body" [ngModel]="rangeDates[0]" (ngModelChange)="onStartChange($event)" placeholder="Từ ngày" dateFormat="dd/mm/yy" [showClear]="showClear()" (onClear)="onClear(1)" [maxDate]="rangeDates[1]" class="w-full">
+        <ng-template #date let-date>
+            <span class="p-datepicker-day" [class.p-datepicker-day-selected]="isStartOrEnd(date)" [class.p-datepicker-day-selected-range]="isInRange(date)"> {{ date.day }} </span>
+        </ng-template>
+    </p-datepicker>
+    <p-datepicker #endPicker appendTo="body" [ngModel]="rangeDates[1]" (ngModelChange)="onEndChange($event)" placeholder="Đến ngày" dateFormat="dd/mm/yy" [minDate]="rangeDates[0]" [showClear]="showClear()" (onClear)="onClear(0)" class="w-full">
+        <ng-template #date let-date>
+            <span class="p-datepicker-day" [class.p-datepicker-day-selected]="isStartOrEnd(date)" [class.p-datepicker-day-selected-range]="isInRange(date)"> {{ date.day }}</span>
+        </ng-template>
+    </p-datepicker>
+</div>

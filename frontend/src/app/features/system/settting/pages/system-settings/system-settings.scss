@@ -1,0 +1,60 @@
+:host {
+    display: block;
+}
+
+.settings-panel {
+    border: 1px solid color-mix(in srgb, var(--surface-border) 82%, var(--primary-color) 18%);
+    box-shadow:
+        0 10px 24px color-mix(in srgb, var(--primary-color) 8%, transparent),
+        0 1px 0 color-mix(in srgb, var(--surface-border) 75%, transparent);
+}
+
+.settings-hero {
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--surface-card) 88%, var(--primary-color) 12%) 0%, var(--surface-card) 62%, color-mix(in srgb, var(--surface-card) 94%, var(--primary-color) 6%) 100%);
+}
+
+.settings-kicker {
+    color: var(--primary-color);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 24%, transparent);
+    background: color-mix(in srgb, var(--primary-color) 12%, var(--surface-card));
+}
+
+.settings-nav-button {
+    border: 1px solid transparent;
+}
+
+.settings-nav-button:hover {
+    border-color: color-mix(in srgb, var(--surface-border) 78%, var(--primary-color) 22%);
+    background: color-mix(in srgb, var(--surface-hover) 88%, var(--primary-color) 12%);
+}
+
+.settings-nav-button-active {
+    color: var(--primary-color);
+    border-color: color-mix(in srgb, var(--surface-border) 72%, var(--primary-color) 28%);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--primary-color) 10%, var(--surface-card)) 0%, color-mix(in srgb, var(--surface-card) 94%, var(--primary-color) 6%) 100%);
+    box-shadow: inset 3px 0 0 var(--primary-color);
+}
+
+.settings-icon-chip {
+    border: 1px solid var(--surface-border);
+    background: color-mix(in srgb, var(--surface-card) 92%, var(--surface-hover) 8%);
+}
+
+.settings-icon-chip-active {
+    color: var(--primary-color);
+    border-color: color-mix(in srgb, var(--surface-border) 70%, var(--primary-color) 30%);
+    background: color-mix(in srgb, var(--primary-color) 10%, var(--surface-card));
+}
+
+:host ::ng-deep {
+    .p-toggleswitch .p-toggleswitch-slider {
+        box-shadow: none;
+    }
+}
+
+.settings-items-scroll {
+    max-height: calc(100vh - 400px);
+    overflow-y: auto;
+    padding-right: 8px; 
+}

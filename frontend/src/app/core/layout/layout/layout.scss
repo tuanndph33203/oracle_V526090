@@ -1,0 +1,199 @@
+:root.app-dark {
+    --surface-ground: var(--p-surface-950);
+}
+
+::ng-deep {
+    .p-autocomplete {
+
+        .p-autocomplete-input,
+        .p-autocomplete-input-multiple {
+            border-radius: 6px !important;
+            padding-right: 30px !important;
+        }
+
+        .p-autocomplete-dropdown {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 90%;
+            right: 0;
+            background: none !important;
+            border: none !important;
+            opacity: 0.6;
+        }
+    }
+
+    .p-dialog {
+        overflow: hidden;
+        max-height: 99%;
+        max-width: 99%;
+
+        .p-dialog-header {
+            font-size: 17px;
+            padding: 1rem 0.75rem !important;
+            background: var(--surface-ground);
+            border-bottom: 1px solid var(--p-surface-border);
+            border-radius: 0px;
+        }
+
+        .p-dialog-content {
+            padding: 0;
+            overflow-y: auto;
+        }
+    }
+
+    .p-confirmdialog {
+        .p-dialog-content {
+            padding: 10px;
+        }
+
+        .p-confirmdialog-accept-button {}
+    }
+
+    .p-menubar {
+        .p-menubar-item-link {
+            padding: 10.5px !important;
+
+            &:hover {
+                padding-right: 4px;
+            }
+        }
+
+        .p-menubar-submenu {
+            min-width: 200px;
+            // .p-menubar-item {
+            //     min-width: 260px;
+            // }
+        }
+
+        .p-menubar-item-content {
+            padding: 0px;
+            background: none !important;
+        }
+
+        .p-menubar-item-link-active {
+            background: var(--surface-ground);
+            color: var(--primary-color);
+        }
+
+        .p-focus {
+            background: none;
+        }
+    }
+
+    .p-breadcrumb {
+        padding: 0 !important;
+        background: none !important;
+    }
+
+    .p-inputmask {
+        .p-inputtext {
+            width: 100%;
+        }
+    }
+
+    .p-password {
+        .p-inputtext {
+            width: 100%;
+        }
+    }
+
+    .p-popover {
+        .p-popover-content {
+            padding: 0;
+        }
+    }
+
+    .p-datepicker {
+        .p-datepicker-input {
+            width: 100%;
+        }
+    }
+
+    .p-autocomplete {
+        .p-autocomplete-input {
+            width: 100%;
+        }
+    }
+
+    .p-tooltip {
+        font-size: 12px;
+        max-width: none !important;
+    }
+
+    input[readonly],
+    textarea[readonly],
+    .p-inputtext[readonly],
+    .p-select.readonly {
+        pointer-events: none;
+        background: rgba(0, 0, 0, 0.03);
+    }
+
+    .p-selectbutton {
+        .p-togglebutton-checked {
+            font-weight: 600;
+
+            .p-togglebutton-content {
+                background: var(--primary-color) !important;
+                color: white !important;
+            }
+        }
+    }
+
+    .status-filter-btn {
+        overflow: visible !important;
+        position: relative !important;
+    }
+
+    .p-drawer {
+        z-index: 1001 !important;
+    }
+
+    .p-drawer-header {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid var(--p-surface-200);
+        border-radius: 0px !important;
+
+        h3 {
+            margin: 0 !important;
+        }
+
+        .p-button-icon-only {
+            padding: 0px !important;
+        }
+    }
+
+    .p-drawer-content {
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        height: 100% !important;
+        padding: 0 0 10px;
+    }
+
+    @media (max-width: 576px) {
+        .p-drawer-header {
+            padding: 0.5rem 0.75rem !important;
+        }
+
+        .p-drawer-content {
+            padding: 0 !important;
+        }
+
+        .p-paginator {
+
+            .p-paginator-page,
+            .p-paginator-next,
+            .p-paginator-last,
+            .p-paginator-first,
+            .p-paginator-prev {
+                min-width: 25px;
+                height: 25px;
+            }
+
+            .p-select-label {
+                padding: 3.5px 5px;
+            }
+        }
+    }
+}

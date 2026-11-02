@@ -1,0 +1,210 @@
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-slate-50 dark:bg-surface-950 p-6 flex flex-col gap-6">
+    <!-- Header Title & Filters in 1 Row Toolbar -->
+    <app-page-header
+        title="BẢNG KÊ HÓA ĐƠN"
+        description="Danh sách chi tiết tất cả các hóa đơn đã bán hàng và thanh toán thành công"
+        icon="pi pi-receipt">
+        <div class="flex flex-wrap items-end gap-3">
+            <!-- Chi nhánh -->
+            <div class="flex flex-col gap-1 min-w-[180px]" *ngIf="rawBranchesLength() > 1">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Chi nhánh</label>
+                <p-select [options]="branches()" [ngModel]="selectedBranchId()"
+                    (ngModelChange)="selectedBranchId.set($event); onFilterChange()" optionLabel="label" optionValue="value"
+                    placeholder="Chọn chi nhánh" styleClass="w-full text-xs" [filter]="true">
+                </p-select>
+            </div>
+
+            <!-- Từ ngày -->
+            <div class="flex flex-col gap-1 min-w-[140px]">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Từ ngày</label>
+                <p-datepicker [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event); onFilterChange()"
+                    dateFormat="dd/mm/yy" [showIcon]="true" placeholder="Từ ngày">
+                </p-datepicker>
+            </div>
+
+            <!-- Đến ngày -->
+            <div class="flex flex-col gap-1 min-w-[140px]">
+                <label class="text-xs font-bold text-surface-600 dark:text-surface-400">Đến ngày</label>
+                <p-datepicker [ngModel]="toDate()" (ngModelChange)="toDate.set($event); onFilterChange()"
+                    dateFormat="dd/mm/yy" [showIcon]="true" placeholder="Đến ngày">
+                </p-datepicker>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button pButton label="Đồng bộ dữ liệu" icon="pi pi-refresh" [loading]="isSyncing()" (click)="triggerSync()"
+                    class="p-button-outlined p-button-secondary text-xs px-3 py-2">
+                </button>
+                <button pButton label="Xuất Excel" icon="pi pi-file-excel" [loading]="isExporting()" (click)="exportExcel()"
+                    class="p-button-success text-xs px-3 py-2">
+                </button>
+            </div>
+        </div>
+    </app-page-header>
+
+    <!-- Data Table Section -->
+    <section
+        class="bg-white dark:bg-surface-900 rounded-2xl shadow-sm border border-surface-200 dark:border-surface-800 overflow-hidden">
+        <!-- Loading State -->
+        @if (isLoading()) {
+        <div class="flex items-center justify-center py-16">
+            <div class="flex flex-col items-center gap-3">
+                <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500"></div>
+                <span class="text-sm text-surface-500">Đang tải dữ liệu...</span>
+            </div>
+        </div>
+        }
+
+        @if (!isLoading()) {
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left text-xs border border-surface-200 dark:border-surface-700 min-w-max">
+                <thead>
+                    <!-- Row 1: Group Headers -->
+                    <tr class="bg-surface-100 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-20 font-bold text-center text-surface-800 dark:text-surface-200">
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center w-[50px] min-w-[50px]">STT</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center min-w-[110px]">Ngày</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center min-w-[120px]">Giờ vào - ra</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left min-w-[155px]">
+                            Mã hóa đơn
+                            <span class="block text-[9px] font-normal text-surface-500 dark:text-surface-400 mt-0.5">Kích đúp để xem chi tiết</span>
+                        </th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Tổng</th>
+                        <!-- Doanh thu Group -->
+                        <th colspan="3" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center bg-primary/20 dark:bg-primary-950/60 text-primary-950 dark:text-primary-100 font-extrabold">DOANH THU</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left min-w-[150px]">Khách hàng</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center w-[80px]">Số người</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center w-24">Hình thức PV</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left w-24">Khu vực</th>
+                        <!-- Payment Group -->
+                        <th colspan="3" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-center">KHÁCH HÀNG / ĐỐI TÁC THANH TOÁN</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left min-w-[120px]">Bàn</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left w-24">Thu ngân</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left w-24">Đối tác GH</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left w-24">Phục vụ</th>
+                        <th rowspan="2" class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-left min-w-[180px]">CTKM</th>
+                        <th rowspan="2" class="p-2.5 text-left min-w-[150px]">Ghi chú</th>
+                        <th rowspan="2" class="p-2.5 text-left min-w-[220px]">Nội dung đánh giá</th>
+                    </tr>
+                    <!-- Row 2: Sub-headers -->
+                    <tr class="bg-surface-100 dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-9 z-20 font-bold text-center text-surface-800 dark:text-surface-200">
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Tiền hàng<br /><span class="text-[10px] font-normal opacity-75">Trước thuế</span></th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[120px]">Thuế GTGT</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right bg-primary/10 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 min-w-[135px]">Khuyến mại<br /><span class="text-[10px] font-normal opacity-75">Trước thuế</span></th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Tiền mặt</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Chuyển khoản</th>
+                        <th class="p-2.5 border-r border-surface-200 dark:border-surface-700 text-right min-w-[120px]">Voucher</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (item of items(); track item.OrderId; let i = $index) {
+                    <tr class="bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800 text-surface-800 dark:text-surface-200 hover:bg-slate-50 dark:hover:bg-surface-850 transition-colors">
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center text-surface-400">{{ (pageNumber() - 1) * pageSize() + i + 1 }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">{{ item.OrderDate | date:'dd/MM/yyyy' }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center text-surface-600 dark:text-surface-400 whitespace-nowrap">
+                            {{ item.OpenTime | date:'HH:mm' }} - {{ item.PaymentTime | date:'HH:mm' }}
+                        </td>
+
+                        <!-- Số hóa đơn double-click opens popup -->
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 font-semibold text-primary-700 dark:text-primary-300 cursor-pointer select-none whitespace-nowrap"
+                            (dblclick)="onInvoiceDblClick(item)" title="Kích đúp để xem chi tiết hóa đơn">
+                            {{ item.OrderCode }}
+                        </td>
+
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right font-bold text-surface-800 dark:text-surface-100 whitespace-nowrap">
+                            {{ (item.TotalAmount || 0) | number:'1.0-0' }}đ
+                        </td>
+
+                        <!-- DOANH THU -->
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (item.PreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-amber-700 dark:text-amber-300 whitespace-nowrap">{{ (item.TaxAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-red-500 whitespace-nowrap">{{ (item.DiscountAmount || 0) | number:'1.0-0' }}đ</td>
+
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ item.CustomerInfo || '—' }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">{{ item.CustomerCount || 0 }}</td>
+
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-center whitespace-nowrap">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold" [ngClass]="{
+                                              'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': item.ServiceType === 'DineIn',
+                                              'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': item.ServiceType === 'TakeAway',
+                                              'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400': item.ServiceType === 'Delivery'
+                                          }">
+                                {{ item.ServiceType === 'DineIn' ? 'Tại chỗ' : item.ServiceType === 'TakeAway' ? 'Mang về' : 'Giao hàng' }}
+                            </span>
+                        </td>
+
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ item.AreaName || '—' }}</td>
+
+                        <!-- KH THANH TOÁN -->
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (item.CashAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right whitespace-nowrap">{{ (item.TransferAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 text-right text-surface-400 whitespace-nowrap">{{ (item.VoucherAmount || 0) | number:'1.0-0' }}đ</td>
+
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ item.TableInfo || '—' }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ item.CashierName || '—' }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ item.DeliveryPartner || '—' }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800 whitespace-nowrap">{{ item.WaiterName || '—' }}</td>
+                        <td class="p-2.5 border-r border-surface-200 dark:border-surface-800">{{ item.PromotionInfo || '—' }}</td>
+                        <td class="p-2.5 italic text-surface-500 whitespace-nowrap">{{ item.Note || '—' }}</td>
+                        <td class="p-2.5 whitespace-pre-line">{{ item.RatingContent || '—' }}</td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="22" class="p-12 text-center text-surface-400 dark:text-surface-600 bg-white dark:bg-surface-900">
+                            <div class="flex flex-col items-center gap-2">
+                                <i class="pi pi-inbox text-4xl opacity-25"></i>
+                                <span class="text-sm">Không tìm thấy hóa đơn nào trong khoảng thời gian đã chọn</span>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+
+                <!-- Global Total Footer -->
+                @if (items().length > 0) {
+                <tfoot>
+                    <tr class="bg-primary/15 dark:bg-primary-950/40 font-black text-primary-950 dark:text-primary-100 text-xs border-t-2 border-primary/30">
+                        <td colspan="4" class="p-3 text-left pl-4 font-black tracking-wider uppercase">TỔNG CỘNG HÓA ĐƠN</td>
+                        <td class="p-3 text-right font-black text-primary-700 dark:text-primary-300 whitespace-nowrap">{{ (summary().TotalTotalAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-extrabold whitespace-nowrap">{{ (summary().TotalPreTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-extrabold whitespace-nowrap">{{ (summary().TotalTaxAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-extrabold text-red-600 dark:text-red-400 whitespace-nowrap">{{ (summary().TotalDiscountAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3"></td> <!-- Khách hàng -->
+                        <td class="p-3 text-center font-bold whitespace-nowrap">{{ summary().TotalCustomerCount || 0 }}</td>
+                        <td class="p-3"></td> <!-- Hình thức PV -->
+                        <td class="p-3"></td> <!-- Khu vực -->
+                        <td class="p-3 text-right font-bold whitespace-nowrap">{{ (summary().TotalCashAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-bold whitespace-nowrap">{{ (summary().TotalTransferAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td class="p-3 text-right font-bold whitespace-nowrap">{{ (summary().TotalVoucherAmount || 0) | number:'1.0-0' }}đ</td>
+                        <td colspan="7" class="p-3"></td> <!-- Bàn, Thu ngân, Đối tác GH, Phục vụ, CTKM, Ghi chú, Đánh giá -->
+                    </tr>
+                </tfoot>
+                }
+            </table>
+        </div>
+
+        <!-- Pagination Bar -->
+        @if (totalRecords > 0) {
+        <div
+            class="flex items-center justify-between px-4 py-3 border-t border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900">
+            <span class="text-xs text-surface-500">
+                Hiển thị trang <strong class="text-surface-800 dark:text-surface-100">{{ pageNumber() }}</strong>
+                / <strong>{{ totalPages }}</strong>
+                &nbsp;·&nbsp; Tổng <strong>{{ totalRecords }}</strong> hóa đơn
+            </span>
+            <p-paginator [first]="(pageNumber() - 1) * pageSize()" [rows]="pageSize()" [totalRecords]="totalRecords"
+                [rowsPerPageOptions]="[10, 20, 50]" (onPageChange)="onPageChange($event)"
+                styleClass="text-xs p-0 bg-transparent border-none">
+            </p-paginator>
+        </div>
+        }
+        }
+    </section>
+</div>
+
+<!-- Invoice Detail Popup -->
+<app-invoice-detail-popup [visible]="isDetailPopupVisible()" (visibleChange)="isDetailPopupVisible.set($event)"
+    [invoiceNo]="selectedInvoiceNo()">
+</app-invoice-detail-popup>

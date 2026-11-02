@@ -1,0 +1,112 @@
+<app-floating-configurator />
+
+<div class="lg:hidden min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950 px-4">
+    <div class="w-full max-w-sm">
+        <div class="bg-surface-0 dark:bg-surface-900 p-6 rounded-2xl shadow-lg border border-surface-100 dark:border-surface-700">
+            <div class="flex flex-col items-center mb-6">
+                <img class="w-12 h-full aspect-square object-cover mb-3 rounded-full bg-primary" src="logo_an.png" />
+                <div class="text-xl font-semibold text-center">Chào mừng đến với An FOOD</div>
+            </div>
+
+            <div class="grid transition-[grid-template-rows,opacity] duration-500 ease-in-out" [ngClass]="isInternalLogin ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'">
+                <div class="overflow-hidden">
+                    <div class="flex flex-col pb-2">
+                        <p-button label="Đăng nhập bằng Microsoft" icon="pi pi-microsoft" severity="info" styleClass="w-full mb-4 h-11 text-sm font-semibold" (onClick)="onLoginWidthMirosoft()" />
+
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="flex-1 h-px bg-surface-300"></div>
+                            <span class="text-xs text-primary font-medium cursor-pointer hover:underline" (click)="isInternalLogin = true">Sử dụng tài khoản nội bộ</span>
+                            <div class="flex-1 h-px bg-surface-300"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid transition-[grid-template-rows,opacity] duration-500 ease-in-out" [ngClass]="isInternalLogin ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'">
+                <div class="overflow-hidden">
+                    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-3 pt-2">
+                        <div>
+                            <label class="text-sm font-medium mb-1 block">Email</label>
+                            <input pInputText formControlName="email" placeholder="Địa chỉ email" class="w-full h-11" />
+
+                            <small class="text-red-500 text-xs" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+                                <span *ngIf="form.get('email')?.errors?.['required']"> Không được để trống </span>
+                                <span *ngIf="form.get('email')?.errors?.['email']"> Email không hợp lệ </span>
+                            </small>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-medium mb-1 block">Mật khẩu</label>
+                            <p-password formControlName="password" placeholder="Mật khẩu" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="h-11 w-full"></p-password>
+
+                            <small class="text-red-500 text-xs" *ngIf="form.get('password')?.touched && form.get('password')?.invalid"> Tối thiểu 6 ký tự </small>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-sm text-surface-500 hover:text-surface-700 font-medium cursor-pointer flex items-center" (click)="isInternalLogin = false">
+                                <i class="pi pi-arrow-left text-xs mr-1"></i> Quay lại
+                            </span>
+                            <span class="text-sm text-primary font-medium cursor-pointer hover:underline"> Quên mật khẩu? </span>
+                        </div>
+
+                        <p-button label="Đăng nhập" type="submit" styleClass="w-full h-11 font-semibold mt-2" [disabled]="form.invalid" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="hidden lg:flex bg-surface-50 dark:bg-surface-950 items-center justify-center min-h-screen overflow-hidden">
+    <div class="flex flex-col items-center justify-center">
+        <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+            <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+                <div class="flex flex-col justify-center items-center mb-8">
+                    <img class="w-14 h-full aspect-square object-cover mb-3 rounded-full bg-primary" src="logo_an.png" />
+                    <div class="text-2xl sm:text-3xl font-medium mb-4">Chào mừng đến với An FOOD</div>
+                </div>
+
+                <div class="grid transition-[grid-template-rows,opacity] duration-500 ease-in-out" [ngClass]="isInternalLogin ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'">
+                    <div class="overflow-hidden">
+                        <div class="flex flex-col pb-2 w-full md:w-120">
+                            <p-button label="Đăng nhập bằng tài khoản Microsoft" icon="pi pi-microsoft" severity="info" styleClass="w-full mb-6 h-12 !text-lg font-semibold" (onClick)="onLoginWidthMirosoft()" />
+
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="flex-1 h-px bg-surface-300"></div>
+                                <span class="text-sm text-primary font-medium cursor-pointer hover:underline" (click)="isInternalLogin = true">Sử dụng tài khoản nội bộ</span>
+                                <div class="flex-1 h-px bg-surface-300"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid transition-[grid-template-rows,opacity] duration-500 ease-in-out" [ngClass]="isInternalLogin ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'">
+                    <div class="overflow-hidden">
+                        <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col w-full md:w-120 pt-2">
+                            <label class="text-lg font-medium mb-1">Email</label>
+                            <input pInputText formControlName="email" placeholder="Địa chỉ mail" class="w-full mb-1 h-12" />
+
+                            <small class="text-red-500" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+                                <span *ngIf="form.get('email')?.errors?.['required']"> Email không được để trống </span>
+                                <span *ngIf="form.get('email')?.errors?.['email']"> Email không đúng định dạng </span>
+                            </small>
+
+                            <label class="text-lg font-medium mt-4 mb-1">Mật khẩu</label>
+                            <p-password formControlName="password" placeholder="Mật khẩu" [toggleMask]="true" [feedback]="false" styleClass="mb-1" inputStyleClass="h-12 w-full" [fluid]="true"></p-password>
+
+                            <small class="text-red-500" *ngIf="form.get('password')?.touched && form.get('password')?.invalid"> Mật khẩu tối thiểu 6 ký tự </small>
+
+                            <div class="flex justify-between items-center mt-4 mb-6">
+                                <span class="text-surface-500 hover:text-surface-700 font-medium cursor-pointer flex items-center" (click)="isInternalLogin = false">
+                                    <i class="pi pi-arrow-left mr-2"></i> Quay lại
+                                </span>
+                                <span class="font-medium cursor-pointer text-primary hover:underline"> Quên mật khẩu? </span>
+                            </div>
+
+                            <p-button label="Đăng nhập" type="submit" styleClass="w-full font-bold h-12 !text-xl" [disabled]="form.invalid" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
