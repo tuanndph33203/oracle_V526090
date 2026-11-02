@@ -56,10 +56,110 @@ export class MenuService {
             });
     }
 
+    private readonly defaultCafeMenu: AppMenuItem[] = [
+        {
+            lable: 'Bán hàng & Sơ đồ bàn',
+            icon: 'pi pi-th-large',
+            routerLink: '/catalogs/dining-tables',
+            order: 1
+        },
+        {
+            lable: 'Lịch sử hóa đơn',
+            icon: 'pi pi-receipt',
+            routerLink: '/catalogs/orders',
+            order: 2
+        },
+        {
+            lable: 'Quản lý Thực đơn',
+            icon: 'pi pi-book',
+            order: 3,
+            items: [
+                {
+                    lable: 'Nhóm đồ uống',
+                    icon: 'pi pi-folder',
+                    routerLink: '/catalogs/menu-groups',
+                    order: 1
+                },
+                {
+                    lable: 'Món / Thức uống',
+                    icon: 'pi pi-coffee',
+                    routerLink: '/catalogs/menu-items',
+                    order: 2
+                }
+            ]
+        },
+        {
+            lable: 'Sơ đồ Bàn & Khu vực',
+            icon: 'pi pi-table',
+            routerLink: '/catalogs/floor-plans',
+            order: 4
+        },
+        {
+            lable: 'Quản lý Khách hàng',
+            icon: 'pi pi-users',
+            routerLink: '/catalogs/business-partners',
+            order: 5
+        },
+        {
+            lable: 'Quản lý Nhân sự',
+            icon: 'pi pi-id-card',
+            order: 6,
+            items: [
+                {
+                    lable: 'Danh sách nhân viên',
+                    icon: 'pi pi-user-edit',
+                    routerLink: '/catalogs/employees',
+                    order: 1
+                },
+                {
+                    lable: 'Tài khoản người dùng',
+                    icon: 'pi pi-user',
+                    routerLink: '/systems/account',
+                    order: 2
+                },
+                {
+                    lable: 'Vai trò & Quyền hạn',
+                    icon: 'pi pi-shield',
+                    routerLink: '/systems/role',
+                    order: 3
+                }
+            ]
+        },
+        {
+            lable: 'Kho & Nguyên liệu',
+            icon: 'pi pi-box',
+            routerLink: '/catalogs/materials',
+            order: 7
+        },
+        {
+            lable: 'Báo cáo Doanh thu',
+            icon: 'pi pi-chart-bar',
+            order: 8,
+            items: [
+                {
+                    lable: 'Doanh thu theo ngày',
+                    icon: 'pi pi-calendar',
+                    routerLink: '/reports/daily-revenue',
+                    order: 1
+                },
+                {
+                    lable: 'Doanh thu theo món',
+                    icon: 'pi pi-chart-pie',
+                    routerLink: '/reports/revenue-by-item',
+                    order: 2
+                },
+                {
+                    lable: 'Doanh thu chi tiết',
+                    icon: 'pi pi-list',
+                    routerLink: '/reports/detailed-revenue',
+                    order: 3
+                }
+            ]
+        }
+    ];
+
     loadMenu() {
-        return this.navigationService.getByFilter({ isTree: true }).pipe(
-            map((res: any) => this.getResponseItems(res)),
-            catchError(() => of([])),
+        return of(this.defaultCafeMenu).pipe(
             tap((menu) => {
                 this._rawMenu.set(this.normalizeMenuTree(menu));
                 this.applyMenuFilter();

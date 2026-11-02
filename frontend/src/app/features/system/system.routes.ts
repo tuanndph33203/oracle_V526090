@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
-import { Permission } from './permission/pages/permission/permission';
-import { Navigation } from './navigation/pages/navigation/navigation';
 
 export default [
     {
         path: 'role',
+        title: 'Vai trò & Quyền hạn - Quán Café',
         children: [
             {
                 path: '',
@@ -20,9 +19,9 @@ export default [
             }
         ]
     },
-    { path: 'permission', component: Permission },
     {
         path: 'account',
+        title: 'Tài khoản người dùng - Quán Café',
         children: [
             {
                 path: '',
@@ -37,18 +36,5 @@ export default [
                 loadComponent: () => import('./account/pages/account-create/account-create').then((c) => c.AccountCreate)
             }
         ]
-    },
-    { path: 'navigation', component: Navigation },
-    {
-        path: 'personnel',
-        loadComponent: () => import('./personnel/pages/personnel/personnel').then((c) => c.Personnel)
-    },
-    {
-        path: 'settings',
-        loadComponent: () => import('./settting/pages/system-settings/system-settings').then((c) => c.SystemSettings)
-    },
-    {
-        path: 'print-settings',
-        loadComponent: () => import('./settting/pages/print-settings/print-settings').then((c) => c.PrintSettings)
     }
 ] as Routes;

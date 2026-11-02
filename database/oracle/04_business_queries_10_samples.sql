@@ -152,3 +152,4 @@ JOIN CHI_TIET_HD ct ON m.MaMon = ct.MaMon
 JOIN HOA_DON hd ON ct.MaHD = hd.MaHD
 WHERE hd.TrangThai = 'DA_THANH_TOAN'
 GROUP BY m.TenMon;
+

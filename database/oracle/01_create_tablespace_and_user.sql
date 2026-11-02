@@ -54,3 +54,4 @@ WHERE username = 'CAFE_ADMIN';
 
 -- HOÀN TẤT BƯỚC 1:
 -- Đăng xuất khỏi SYS/SYSTEM và kết nối vào CSDL bằng User: CAFE_ADMIN / CafeAdmin@123
+

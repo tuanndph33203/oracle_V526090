@@ -135,3 +135,4 @@ Tập lệnh thực hành chi tiết có trong tệp `database/oracle/05_oracle_
    - Trang 2: **Quản lý Bàn** (Interactive Grid cho phép thêm, sửa, đổi trạng thái bàn).
    - Trang 3: **Menu Đồ uống** (Interactive Report cho phép tìm kiếm, thêm món mới, cập nhật giá).
    - Trang 4: **Bán hàng / Hóa đơn** (Form tạo đơn, chọn bàn, chọn món và thanh toán).
+
