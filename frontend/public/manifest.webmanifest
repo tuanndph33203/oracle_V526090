@@ -1,6 +1,6 @@
 {
-  "name": "An FOOD",
-  "short_name": "An FOOD",
+  "name": "UTC Coffee",
+  "short_name": "UTC Coffee",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

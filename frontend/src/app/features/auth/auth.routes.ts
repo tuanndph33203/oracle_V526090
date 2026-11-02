@@ -4,18 +4,18 @@ import { Routes } from '@angular/router';
 export default [
     {
         path: 'access',
-        title: 'Lỗi xác thực - An FOOD',
+        title: 'Lỗi xác thực - UTC Coffee',
         loadComponent: () => import('./pages/access/access').then((m) => m.Access)
     },
     {
         path: 'login',
         canActivate: [loggedGuard],
-        title: 'Đăng nhập - An FOOD',
+        title: 'Đăng nhập - UTC Coffee',
         loadComponent: () => import('./pages/login/login').then((m) => m.Login)
     },
     {
         path: 'error',
-        title: 'Lỗi - An FOOD',
+        title: 'Lỗi - UTC Coffee',
         loadComponent: () => import('./pages/error/error').then((m) => m.Error)
     },
     {

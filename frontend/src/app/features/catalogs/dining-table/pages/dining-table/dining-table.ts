@@ -5029,7 +5029,7 @@ export class DiningTable implements OnInit {
                 </head>
                 <body>
                   <div class="text-center">
-                    <div class="store-title">${order.BranchName || this.branchUser()[0]?.Name || 'AN FOOD'}</div>
+                    <div class="store-title">UTC COFFEE</div>
                     <div class="bill-title">HÓA ĐƠN THANH TOÁN</div>
                   </div>
 
@@ -5167,7 +5167,7 @@ export class DiningTable implements OnInit {
                   ` : ''}
 
                   <div class="text-center" style="font-size: 10px; margin-top: 12px;">Trân trọng cảm ơn!</div>
-                  <div class="text-center" style="font-size: 10px; font-weight: bold;">AnFood - Một sản phẩm của An Solution</div>
+                  <div class="text-center" style="font-size: 10px; font-weight: bold;">Hệ thống Quản lý Quán Café - UTC Coffee</div>
                   <div class="text-center" style="margin-top: 16px;">-</div>
                 </body>
                 </html>
