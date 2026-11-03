@@ -37,79 +37,64 @@ namespace AnFood.API.Controllers
                 var itemGroupRepo = _unit.GetRepository<MenuItemGroup>();
                 var itemBranchRepo = _unit.GetRepository<MenuItemBranch>();
 
-                // 1. Cập nhật tên các chi nhánh thành Quán Café UTC & dọn dẹp các chi nhánh cũ
+                // 1. Chỉ giữ lại DUY NHẤT chi nhánh Quán Café UTC – ĐH Giao thông Vận tải
                 var b02 = await branchRepo.Get(x => x.Code == "02").FirstOrDefaultAsync();
                 if (b02 != null)
                 {
-                    b02.Name = "Quán Café UTC – Cơ sở 1 (Cầu Giấy)";
-                    b02.Address = "97 Triều Khúc, Thanh Xuân, Hà Nội (ĐH GTVT)";
-                    b02.Email = "cafe.utc.cs1@utc.edu.vn";
-                    b02.Status = 1;
+                    b02.Name = "Quán Café UTC – ĐH Giao thông Vận tải";
+                    b02.Address = "Số 3 Cầu Giấy, Láng Thượng, Đống Đa, Hà Nội (Trường ĐH Giao thông Vận tải)";
+                    b02.Email = "cafe@utc.edu.vn";
+                    b02.Phone = "02437663311";
+                    b02.Status = 1; // Chi nhánh duy nhất hoạt động
                     branchRepo.Update(b02);
                 }
 
-                var b17 = await branchRepo.Get(x => x.Code == "17A").FirstOrDefaultAsync();
-                if (b17 != null)
-                {
-                    b17.Name = "Quán Café UTC – Cơ sở 2 (Xuân Thủy)";
-                    b17.Address = "136 Xuân Thủy, Cầu Giấy, Hà Nội (ĐH GTVT)";
-                    b17.Email = "cafe.utc.cs2@utc.edu.vn";
-                    b17.Status = 1;
-                    branchRepo.Update(b17);
-                }
-
-                var b04 = await branchRepo.Get(x => x.Code == "04").FirstOrDefaultAsync();
-                if (b04 != null)
-                {
-                    b04.Name = "Quán Café UTC – Xưởng Pha Chế & Rang Xay";
-                    b04.Address = "Phòng Thực hành Pha chế - ĐH Giao thông Vận tải";
-                    b04.Status = 1;
-                    branchRepo.Update(b04);
-                }
-
-                var b05 = await branchRepo.Get(x => x.Code == "05").FirstOrDefaultAsync();
-                if (b05 != null)
-                {
-                    b05.Name = "Quán Café UTC – Kiosk Thư Viện ĐH GTVT";
-                    b05.Address = "Sảnh Thư viện Trường ĐH GTVT";
-                    b05.Status = 1;
-                    branchRepo.Update(b05);
-                }
-
-                var b06 = await branchRepo.Get(x => x.Code == "06").FirstOrDefaultAsync();
-                if (b06 != null)
-                {
-                    b06.Name = "Quán Café UTC – Cơ sở Ký Túc Xá";
-                    b06.Address = "Khu KTX Sinh viên ĐH GTVT";
-                    b06.Status = 1;
-                    branchRepo.Update(b06);
-                }
-
-                // Chuyển các chi nhánh cũ còn lại sang trạng thái 2 (Ngừng sử dụng) để menu gọn gàng
+                // Chuyển toàn bộ tất cả chi nhánh khác sang trạng thái 2 (Ngừng sử dụng)
                 var allBranches = await branchRepo.GetAll().ToListAsync();
-                var activeCodes = new HashSet<string> { "02", "17A", "04", "05", "06" };
                 foreach (var b in allBranches)
                 {
-                    if (!activeCodes.Contains(b.Code))
+                    if (b.Code != "02")
                     {
                         b.Status = 2; // Ngừng sử dụng
                         branchRepo.Update(b);
                     }
                 }
 
-                // Cập nhật tên mặt sàn
-                var f02 = await floorRepo.Get(x => x.Code == "TANG1" || x.Code == "Tang1").ToListAsync();
-                foreach (var f in f02)
+                // Gom tất cả mặt sàn và bàn ăn về Chi nhánh UTC GTVT (b02)
+                var allFloors = await floorRepo.GetAll().ToListAsync();
+                int floorIndex = 1;
+                foreach (var f in allFloors)
                 {
-                    if (b02 != null && f.BranchId == b02.Id)
+                    if (b02 != null)
                     {
-                        f.Name = "Tầng 1 - Quầy Bar & Phòng Lạnh";
+                        f.BranchId = b02.Id;
+                        f.Code = $"FLOOR_{floorIndex:D2}";
+                        if (floorIndex == 1)
+                        {
+                            f.Name = "Tầng 1 - Quầy Bar & Phòng Lạnh";
+                        }
+                        else if (floorIndex == 2)
+                        {
+                            f.Name = "Tầng 2 - Khu Học Tập & Sân Vườn";
+                        }
+                        else
+                        {
+                            f.Name = $"Tầng {floorIndex} - Không Gian Mở";
+                        }
+                        f.Status = 1;
                         floorRepo.Update(f);
+                        floorIndex++;
                     }
-                    else if (b17 != null && f.BranchId == b17.Id)
+                }
+
+                var tableRepo = _unit.GetRepository<DiningTable>();
+                var allTables = await tableRepo.GetAll().ToListAsync();
+                foreach (var t in allTables)
+                {
+                    if (b02 != null)
                     {
-                        f.Name = "Tầng 1 - Khu Sân Vườn Thoáng Mát";
-                        floorRepo.Update(f);
+                        t.BranchId = b02.Id;
+                        tableRepo.Update(t);
                     }
                 }
 
@@ -312,10 +297,9 @@ namespace AnFood.API.Controllers
                     ("TP04", "Thạch nha đam thanh mát", "TOPPING", 5000, false, false, "Nha đam giòn mát ngọt dịu")
                 };
 
-                // Thu thập tất cả ID chi nhánh cần link (cả 02 và 17A)
+                // Thu thập tất cả ID chi nhánh cần link (Chỉ chi nhánh UTC GTVT duy nhất)
                 var branchIds = new List<Guid>();
                 if (b02 != null) branchIds.Add(b02.Id);
-                if (b17 != null) branchIds.Add(b17.Id);
 
                 int createdCount = 0;
                 int updatedCount = 0;
@@ -435,8 +419,7 @@ namespace AnFood.API.Controllers
                     {
                         branches = new[]
                         {
-                            new { code = "02", name = b02?.Name },
-                            new { code = "17A", name = b17?.Name }
+                            new { code = "02", name = b02?.Name }
                         },
                         groupsCount = groupsDef.Length,
                         productsCreated = createdCount,
