@@ -723,7 +723,7 @@ export class DiningTable implements OnInit {
     getKitchenSendButtonLabel(): string {
         if (this.isOrderInLockedPeriod()) return 'Lưu';
         if (this.requireKitchenSend() || this.enableKitchenPrint()) {
-            return 'Gửi Bếp/Bar';
+            return 'Gửi Pha chế';
         }
         if (!this.currentOrder?.BillId) {
             return 'Mở bàn';
@@ -750,7 +750,7 @@ export class DiningTable implements OnInit {
     getKitchenSendLoadingTitle(): string {
         if (this.isOrderInLockedPeriod()) return 'Đang lưu đơn hàng...';
         if (this.requireKitchenSend() || this.enableKitchenPrint()) {
-            return 'Đang gửi Bếp/Bar...';
+            return 'Đang gửi Pha chế...';
         }
         if (!this.currentOrder?.BillId) {
             return 'Đang mở bàn & lưu đơn...';
@@ -761,7 +761,7 @@ export class DiningTable implements OnInit {
     getKitchenSendLoadingMessage(): string {
         if (this.isOrderInLockedPeriod()) return 'Hệ thống đang lưu thông tin đơn hàng, vui lòng chờ trong giây lát...';
         if (this.requireKitchenSend() || this.enableKitchenPrint()) {
-            return 'Hệ thống đang lưu đơn và chuyển thông tin món đến Bếp/Bar, vui lòng chờ trong giây lát...';
+            return 'Hệ thống đang lưu đơn và chuyển thông tin đồ uống đến Quầy Pha chế, vui lòng chờ trong giây lát...';
         }
         return 'Hệ thống đang lưu thông tin đơn hàng, vui lòng chờ trong giây lát...';
     }
