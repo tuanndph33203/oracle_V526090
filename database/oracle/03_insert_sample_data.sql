@@ -4,6 +4,8 @@
 -- (Thực thi bằng User CAFE_ADMIN)
 -- ============================================================================
 
+SET DEFINE OFF;
+
 -- 1. DỮ LIỆU BẢNG KHU_VUC (5 bản ghi)
 INSERT INTO KHU_VUC (MaKhuVuc, TenKhuVuc, GhiChu) VALUES ('KV01', N'Tầng 1 - Trong nhà', N'Khu vực máy lạnh, gần quầy bar');
 INSERT INTO KHU_VUC (MaKhuVuc, TenKhuVuc, GhiChu) VALUES ('KV02', N'Tầng 2 - Yên tĩnh', N'Thích hợp làm việc, học tập');
@@ -98,8 +100,9 @@ VALUES ('HD003', TO_TIMESTAMP('2026-10-25 10:00:00', 'YYYY-MM-DD HH24:MI:SS'), 7
 INSERT INTO HOA_DON (MaHD, NgayTao, TongTien, GiamGia, ThanhTien, PhuongThucTT, TrangThai, MaBan, MaNV, MaKH)
 VALUES ('HD004', TO_TIMESTAMP('2026-10-26 14:20:00', 'YYYY-MM-DD HH24:MI:SS'), 180000, 30000, 150000, 'THE', 'DA_THANH_TOAN', 'B05', 'NV02', 'KH04');
 
+-- Khách mang về
 INSERT INTO HOA_DON (MaHD, NgayTao, TongTien, GiamGia, ThanhTien, PhuongThucTT, TrangThai, MaBan, MaNV, MaKH)
-VALUES ('HD005', TO_TIMESTAMP('2026-10-26 15:45:00', 'YYYY-MM-DD HH24:MI:SS'), 58000, 0, 58000, 'TIEN_MAT', 'DA_THANH_TOAN', NULL, 'NV02', 'KH03'); -- Khách mang về
+VALUES ('HD005', TO_TIMESTAMP('2026-10-26 15:45:00', 'YYYY-MM-DD HH24:MI:SS'), 58000, 0, 58000, 'TIEN_MAT', 'DA_THANH_TOAN', NULL, 'NV02', 'KH03');
 
 INSERT INTO HOA_DON (MaHD, NgayTao, TongTien, GiamGia, ThanhTien, PhuongThucTT, TrangThai, MaBan, MaNV, MaKH)
 VALUES ('HD006', TO_TIMESTAMP('2026-10-27 19:30:00', 'YYYY-MM-DD HH24:MI:SS'), 104000, 0, 104000, 'CHUYEN_KHOAN', 'CHO_THANH_TOAN', 'B02', 'NV02', 'KH05');

@@ -25,7 +25,7 @@ SEGMENT SPACE MANAGEMENT AUTO;
 
 -- 4. Tạo User mới quản trị CSDL Quán Café (User Schema)
 -- Trong Oracle 12c+ nếu tạo ở CDB root cần c##, còn ở PDB hoặc Oracle 11g thì tạo bình thường
-CREATE USER CAFE_ADMIN IDENTIFIED BY CafeAdmin@123
+CREATE USER CAFE_ADMIN IDENTIFIED BY CafeAdmin123#
 DEFAULT TABLESPACE TBS_QUAN_CAFE
 TEMPORARY TABLESPACE TEMP
 QUOTA UNLIMITED ON TBS_QUAN_CAFE
@@ -53,5 +53,5 @@ FROM dba_users
 WHERE username = 'CAFE_ADMIN';
 
 -- HOÀN TẤT BƯỚC 1:
--- Đăng xuất khỏi SYS/SYSTEM và kết nối vào CSDL bằng User: CAFE_ADMIN / CafeAdmin@123
+-- Đăng xuất khỏi SYS/SYSTEM và kết nối vào CSDL bằng User: CAFE_ADMIN / CafeAdmin123#
 
