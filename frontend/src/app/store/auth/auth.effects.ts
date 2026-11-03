@@ -89,7 +89,7 @@ export class AuthEffects {
                 forkJoin([this.employeeService.getByCode(user?.code), this.branchService.getByFilter({ page: 1, size: 100 })]).pipe(
                     switchMap(([employeeRes, branchRes]) => {
                         const employee = employeeRes?.Data;
-                        const content = branchRes?.Data?.Content ?? [];
+                        const content = (branchRes?.Data?.Content ?? []).filter((b: any) => b.Status === 1);
                         const rawApplyBranchCodes = user?.applyBranchCodes ?? user?.ApplyBranchCodes ?? [];
                         const applyBranchCodes: string[] = typeof rawApplyBranchCodes === 'string'
                             ? rawApplyBranchCodes.split(',').map((x: string) => x.trim()).filter((x: string) => x.length > 0)

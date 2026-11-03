@@ -37,7 +37,7 @@ namespace AnFood.API.Controllers
                 var itemGroupRepo = _unit.GetRepository<MenuItemGroup>();
                 var itemBranchRepo = _unit.GetRepository<MenuItemBranch>();
 
-                // 1. Cập nhật tên các chi nhánh thành Quán Café UTC
+                // 1. Cập nhật tên các chi nhánh thành Quán Café UTC & dọn dẹp các chi nhánh cũ
                 var b02 = await branchRepo.Get(x => x.Code == "02").FirstOrDefaultAsync();
                 if (b02 != null)
                 {
@@ -56,6 +56,45 @@ namespace AnFood.API.Controllers
                     b17.Email = "cafe.utc.cs2@utc.edu.vn";
                     b17.Status = 1;
                     branchRepo.Update(b17);
+                }
+
+                var b04 = await branchRepo.Get(x => x.Code == "04").FirstOrDefaultAsync();
+                if (b04 != null)
+                {
+                    b04.Name = "Quán Café UTC – Xưởng Pha Chế & Rang Xay";
+                    b04.Address = "Phòng Thực hành Pha chế - ĐH Giao thông Vận tải";
+                    b04.Status = 1;
+                    branchRepo.Update(b04);
+                }
+
+                var b05 = await branchRepo.Get(x => x.Code == "05").FirstOrDefaultAsync();
+                if (b05 != null)
+                {
+                    b05.Name = "Quán Café UTC – Kiosk Thư Viện ĐH GTVT";
+                    b05.Address = "Sảnh Thư viện Trường ĐH GTVT";
+                    b05.Status = 1;
+                    branchRepo.Update(b05);
+                }
+
+                var b06 = await branchRepo.Get(x => x.Code == "06").FirstOrDefaultAsync();
+                if (b06 != null)
+                {
+                    b06.Name = "Quán Café UTC – Cơ sở Ký Túc Xá";
+                    b06.Address = "Khu KTX Sinh viên ĐH GTVT";
+                    b06.Status = 1;
+                    branchRepo.Update(b06);
+                }
+
+                // Chuyển các chi nhánh cũ còn lại sang trạng thái 2 (Ngừng sử dụng) để menu gọn gàng
+                var allBranches = await branchRepo.GetAll().ToListAsync();
+                var activeCodes = new HashSet<string> { "02", "17A", "04", "05", "06" };
+                foreach (var b in allBranches)
+                {
+                    if (!activeCodes.Contains(b.Code))
+                    {
+                        b.Status = 2; // Ngừng sử dụng
+                        branchRepo.Update(b);
+                    }
                 }
 
                 // Cập nhật tên mặt sàn

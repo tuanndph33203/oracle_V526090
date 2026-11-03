@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -18,6 +19,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     selector: 'app-floor-plan',
     imports: [
         CommonModule, 
+        RouterModule,
         FormsModule, 
         ReactiveFormsModule,
         ButtonModule, 

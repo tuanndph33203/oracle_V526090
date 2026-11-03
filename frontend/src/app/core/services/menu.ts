@@ -89,10 +89,16 @@ export class MenuService {
             ]
         },
         {
+            lable: 'Quản lý Chi nhánh',
+            icon: 'pi pi-building',
+            routerLink: '/catalogs/branches',
+            order: 4
+        },
+        {
             lable: 'Sơ đồ Bàn & Khu vực',
             icon: 'pi pi-table',
             routerLink: '/catalogs/floor-plans',
-            order: 4
+            order: 5
         },
         {
             lable: 'Quản lý Khách hàng',

@@ -3,7 +3,12 @@
     <div class="col-span-12 md:col-span-3 bg-surface-0 dark:bg-surface-800 p-4 rounded-md shadow-sm flex flex-col justify-start gap-4">
         <!-- Branch Selector -->
         <div class="mb-2" *ngIf="branchUser().length > 1">
-            <label class="block font-bold mb-1 text-sm text-surface-700 dark:text-surface-300">Chi nhánh</label>
+            <div class="flex items-center justify-between mb-1">
+                <label class="block font-bold text-sm text-surface-700 dark:text-surface-300">Chi nhánh</label>
+                <a routerLink="/catalogs/branches" class="text-xs text-primary hover:underline flex items-center gap-1 font-medium cursor-pointer">
+                    <i class="pi pi-cog text-[10px]"></i> Cấu hình chi nhánh
+                </a>
+            </div>
             <p-select 
                 [options]="branchUser()" 
                 [(ngModel)]="selectedBranchCode" 

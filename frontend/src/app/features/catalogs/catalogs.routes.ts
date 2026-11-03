@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 
 export default [
     {
+        path: 'branches',
+        title: 'Quản lý Chi nhánh - Quán Café',
+        loadComponent: () => import('./branch/pages/branch/branch').then((c) => c.Branch)
+    },
+    {
         path: 'dining-tables',
         title: 'Bàn ăn & Bán hàng - Quán Café',
         loadComponent: () => import('./dining-table/pages/dining-table/dining-table').then((c) => c.DiningTable)
