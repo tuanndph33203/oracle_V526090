@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +11,7 @@ namespace AnFood.Application.Bussiness.LogsBusiness
     }
     public class SystemAuditLogModel
     {
-        public string? ServiceName { get; set; } = "ANPOS";
+        public string? ServiceName { get; set; } = "UTC_COFFEE";
         public string? Environment { get; set; } = "prod";  // dev / uat / prod
         public string? UserId { get; set; }
         public string? UserName { get; set; }
@@ -24,7 +24,7 @@ namespace AnFood.Application.Bussiness.LogsBusiness
     }
     public class CreateAppLogRequest
     {
-        public string? ServiceName { get; set; } = "ANPOS";
+        public string? ServiceName { get; set; } = "UTC_COFFEE";
         public string? Environment { get; set; } = "prod";  // dev / uat / prod
         public string Level { get; set; } = "Info";   // Info / Warn / Error / Debug
         public string? LogType { get; set; }

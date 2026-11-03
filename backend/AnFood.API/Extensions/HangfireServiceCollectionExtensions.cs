@@ -1,4 +1,4 @@
-﻿using Hangfire;
+using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +7,7 @@ namespace AnFood.API.Extensions
 {
     public static class HangfireServiceCollectionExtensions
     {
-        public static IServiceCollection AddAnposHangfire(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddAppHangfire(this IServiceCollection services, IConfiguration configuration)
         {
             var hangfireCs = configuration["ConnectionStringHangFire"];
             if (string.IsNullOrWhiteSpace(hangfireCs))

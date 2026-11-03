@@ -1,14 +1,13 @@
-# ANPOS AI Agent Rules
+# UTC Coffee AI Agent Rules
 
-Tài liệu này là bộ quy tắc bắt buộc cho mọi AI Agent khi làm việc trong repository `AnPos.API.sln`.
+Tài liệu này là bộ quy tắc bắt buộc cho mọi AI Agent khi làm việc trong repository `UTC Coffee`.
 Mục tiêu: thay đổi nhỏ, đúng kiến trúc, an toàn dữ liệu, dễ review và dễ rollback.
 ## 0) 🔴 BẮT BUỘC: Đọc tài liệu kiến trúc trước khi làm
 
 Trước khi thực hiện BẤT KỲ task nào, AI Agent PHẢI đọc và hiểu các file sau:
 
-1. `ANPOS_ARCHITECTURE_ANALYSIS.md` (tài liệu kiến trúc tổng thể)
-2. `Program.cs` 
-3. `appsettings.json`
+1. `Program.cs` 
+2. `appsettings.json`
 
 Yêu cầu:
 - Không được phép sửa code nếu chưa đọc các file trên
@@ -18,8 +17,6 @@ Nếu tài liệu và source code mâu thuẫn:
 → Ưu tiên source code  
 → Ghi nhận và đề xuất cập nhật lại tài liệu
 
-Nếu không tìm thấy `ANPOS_ARCHITECTURE_ANALYSIS.md`:
-→ Phải báo lại user trước khi tiếp tục
 
 ## 1) Nguyên tắc ưu tiên
 
@@ -68,28 +65,28 @@ AI Agent phải thực hiện đủ các bước sau trước khi chỉnh sửa 
 2. Đọc call chain tối thiểu:
    - `Program.cs`/`Extensions` của project liên quan.
    - Controller liên quan.
-   - Handler/Service liên quan trong `Anpos.Business`.
-   - Entity/DbContext/Repository trong `Anpos.Data` và `Anpos.Domain`.
+   - Handler/Service liên quan trong `AnFood.Application`.
+   - Entity/DbContext/Repository trong `AnFood.Persistence` và `AnFood.Domain`.
 3. Xác định impact scope:
-   - `MA.Core.API`, `Anpos.Mobile.API`, `Anpos.Business`, `Anpos.Data`, `Anpos.Domain`.
+   - `AnFood.API`, `AnFood.Application`, `AnFood.Persistence`, `AnFood.Domain`.
 4. Kiểm tra rủi ro:
    - Auth/JWT/Authorize.
-   - Payment/Card/Point flow.
+   - Payment/Card flow.
    - SQL query hiệu năng cao hoặc tác động dữ liệu lớn.
 5. Chỉ khi hoàn thành các bước trên mới bắt đầu sửa code.
 
 ## 6) Kiến trúc dự án và ranh giới trách nhiệm
 
-- `MA.Core.API/`, `Anpos.Mobile.API/`
+- `AnFood.API/`
   - Chỉ xử lý HTTP, binding, validation đầu vào cơ bản, trả response.
   - Không nhét business logic phức tạp vào controller.
-- `Anpos.Business/`
+- `AnFood.Application/`
   - Chứa toàn bộ nghiệp vụ chính (`*Handler`, `*Logic`).
   - Điều phối transaction/use-case, gọi repository, gọi external service.
-- `Anpos.Data/`
-  - Chứa `DataContext`, migrations, persistence concerns.
+- `AnFood.Persistence/`
+  - Chứa `DataContext`, repositories, persistence concerns.
   - Không đặt nghiệp vụ domain tại đây.
-- `Anpos.Domain/`
+- `AnFood.Domain/`
   - Chứa entity/model domain.
 - `src/BuildingBlocks/`
   - Dùng cho utility/infrastructure dùng chung (DataUtils, ApiUtils, EventBus...).
@@ -118,7 +115,7 @@ AI Agent phải thực hiện đủ các bước sau trước khi chỉnh sửa 
 ## 9) Quy tắc database và migration
 
 - Không sửa lại migration cũ đã apply (trừ khi có yêu cầu rõ ràng).
-- Khi đổi schema: tạo migration mới trong `Anpos.Data/Migrations`.
+- Khi đổi schema: tạo migration mới trong `AnFood.Persistence/Migrations`.
 - Không hard-code secrets/connection string.
 - Với flow nhạy cảm (payment, card, point): ưu tiên tính nhất quán, auditability, và idempotency.
 

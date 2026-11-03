@@ -1224,7 +1224,7 @@ export class DiningTable implements OnInit {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Lỗi mã phiếu',
-                            detail: res?.Message || 'Mã phiếu không có trên AnPOS'
+                            detail: res?.Message || 'Mã phiếu không tồn tại trên hệ thống'
                         });
                         resolve(false);
                     }
@@ -1233,7 +1233,7 @@ export class DiningTable implements OnInit {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Lỗi mã phiếu',
-                        detail: 'Mã phiếu không có trên AnPOS'
+                        detail: 'Mã phiếu không tồn tại trên hệ thống'
                     });
                     resolve(false);
                 }
@@ -1246,12 +1246,12 @@ export class DiningTable implements OnInit {
             this.therapyVoucherCode = '';
             this.therapyServices = [];
             this.selectedTherapyServiceCode = '';
-            this.messageService.add({ severity: 'info', summary: 'Thông báo', detail: 'Đã xóa mã phiếu trị liệu' });
+            this.messageService.add({ severity: 'info', summary: 'Thông báo', detail: 'Đã xóa mã phiếu' });
             return;
         }
 
         this.therapyVoucherCode = code.trim();
-        // Gọi API kiểm tra tính hợp lệ của mã phiếu trị liệu
+        // Gọi API kiểm tra tính hợp lệ của mã phiếu
         this.salesService.validateTherapyVoucher(this.therapyVoucherCode).subscribe({
             next: (res: any) => {
                 if (res?.Code === 200) {
@@ -1263,18 +1263,18 @@ export class DiningTable implements OnInit {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Thành công',
-                        detail: count > 0 ? `Mã phiếu hợp lệ! Có ${count} dịch vụ.` : 'Mã phiếu trị liệu hợp lệ!'
+                        detail: count > 0 ? `Mã phiếu hợp lệ! Có ${count} dịch vụ.` : 'Mã phiếu hợp lệ!'
                     });
                 } else {
                     this.therapyServices = [];
                     this.selectedTherapyServiceCode = '';
-                    this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: res?.Message || 'Mã phiếu không có trên AnPOS' });
+                    this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: res?.Message || 'Mã phiếu không tồn tại trên hệ thống' });
                 }
             },
             error: () => {
                 this.therapyServices = [];
                 this.selectedTherapyServiceCode = '';
-                this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Mã phiếu không có trên AnPOS' });
+                this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Mã phiếu không tồn tại trên hệ thống' });
             }
         });
     }

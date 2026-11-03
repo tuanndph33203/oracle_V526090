@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -10,7 +10,7 @@ namespace AnFood.API.JsonConverters;
 /// - If the input has no offset, we parse as DateTime and force Kind=Unspecified.
 /// This avoids the common "+7 hours" shift when clients send UTC timestamps but the server stores local wall-clock times.
 /// </summary>
-public sealed class AnposDateTimeJsonConverter : JsonConverter<DateTime>
+public sealed class CustomDateTimeJsonConverter : JsonConverter<DateTime>
 {
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -51,9 +51,9 @@ public sealed class AnposDateTimeJsonConverter : JsonConverter<DateTime>
     }
 }
 
-public sealed class NullableAnposDateTimeJsonConverter : JsonConverter<DateTime?>
+public sealed class NullableCustomDateTimeJsonConverter : JsonConverter<DateTime?>
 {
-    private readonly AnposDateTimeJsonConverter inner = new();
+    private readonly CustomDateTimeJsonConverter inner = new();
 
     public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

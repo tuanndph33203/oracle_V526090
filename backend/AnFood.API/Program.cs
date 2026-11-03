@@ -122,8 +122,8 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null; // giữ nguyên PascalCase
         options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
-        options.JsonSerializerOptions.Converters.Add(new AnposDateTimeJsonConverter());
-        options.JsonSerializerOptions.Converters.Add(new NullableAnposDateTimeJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new CustomDateTimeJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new NullableCustomDateTimeJsonConverter());
     });
 
 builder.Host.UseSerilog((context, configuration) =>

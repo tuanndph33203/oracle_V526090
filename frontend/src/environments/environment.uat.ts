@@ -2,7 +2,7 @@ export const environment = {
     production: true,
     name: 'uat',
     serviceWorker: false,
-    apiUrl: 'https://food-uat.ansolution.vn/system/api/',
+    apiUrl: 'http://localhost:5186/api/',
     eInvoiceLandingUrl: '/register-invoice/',
     paymentHubUrl: '/paymentHub',
     authencationUrl: 'https://sso.ansolution.vn/api/',

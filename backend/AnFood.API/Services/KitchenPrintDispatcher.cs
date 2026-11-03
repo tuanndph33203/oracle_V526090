@@ -108,7 +108,7 @@ public sealed class KitchenPrintDispatcher(DataContext db, IHubContext<PrintAgen
                     JobId = jobId,
                     PrinterName = route.PrinterName,
                     Html = KitchenPrintHtmlTemplate.Render(slip),
-                    Title = $"ANPOS-{slip.SlipType}-{slip.RequestCode}"
+                    Title = $"UTC-{slip.SlipType}-{slip.RequestCode}"
                 }, cancellationToken);
                 response.PrintDispatchResults.Add(new KitchenPrintDispatchResultDto
                 {

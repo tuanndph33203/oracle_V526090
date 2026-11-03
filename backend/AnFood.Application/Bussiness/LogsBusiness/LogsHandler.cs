@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,7 +30,7 @@ namespace AnFood.Application.Bussiness.LogsBusiness
                 {
                     Id = Guid.NewGuid(),
                     CreatedAt = DateTime.UtcNow,
-                    ServiceName = model.ServiceName ?? "ANPOS",
+                    ServiceName = model.ServiceName ?? "UTC_COFFEE",
                     Environment = model.Environment ?? "prod",
                     Level = model.Level,
                     LogType = model.LogType,
@@ -62,7 +62,7 @@ namespace AnFood.Application.Bussiness.LogsBusiness
                 {
                     Id = Guid.NewGuid(),
                     CreatedAt = DateTime.UtcNow,
-                    ServiceName = model.ServiceName ?? "ANPOS",
+                    ServiceName = model.ServiceName ?? "UTC_COFFEE",
                     Environment = model.Environment ?? "prod",
                     UserId = model.UserId,
                     UserName = model.UserName,

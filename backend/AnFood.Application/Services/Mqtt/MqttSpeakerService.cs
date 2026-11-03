@@ -54,7 +54,7 @@ namespace AnFood.Application.Services.Mqtt
                 }
 
                 var clientId = string.IsNullOrWhiteSpace(_settings.ClientId)
-                    ? "ANPOS_" + Guid.NewGuid().ToString("N")[..8]
+                    ? "UTC_" + Guid.NewGuid().ToString("N")[..8]
                     : _settings.ClientId;
 
                 optionsBuilder.WithClientId(clientId);

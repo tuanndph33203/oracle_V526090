@@ -2499,25 +2499,25 @@ namespace AnFood.Application.Bussiness.SalesBussiness
                 using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
                 var response = await httpClient.GetAsync(apiUrl);
                 if (!response.IsSuccessStatusCode)
-                    return new Response(Code.BadRequest, "Mã phiếu không có trên AnPOS");
+                    return new Response(Code.BadRequest, "Mã phiếu không tồn tại trên hệ thống");
 
                 var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrWhiteSpace(content))
-                    return new Response(Code.BadRequest, "Mã phiếu không có trên AnPOS");
+                    return new Response(Code.BadRequest, "Mã phiếu không tồn tại trên hệ thống");
 
                 using var doc = System.Text.Json.JsonDocument.Parse(content);
                 var root = doc.RootElement;
 
-                // Kiểm tra Code nếu API AnPOS trả về lỗi
+                // Kiểm tra Code nếu API trả về lỗi
                 if (root.TryGetProperty("Code", out var codeProp) || root.TryGetProperty("code", out codeProp))
                 {
                     if (codeProp.GetInt32() != 200)
-                        return new Response(Code.BadRequest, "Mã phiếu không có trên AnPOS");
+                        return new Response(Code.BadRequest, "Mã phiếu không tồn tại trên hệ thống");
                 }
 
                 if ((!root.TryGetProperty("Data", out var dataProp) && !root.TryGetProperty("data", out dataProp)) || dataProp.ValueKind == System.Text.Json.JsonValueKind.Null)
                 {
-                    return new Response(Code.BadRequest, "Mã phiếu không có trên AnPOS");
+                    return new Response(Code.BadRequest, "Mã phiếu không tồn tại trên hệ thống");
                 }
 
                 // Trích xuất danh sách dịch vụ
@@ -2526,7 +2526,7 @@ namespace AnFood.Application.Bussiness.SalesBussiness
                 return new ResponseObject<object>
                 {
                     Code = Code.Success,
-                    Message = "Mã phiếu hợp lệ trên AnPOS!",
+                    Message = "Mã phiếu hợp lệ!",
                     Data = new
                     {
                         Code = documentNumber,
@@ -2537,7 +2537,7 @@ namespace AnFood.Application.Bussiness.SalesBussiness
             catch (Exception ex)
             {
                 await _logsapp.ErrorAsync("ValidateTherapyVoucher Error", ex, code);
-                return new Response(Code.BadRequest, "Mã phiếu không có trên AnPOS");
+                return new Response(Code.BadRequest, "Mã phiếu không tồn tại trên hệ thống");
             }
         }
 
