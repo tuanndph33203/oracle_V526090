@@ -67,7 +67,7 @@ export interface ITableAction {
     command?: () => void;
     icon?: string | ((row: any, col?: ITableConfig) => string);
     type: string;
-    severity?: Severity;
+    severity?: Severity | ((row: any, col?: ITableConfig) => Severity);
     permission?: string;
     tooltipLabel?: string | ((row: any, col?: ITableConfig) => string);
     children?: ITableAction[];

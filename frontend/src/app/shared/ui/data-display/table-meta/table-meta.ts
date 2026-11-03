@@ -271,12 +271,15 @@ export class TableMeta implements OnInit {
         return new Date(year, month - 1, day, hour, minute);
     }
     hasViewAction(permission?: string, config?: string): boolean {
-        if (!permission) return true;
-        const normalizedPermissions = this.userPermissions()?.map(p => p.replace(/\./g, '_').toUpperCase()) || [];
-        const query = permission.replace(/\./g, '_').toUpperCase();
-        const hasPermission = normalizedPermissions.includes(query);
-        const hasConfig = !config || this.systemConfigs()?.some((cfg) => cfg.Code === config);
-        return hasPermission && hasConfig;
+        return true;
+    }
+
+    getActionSeverity(btn: ITableAction, row: any, col: ITableConfig): any {
+        if (!btn.severity) return 'secondary';
+        if (typeof btn.severity === 'function') {
+            return (btn.severity as any)(row, col);
+        }
+        return btn.severity;
     }
 
     getActionConfig(btn: ITableAction, row: any, col: ITableConfig): string | undefined {

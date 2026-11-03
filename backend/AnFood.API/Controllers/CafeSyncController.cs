@@ -39,6 +39,11 @@ namespace AnFood.API.Controllers
 
                 // 1. Chỉ giữ lại DUY NHẤT chi nhánh Quán Café UTC – ĐH Giao thông Vận tải
                 var b02 = await branchRepo.Get(x => x.Code == "02").FirstOrDefaultAsync();
+                if (b02 == null)
+                {
+                    b02 = await branchRepo.GetAll().FirstOrDefaultAsync();
+                }
+
                 if (b02 != null)
                 {
                     b02.Name = "Quán Café UTC – ĐH Giao thông Vận tải";
@@ -53,7 +58,7 @@ namespace AnFood.API.Controllers
                 var allBranches = await branchRepo.GetAll().ToListAsync();
                 foreach (var b in allBranches)
                 {
-                    if (b.Code != "02")
+                    if (b02 != null && b.Id != b02.Id)
                     {
                         b.Status = 2; // Ngừng sử dụng
                         branchRepo.Update(b);
@@ -129,10 +134,22 @@ namespace AnFood.API.Controllers
 
                 var unitPhan = await unitRepo.Get(x => x.Code == "PHAN" || x.Name.ToLower().Contains("phần") || x.Name.ToLower().Contains("suất")).FirstOrDefaultAsync();
 
-                // 3. Thuế suất (TaxRate)
-                var taxRate = await taxRepo.Get(x => x.Rate == 8 || x.Rate == 10).FirstOrDefaultAsync();
-                var taxRateId = taxRate?.Id ?? Guid.Parse("d240090e-6d53-42b9-a7c8-9e1a2dffc418");
-                var taxRatePercent = taxRate?.Rate ?? 8;
+                // 3. Thuế suất (TaxRate): Sử dụng 0% cho quán cà phê để không bị chia tiền lẻ
+                var taxZero = await taxRepo.Get(x => x.Rate == 0).FirstOrDefaultAsync();
+                if (taxZero == null)
+                {
+                    taxZero = new TaxRate
+                    {
+                        Id = Guid.NewGuid(),
+                        Code = "VAT0",
+                        Rate = 0,
+                        Description = "0% (Không chịu thuế)",
+                        Status = 1,
+                        CreatedOnDate = DateTime.UtcNow
+                    };
+                    taxRepo.Add(taxZero);
+                }
+                var taxRateId = taxZero.Id;
 
                 // 4. Nhóm thực đơn Quán Café (MenuGroups)
                 var groupsDef = new (string Code, string Name, int Priority, string Desc)[]
@@ -304,6 +321,7 @@ namespace AnFood.API.Controllers
                 int createdCount = 0;
                 int updatedCount = 0;
 
+                // Chuẩn hóa giá vốn tròn theo nghìn đồng
                 foreach (var p in products)
                 {
                     if (!createdGroups.TryGetValue(p.GroupCode, out var group))
@@ -311,6 +329,7 @@ namespace AnFood.API.Controllers
 
                     var unitToUse = p.GroupCode == "BAKERY" ? (unitDia?.Id ?? unitLy.Id) : unitLy.Id;
                     var optionJson = p.HasOptions ? drinkOptionJson : emptyOptionJson;
+                    var costPrice = Math.Round((p.Price * 0.4m) / 1000m) * 1000m;
 
                     var existing = await itemRepo.Get(x => x.Code == p.Code).FirstOrDefaultAsync();
                     if (existing == null)
@@ -324,11 +343,11 @@ namespace AnFood.API.Controllers
                             CourseOrder = 1,
                             MenuGroupId = group.Id,
                             UnitId = unitToUse,
-                            SalePrice = Math.Round(p.Price / (1 + (taxRatePercent / 100m)), 2),
+                            SalePrice = p.Price,
                             TaxRateId = taxRateId,
                             FixedTaxAmount = 0,
                             Amount = p.Price,
-                            CostPrice = Math.Round(p.Price * 0.35m, 2),
+                            CostPrice = costPrice,
                             Description = p.Desc,
                             ImageUrl = "",
                             OptionGroupsJson = optionJson,
@@ -369,7 +388,9 @@ namespace AnFood.API.Controllers
                         existing.MenuGroupId = group.Id;
                         existing.UnitId = unitToUse;
                         existing.Amount = p.Price;
-                        existing.SalePrice = Math.Round(p.Price / (1 + (taxRatePercent / 100m)), 2);
+                        existing.SalePrice = p.Price;
+                        existing.CostPrice = costPrice;
+                        existing.FixedTaxAmount = 0;
                         existing.TaxRateId = taxRateId;
                         existing.Description = p.Desc;
                         existing.OptionGroupsJson = optionJson;
@@ -406,6 +427,28 @@ namespace AnFood.API.Controllers
                         }
 
                         updatedCount++;
+                    }
+                }
+
+                // 6. Dọn dẹp: Vô hiệu hóa toàn bộ món cũ không thuộc danh mục Cafe UTC (Status = 2)
+                var validCodes = products.Select(p => p.Code).ToHashSet();
+                var allDbItems = await itemRepo.GetAll().ToListAsync();
+                foreach (var oldItem in allDbItems)
+                {
+                    if (!validCodes.Contains(oldItem.Code))
+                    {
+                        oldItem.Status = 2; // Ngừng sử dụng
+                        itemRepo.Update(oldItem);
+                    }
+                }
+
+                // 7. Xóa tất cả liên kết MenuItemBranch đến các chi nhánh khác ngoài Quán Café UTC (b02)
+                if (b02 != null)
+                {
+                    var otherBranchItems = await itemBranchRepo.Get(x => x.BranchId != b02.Id).ToListAsync();
+                    foreach (var obi in otherBranchItems)
+                    {
+                        itemBranchRepo.Delete(obi);
                     }
                 }
 

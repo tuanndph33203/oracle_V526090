@@ -123,19 +123,19 @@
                 } @case ('action') {
                 <td pFrozenColumn [frozen]="true" [alignFrozen]="'right'" class="!px-4" [style.maxWidth]="item.maxWidth"
                     [style.width]="item.width">
-                    <div class="flex">
+                    <div class="flex items-center justify-center">
                         @for (btn of item.actionButtons; track $index) { @if (hasViewAction(btn.permission,
                         getActionConfig(btn, data, item)) && isActionVisible(btn, data, item)) {
-                        <button pButton [severity]="btn?.severity ?? 'secondary'" type="button" size="small"
+                        <button pButton [severity]="getActionSeverity(btn, data, item)" type="button" size="small"
                             [pTooltip]="getActionTooltip(btn, data, item)" tooltipPosition="top"
-                            class="flex justify-center items-center gap-1 px-2 py-1 rounded text-sm cursor-pointer ml-2"
+                            class="flex justify-center items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm cursor-pointer ml-1.5 shadow-sm transition-all"
                             (click)="
                             btn.children ? toggleMenu($event, menu) : onActionClick(btn, data)
                           ">
                             @if (btn.icon) {
-                            <i style="font-size: 0.75rem" [class]="getActionIcon(btn, data, item)"></i>
+                            <i style="font-size: 0.9rem" [class]="getActionIcon(btn, data, item)"></i>
                             } @if (btn.label) {
-                            <span class="w-fit"> {{ btn.label }} </span>
+                            <span class="w-fit font-medium"> {{ btn.label }} </span>
                             }
                         </button>
                         <p-popover #menu>

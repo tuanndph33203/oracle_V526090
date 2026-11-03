@@ -72,20 +72,24 @@ export class MenuItem extends BaseCrudPage<any> implements OnInit {
                                 let totalPrice = 0;
                                 if (fixedTax > 0) {
                                     totalPrice = (x.SalePrice || 0) + fixedTax;
-                                } else {
+                                } else if (taxPercent > 0) {
                                     totalPrice = (x.SalePrice || 0) * (1 + taxPercent / 100);
+                                } else {
+                                    totalPrice = x.SalePrice || 0;
                                 }
                                 return {
                                     ...x,
                                     MenuGroupDisplay: x.MenuGroupName ?? '',
                                     UnitDisplay: x.UnitName ?? '',
-                                    TaxRateDisplay: x.TaxRatePercent != null ? `${x.TaxRatePercent}%` : '',
+                                    TaxRateDisplay: x.TaxRatePercent != null ? `${x.TaxRatePercent}%` : '0%',
                                     StatusText: x.Status === 1 ? 'Đang hoạt động' : x.Status === 2 ? 'Ngừng sử dụng' : 'Đã xóa',
                                     IsAvailableDisplay: x.IsAvailable !== false 
-                                        ? (x.IsTrackStock ? `🟢 Còn món (Còn ${x.StockQuantity ?? 0})` : '🟢 Hiển thị (Còn món)') 
-                                        : '🔴 Tắt (Hết món)',
+                                        ? (x.IsTrackStock ? `🟢 Còn món (Còn ${x.StockQuantity ?? 0})` : '🟢 Còn món') 
+                                        : '🔴 Hết món',
                                     BranchDisplay: branchDisplay,
-                                    TotalPriceDisplay: totalPrice.toLocaleString('vi-VN') + ' đ'
+                                    SalePriceDisplay: Math.round(x.SalePrice || 0).toLocaleString('vi-VN') + ' đ',
+                                    CostPriceDisplay: Math.round(x.CostPrice || 0).toLocaleString('vi-VN') + ' đ',
+                                    TotalPriceDisplay: Math.round(totalPrice || 0).toLocaleString('vi-VN') + ' đ'
                                 };
                             });
                             if (res.Data?.Content) res.Data.Content = mapped;

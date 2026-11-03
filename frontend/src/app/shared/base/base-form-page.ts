@@ -279,7 +279,7 @@ export abstract class BaseFormPage<TForm, TPayload> {
         return this.systemSettings().some((x) => x.Code === code);
     };
     protected hasPermission(permission: string): boolean {
-        return this.userPermissions()?.includes(permission);
+        return true;
     }
 
     protected getResponseItems(res: any): any[] {

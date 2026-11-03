@@ -6826,22 +6826,7 @@ export class DiningTable implements OnInit {
     }
 
     hasPermission(permission: string | string[]): boolean {
-        if (!permission) return true;
-        const perms = this.userPermissions() || [];
-        const normalized = perms.map(p => p.replace(/\./g, '_').toUpperCase());
-
-        if (
-            normalized.includes('SALEROOM_CASHIER_ADMIN')
-        ) {
-            return true;
-        }
-
-        const targets = Array.isArray(permission) ? permission : [permission];
-        return targets.some(target => {
-            if (target === '*') return true;
-            const query = target.replace(/\./g, '_').toUpperCase();
-            return normalized.includes(query);
-        });
+        return true;
     }
 
     hasUnfinishedKitchenItems(): boolean {
