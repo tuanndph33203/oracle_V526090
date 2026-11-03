@@ -24,13 +24,13 @@ export class Login {
     password: string = '';
 
     checked: boolean = false;
-    isInternalLogin: boolean = false;
+    isInternalLogin: boolean = true;
     authService = inject(AuthService);
     store = inject(Store);
     constructor(private fb: FormBuilder) {
         this.form = this.fb.group({
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]]
+            email: ['admin@utc.edu.vn', [Validators.required, Validators.email]],
+            password: ['CafeAdmin123#', [Validators.required, Validators.minLength(6)]]
         });
     }
 

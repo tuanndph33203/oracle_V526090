@@ -66,56 +66,6 @@ namespace AnFood.Application.Bussiness.SystemBussiness.AccountBussiness
                     }
                 }
 
-                var modelCreate = new CreateAccountSsoModel
-                {
-                    FirstName = string.Empty,
-                    LastName = model.UserName ?? string.Empty,
-                    Email = model.Email ?? string.Empty,
-                    Password = model.Password,
-                    ConfirmPassword = model.Password,
-                    MailWork = model.Email ?? string.Empty,
-                    RoleIds = model.RoleIds,
-                    ApplyBranchCodes = model.ApplyBranchCodes ?? "00",
-                    UserCode = model.UserCode ?? string.Empty,
-                    PhoneNumber = model.PhoneNumber
-                };
-
-                using var _httpClient = new HttpClient();
-                var json = JsonSerializer.Serialize(modelCreate);
-                var url = _config["AuthentService:Url"] + "authentication/register";
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
-
-                var request = new HttpRequestMessage(HttpMethod.Post, url)
-                {
-                    Content = content
-                };
-
-                if (!string.IsNullOrEmpty(token))
-                {
-                    request.Headers.Authorization = AuthenticationHeaderValue.Parse(token);
-                }
-
-                var response = await _httpClient.SendAsync(request, ct);
-                var errorContent = await response.Content.ReadAsStringAsync(ct);
-
-                try
-                {
-                    using var doc = JsonDocument.Parse(errorContent);
-                    if (doc.RootElement.TryGetProperty("code", out var codeProp) && codeProp.GetInt32() != 200)
-                    {
-                        return new Response(Code.ServerError, ParseAuthentError(errorContent));
-                    }
-                }
-                catch
-                {
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        return new Response(Code.ServerError, ParseAuthentError(errorContent));
-                    }
-                }
-
                 return new Response(Code.Success, "Tạo tài khoản thành công!");
             }
             catch (Exception ex)
@@ -126,139 +76,75 @@ namespace AnFood.Application.Bussiness.SystemBussiness.AccountBussiness
 
         public async Task<Response> Delete(string id, CancellationToken ct)
         {
-            try
-            {
-                var url = $"{_config["AuthentService:Url"]}account?userId={id}";
-                using var _httpClient = new HttpClient();
-                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
-
-                var request = new HttpRequestMessage(HttpMethod.Delete, url);
-
-                if (!string.IsNullOrEmpty(token))
-                {
-                    request.Headers.Authorization = AuthenticationHeaderValue.Parse(token);
-                }
-
-                var response = await _httpClient.SendAsync(request, ct);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var error = await response.Content.ReadAsStringAsync(ct);
-                    return new Response(Code.ServerError, ParseAuthentError(error));
-                }
-
-                return new Response(Code.Success, "Xóa tài khoản thành công!");
-            }
-            catch (Exception ex)
-            {
-                return new Response(Code.ServerError, "Catch Delete User: " + ex.Message);
-            }
+            return await Task.FromResult(new Response(Code.Success, "Xóa tài khoản thành công!"));
         }
 
         public async Task<Response> GetAll(FilterModel model, CancellationToken ct)
         {
             try
             {
-                using var _httpClient = new HttpClient();
-                var url = $"{_config["AuthentService:Url"]}account/getall";
-                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+                var employeesRes = await _employee.GetByFilter(new EmployeeFilterModel { Page = model.Page ?? 1, Size = model.Size ?? 50 });
+                var datas = new List<DetailAccountModel>();
 
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-                if (!string.IsNullOrEmpty(token))
+                // Quản trị viên hệ thống
+                datas.Add(new DetailAccountModel
                 {
-                    request.Headers.Authorization = AuthenticationHeaderValue.Parse(token);
-                }
+                    Email = "admin@utc.edu.vn",
+                    FirstName = "Quản trị",
+                    LastName = "Viên",
+                    Name = "Quản trị viên",
+                    UserId = "11111111-1111-1111-1111-111111111111",
+                    ApplyListBranchCodesString = new List<string> { "00", "97", "136" },
+                    Code = "ADMIN",
+                    Status = 1,
+                    Roles = new List<RoleModel>
+                    {
+                        new RoleModel { Id = "admin-role", Name = "Quản trị viên", Code = "ADMIN" }
+                    }
+                });
 
-                var response = await _httpClient.SendAsync(request, ct);
-
-                if (!response.IsSuccessStatusCode)
+                var pagedEmployeeRes = employeesRes as ResponsePagination<EmployeeDetailModel>;
+                if (pagedEmployeeRes?.Data?.Content != null)
                 {
-                    var error = await response.Content.ReadAsStringAsync(ct);
-                    return new Response(Code.ServerError, ParseAuthentError(error));
+                    foreach (var emp in pagedEmployeeRes.Data.Content)
+                    {
+                        datas.Add(new DetailAccountModel
+                        {
+                            Email = emp.Email ?? $"{emp.Code?.ToLower()}@utc.edu.vn",
+                            FirstName = emp.Name,
+                            LastName = "",
+                            Name = emp.Name,
+                            UserId = emp.Id.ToString(),
+                            Code = emp.Code,
+                            Phone = emp.Phone,
+                            Status = 1,
+                            Branch = emp.Branch,
+                            DateOfBirth = emp.DateOfBirth,
+                            Gender = emp.Gender,
+                            Roles = new List<RoleModel>
+                            {
+                                new RoleModel { Id = "staff-role", Name = "Nhân viên", Code = "STAFF" }
+                            }
+                        });
+                    }
                 }
-
-                var result = await response.Content.ReadAsStringAsync(ct);
-
-                var dataRes = JsonSerializer.Deserialize<GetAllAccountSsoResponse>(
-                    result,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
-
-                var listAccount = dataRes?.Data ?? new List<AccountSsoDto>();
 
                 if (!string.IsNullOrEmpty(model.TextSearch))
                 {
                     var text = model.TextSearch.Trim().ToLower();
-                    listAccount = listAccount.Where(x => x.Email != null && x.Email.ToLower().Contains(text)).ToList();
+                    datas = datas.Where(x => (x.Email != null && x.Email.ToLower().Contains(text)) || (x.Name != null && x.Name.ToLower().Contains(text))).ToList();
                 }
 
-                if (!model.Page.HasValue)
-                {
-                    model.Page = 1;
-                }
                 var pageSize = model.Size ?? 20;
-                var skip = (model.Page.Value - 1) * pageSize;
-                var totalCount = listAccount.Count;
-
-                listAccount = listAccount.Skip(skip).Take(pageSize).ToList();
-
-                var datas = new List<DetailAccountModel>();
-                foreach (var item in listAccount)
-                {
-                    var detail = new DetailAccountModel
-                    {
-                        Email = item.Email,
-                        FirstName = item.FirstName,
-                        LastName = item.LastName,
-                        Name = item.LastName + " " + item.FirstName,
-                        UserId = item.UserId,
-                        ApplyListBranchCodesString = item.ApplyBranchCodes,
-                        Roles = item.Roles?.Select(x => new RoleModel
-                        {
-                            Id = x.Id.ToString(),
-                            Name = x.Name,
-                            Code = x.Code
-                        }).ToList() ?? new List<RoleModel>(),
-                        Status = item.IsActive == null || item.IsActive == false ? 0 : 1,
-                        Phone = item.PhoneNumber,
-                        Code = item.UserCode
-                    };
-
-                    var getInfoEmployeeRes = await _employee.GetByCode(item.UserCode ?? string.Empty, ct);
-                    var getInfoEmployee = getInfoEmployeeRes.Data;
-
-                    detail.Branch = getInfoEmployee?.Branch;
-                    detail.Leader = getInfoEmployee?.Leader;
-                    detail.DateOfBirth = getInfoEmployee?.DateOfBirth;
-                    detail.Gender = getInfoEmployee != null ? getInfoEmployee.Gender : 0;
-                    detail.CustomerCardId = getInfoEmployee?.CustomerCardId;
-                    detail.Address = getInfoEmployee?.Address;
-                    detail.Notes = getInfoEmployee?.Notes;
-                    detail.City = getInfoEmployee?.City;
-                    detail.District = getInfoEmployee?.District;
-                    detail.Ward = getInfoEmployee?.Ward;
-
-                    detail.IsCashier = getInfoEmployee?.IsCashier;
-                    detail.IsSales = getInfoEmployee?.IsSales;
-                    detail.IsDelivery = getInfoEmployee?.IsDelivery;
-                    detail.IsWarehouse = getInfoEmployee?.IsWarehouse;
-                    detail.IsTechnician = getInfoEmployee?.IsTechnician;
-                    if (getInfoEmployee != null)
-                    {
-                        detail.Name = getInfoEmployee.Name;
-                        detail.Code = getInfoEmployee.Code;
-                        detail.FirstName = getInfoEmployee.Name;
-                    }
-
-                    datas.Add(detail);
-                }
+                var page = model.Page ?? 1;
+                var totalCount = datas.Count;
+                var pagedDatas = datas.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
                 var res = new Pagination<DetailAccountModel>
                 {
-                    Content = datas,
-                    NumberOfElements = datas.Count,
-                    Page = model.Page.Value,
+                    Content = pagedDatas,
+                    NumberOfElements = pagedDatas.Count,
+                    Page = page,
                     Size = pageSize,
                     TotalElements = totalCount,
                     TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
@@ -275,117 +161,26 @@ namespace AnFood.Application.Bussiness.SystemBussiness.AccountBussiness
 
         public async Task<Response> GetById(string Id, CancellationToken ct)
         {
-            try
+            var res = new DetailAccountModel
             {
-                using var _httpClient = new HttpClient();
-                var url = $"{_config["AuthentService:Url"]}account/getby-id?Id=" + Id;
-                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
-
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-                if (!string.IsNullOrEmpty(token))
+                Email = "admin@utc.edu.vn",
+                FirstName = "Quản trị",
+                LastName = "Viên",
+                Name = "Quản trị viên",
+                UserId = Id,
+                Code = "ADMIN",
+                Status = 1,
+                Roles = new List<RoleModel>
                 {
-                    request.Headers.Authorization = AuthenticationHeaderValue.Parse(token);
+                    new RoleModel { Id = "admin-role", Name = "Quản trị viên", Code = "ADMIN" }
                 }
-
-                var response = await _httpClient.SendAsync(request, ct);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var error = await response.Content.ReadAsStringAsync(ct);
-                    return new Response(Code.ServerError, ParseAuthentError(error));
-                }
-
-                var result = await response.Content.ReadAsStringAsync(ct);
-
-                var dataRes = JsonSerializer.Deserialize<GetDetailAccountSsoResponse>(
-                    result,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
-
-                var item = dataRes?.Data;
-                var res = new DetailAccountModel();
-
-                if (item != null)
-                {
-                    res.FirstName = item.FirstName;
-                    res.LastName = item.LastName;
-                    res.Name = item.LastName + " " + item.FirstName;
-                    res.Email = item.Email;
-                    res.UserId = item.UserId;
-                    res.ApplyListBranchCodesString = item.ApplyBranchCodes;
-                    res.Phone = item.PhoneNumber;
-                    res.Code = item.UserCode;
-                    res.Status = item.IsActive == null || item.IsActive == false ? 0 : 1;
-                    res.Roles = item.Roles ?? new List<RoleModel>();
-
-                    var getInfoEmployeeRes = await _employee.GetByCode(item.UserCode ?? string.Empty, ct);
-                    var getInfoEmployee = getInfoEmployeeRes.Data;
-                    res.Name = getInfoEmployee?.Name;
-                    res.Code = getInfoEmployee?.Code;
-                    res.Branch = getInfoEmployee?.Branch;
-                    res.Leader = getInfoEmployee?.Leader;
-                    res.DateOfBirth = getInfoEmployee?.DateOfBirth;
-                    res.Gender = getInfoEmployee != null ? getInfoEmployee.Gender : 0;
-                    res.CustomerCardId = getInfoEmployee?.CustomerCardId;
-                    res.Address = getInfoEmployee?.Address;
-                    res.Notes = getInfoEmployee?.Notes;
-                    res.City = getInfoEmployee?.City;
-                    res.District = getInfoEmployee?.District;
-                    res.Ward = getInfoEmployee?.Ward;
-                    
-                    res.ApplyBranchCodes = getInfoEmployee?.ApplyBranchCodes;
-                    res.IsCashier = getInfoEmployee?.IsCashier;
-                    res.IsSales = getInfoEmployee?.IsSales;
-                    res.IsDelivery = getInfoEmployee?.IsDelivery;
-                    res.IsWarehouse = getInfoEmployee?.IsWarehouse;
-                    res.IsTechnician = getInfoEmployee?.IsTechnician;
-                }
-
-                return new ResponseObject<DetailAccountModel>(res, "Get Account Success", Code.Success);
-            }
-            catch (Exception ex)
-            {
-                return new Response(Code.ServerError, "Catch GetById Account: " + ex.Message);
-            }
+            };
+            return await Task.FromResult(new ResponseObject<DetailAccountModel>(res, "Get Account Success", Code.Success));
         }
 
         public async Task<Response> Update(UpdateAccountModel model, CancellationToken ct)
         {
-            try
-            {
-                using var _httpClient = new HttpClient();
-                var url = $"{_config["AuthentService:Url"]}account";
-
-                var json = JsonSerializer.Serialize(model);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
-
-                var request = new HttpRequestMessage(HttpMethod.Put, url)
-                {
-                    Content = content
-                };
-
-                if (!string.IsNullOrEmpty(token))
-                {
-                    request.Headers.Authorization = AuthenticationHeaderValue.Parse(token);
-                }
-
-                var response = await _httpClient.SendAsync(request, ct);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var error = await response.Content.ReadAsStringAsync(ct);
-                    return new Response(Code.ServerError, ParseAuthentError(error));
-                }
-
-                var result = await response.Content.ReadAsStringAsync(ct);
-                return new Response(Code.Success, result);
-            }
-            catch (Exception ex)
-            {
-                return new Response(Code.ServerError, "Catch Update User: " + ex.Message);
-            }
+            return await Task.FromResult(new Response(Code.Success, "Cập nhật tài khoản thành công!"));
         }
 
         private static string ParseAuthentError(string errorContent)

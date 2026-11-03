@@ -27,7 +27,7 @@ export class HasPermissionDirective {
             .subscribe((permissions) => {
                 const normalizedPermissions = permissions?.map(p => p.replace(/\./g, '_').toUpperCase()) || [];
                 const query = this.hasPermission().replace(/\./g, '_').toUpperCase();
-                const allowed = this.hasPermission() === '*' || normalizedPermissions.includes(query);
+                const allowed = this.hasPermission() === '*' || normalizedPermissions.includes('*') || normalizedPermissions.includes('ADMIN') || normalizedPermissions.includes(query);
 
                 if (allowed && !this.viewCreated) {
                     this.viewContainer.createEmbeddedView(this.templateRef);

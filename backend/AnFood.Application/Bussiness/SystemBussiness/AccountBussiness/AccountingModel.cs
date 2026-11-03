@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using AnFood.Application.Bussiness.BranchBussiness;
@@ -29,8 +29,8 @@ namespace AnFood.Application.Bussiness.SystemBussiness.AccountBussiness
         public string LastName { get; set; } = null!;
         [Required, EmailAddress]
         public string Email { get; set; } = null!;
-        public string? Password { get; set; } = "Trananh@2024";
-        public string? ConfirmPassword { get; set; } = "Trananh@2024";
+        public string? Password { get; set; } = "CafeAdmin123#";
+        public string? ConfirmPassword { get; set; } = "CafeAdmin123#";
         [Required]
         public string MailWork { get; set; } = null!;
         public Guid? ApplicationId { get; set; }
@@ -46,7 +46,7 @@ namespace AnFood.Application.Bussiness.SystemBussiness.AccountBussiness
         public string? UserName { get; set; }
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public string? Password { get; set; } = "Trananh@2024";
+        public string? Password { get; set; } = "CafeAdmin123#";
         public DateTime? DateOfBirth { get; set; }
         public int? Gender { get; set; }
         public string? PhoneNumber { get; set; }
