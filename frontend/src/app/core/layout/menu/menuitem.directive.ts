@@ -13,15 +13,24 @@ import { LayoutService } from '../../services/layout';
     imports: [CommonModule, RouterModule, RippleModule],
     template: `
         <ng-container>
-            <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text" (click)="toggleRootMenu($event)" [attr.title]="item.lable">
-                <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
-                <span>{{ item.lable }}</span>
+            <div *ngIf="root && item.visible !== false"
+                class="layout-menuitem-root-text"
+                [class.active-route]="isRootActive"
+                [class.menu-expanded]="active"
+                (click)="toggleRootMenu($event)"
+                [attr.title]="item.lable">
+                <span class="menuitem-icon-wrapper">
+                    <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+                </span>
+                <span class="menuitem-label">{{ item.lable }}</span>
                 @if (item.items?.length) {
-                    <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+                    <i class="pi pi-fw pi-angle-down layout-submenu-toggler" [class.rotated]="active"></i>
                 }
             </div>
             <a *ngIf="(!item.routerLink || item.items?.length > 0) && item.visible !== false" [attr.href]="item.url" (click)="itemClick($event)" [ngClass]="item.styleClass" [attr.target]="item.target" tabindex="0" pRipple [attr.title]="item.lable">
-                <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+                <span class="menuitem-icon-wrapper sm">
+                    <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+                </span>
                 <span class="layout-menuitem-text">{{ item.lable }}</span>
                 @if (item.items?.length) {
                     <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
@@ -46,7 +55,9 @@ import { LayoutService } from '../../services/layout';
                 pRipple
                 [attr.title]="item.lable"
             >
-                <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+                <span class="menuitem-icon-wrapper sm">
+                    <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+                </span>
                 <span class="layout-menuitem-text">{{ item.lable }}</span>
                 @if (item.items?.length) {
                     <i class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
@@ -54,7 +65,7 @@ import { LayoutService } from '../../services/layout';
             </a>
 
             @if (item.items?.length) {
-                <ul [@children]="submenuAnimation">
+                <ul [@children]="submenuAnimation" class="submenu-list">
                     <ng-template ngFor let-child let-i="index" [ngForOf]="item.items">
                         <li app-menuitem [item]="child" [index]="i" [parentKey]="key" [class]="child['badgeClass']"></li>
                     </ng-template>
@@ -165,6 +176,22 @@ export class AppMenuitem {
         this.layoutService.onMenuStateChange({ key: this.key });
     }
 
+    get isRootActive(): boolean {
+        if (!this.root) return false;
+        if (this.item?.routerLink) {
+            const route = this.resolveRouteLink(this.item.routerLink);
+            return route ? this.router.isActive(route, { paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }) : false;
+        }
+        if (this.item?.items?.length) {
+            return this.item.items.some((child: any) => {
+                if (!child.routerLink) return false;
+                const childRoute = this.resolveRouteLink(child.routerLink);
+                return childRoute ? this.router.isActive(childRoute, { paths: 'subset', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' }) : false;
+            });
+        }
+        return false;
+    }
+
     toggleRootMenu(event: Event) {
         if (!this.item.items?.length) {
             const route = this.resolveRouteLink(this.item.routerLink);
@@ -174,6 +201,9 @@ export class AppMenuitem {
 
             event.preventDefault();
             this.router.navigateByUrl(route);
+            if (this.layoutService.isOverlay() || this.layoutService.isMobile()) {
+                this.layoutService.layoutState.update((prev) => ({ ...prev, overlayMenuActive: false, staticMenuMobileActive: false }));
+            }
             return;
         }
 

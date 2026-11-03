@@ -2,24 +2,23 @@
 
 .layout-sidebar {
     position: fixed;
-    width: 22rem;
-    height: calc(100vh - 8rem);
+    width: 21rem;
+    height: calc(100vh - 7.5rem);
     z-index: 999;
-    overflow-y: auto;
+    overflow: hidden;
     user-select: none;
-    top: 6rem;
-    left: 2rem;
+    top: 5.5rem;
+    left: 1.5rem;
     transition:
         transform var(--layout-section-transition-duration),
         left var(--layout-section-transition-duration);
     background-color: var(--surface-overlay);
-    border-radius: var(--content-border-radius);
-    padding: 1rem 1.5rem;
+    border-radius: 1.25rem;
+    padding: 1.15rem 1rem 1rem 1rem;
     border: 1px solid var(--surface-border);
     box-shadow:
-        0px 3px 5px rgba(0, 0, 0, 0.02),
-        0px 0px 2px rgba(0, 0, 0, 0.05),
-        0px 1px 4px rgba(0, 0, 0, 0.08);
+        0 10px 25px -5px rgba(0, 0, 0, 0.08),
+        0 8px 10px -6px rgba(0, 0, 0, 0.05);
 
     &::-webkit-scrollbar {
         width: 0;
@@ -39,6 +38,9 @@
     margin: 0;
     padding: 0;
     list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
 
     .layout-root-menuitem {
         position: relative;
@@ -47,34 +49,94 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-size: 1.05rem !important;
-            text-transform: uppercase;
+            font-size: 0.925rem !important;
+            text-transform: none;
             font-weight: 600;
             color: var(--text-color);
-            height: 2.6rem;
+            height: 2.75rem;
             padding: 0 0.75rem;
-            border-radius: var(--content-border-radius);
+            border-radius: 0.75rem;
             cursor: pointer;
-            transition: background-color var(--element-transition-duration);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
 
-            &:hover {
-                background-color: var(--surface-hover);
+            .menuitem-icon-wrapper {
+                width: 2rem;
+                height: 2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0.55rem;
+                background-color: color-mix(in srgb, var(--text-color), transparent 93%);
+                color: var(--text-color-secondary);
+                transition: all 0.2s ease;
+                flex-shrink: 0;
+
+                .layout-menuitem-icon {
+                    font-size: 1rem !important;
+                    width: auto;
+                    text-align: center;
+
+                    &::before {
+                        font-size: 1rem !important;
+                    }
+                }
             }
 
-            .layout-menuitem-icon {
-                flex-shrink: 0;
-                font-size: 1.1rem !important;
-                width: 1.25rem;
-                text-align: center;
-
-                &::before {
-                    font-size: 1.1rem !important;
-                }
+            .menuitem-label {
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .layout-submenu-toggler {
                 margin-left: auto;
-                transition: transform var(--element-transition-duration);
+                font-size: 0.85rem;
+                opacity: 0.65;
+                transition: transform 0.25s ease, opacity 0.2s ease;
+
+                &.rotated {
+                    transform: rotate(-180deg);
+                    opacity: 1;
+                }
+            }
+
+            &:hover {
+                background-color: var(--surface-hover);
+                color: var(--primary-color);
+
+                .menuitem-icon-wrapper {
+                    background-color: color-mix(in srgb, var(--primary-color), transparent 86%);
+                    color: var(--primary-color);
+                }
+
+                .layout-submenu-toggler {
+                    opacity: 1;
+                }
+            }
+
+            &.active-route {
+                background: linear-gradient(90deg, color-mix(in srgb, var(--primary-color), transparent 86%) 0%, color-mix(in srgb, var(--primary-color), transparent 96%) 100%);
+                color: var(--primary-color);
+                font-weight: 700;
+                border-color: color-mix(in srgb, var(--primary-color), transparent 78%);
+                box-shadow: inset 3px 0 0 var(--primary-color);
+
+                .menuitem-icon-wrapper {
+                    background-color: var(--primary-color);
+                    color: #ffffff;
+                    box-shadow: 0 3px 8px color-mix(in srgb, var(--primary-color), transparent 65%);
+                }
+
+                .layout-submenu-toggler {
+                    opacity: 1;
+                    color: var(--primary-color);
+                }
+            }
+
+            &.menu-expanded:not(.active-route) {
+                background-color: color-mix(in srgb, var(--surface-hover), transparent 30%);
             }
         }
 
@@ -102,33 +164,48 @@
     }
 
     ul {
-        margin: 0;
-        padding: 0;
+        margin: 0.25rem 0 0.35rem 1.35rem;
+        padding: 0.15rem 0 0.15rem 0.65rem;
         list-style-type: none;
+        border-left: 1.5px dashed var(--surface-border);
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
 
         a {
             display: flex;
             align-items: center;
+            gap: 0.6rem;
             position: relative;
             outline: 0 none;
-            color: var(--text-color);
+            color: var(--text-color-secondary);
             cursor: pointer;
-            height: 2.6rem;
-            padding: 0 1rem;
-            border-radius: var(--content-border-radius);
-            transition:
-                background-color var(--element-transition-duration),
-                box-shadow var(--element-transition-duration);
+            height: 2.35rem;
+            padding: 0 0.75rem;
+            border-radius: 0.6rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
             font-weight: 500;
 
-            .layout-menuitem-icon {
-                margin-right: 0.5rem;
-                font-size: 1.1rem !important;
-                width: 1.25rem;
-                text-align: center;
+            .menuitem-icon-wrapper.sm {
+                width: 1.5rem;
+                height: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0.4rem;
+                flex-shrink: 0;
+                transition: all 0.2s ease;
 
-                &::before {
-                    font-size: 1.1rem !important;
+                .layout-menuitem-icon {
+                    margin-right: 0;
+                    font-size: 0.9rem !important;
+                    width: auto;
+                    text-align: center;
+
+                    &::before {
+                        font-size: 0.9rem !important;
+                    }
                 }
             }
 
@@ -139,12 +216,18 @@
             }
 
             &.active-route {
-                font-weight: 500;
+                font-weight: 700;
                 color: var(--primary-color);
+                background-color: color-mix(in srgb, var(--primary-color), transparent 88%);
+
+                .menuitem-icon-wrapper.sm {
+                    color: var(--primary-color);
+                }
             }
 
             &:hover {
                 background-color: var(--surface-hover);
+                color: var(--text-color);
             }
 
             &:focus {
@@ -155,42 +238,6 @@
         ul {
             overflow: hidden;
             border-radius: var(--content-border-radius);
-
-            li {
-                a {
-                    margin-left: 1rem;
-                }
-
-                li {
-                    a {
-                        margin-left: 2rem;
-                    }
-
-                    li {
-                        a {
-                            margin-left: 2.5rem;
-                        }
-
-                        li {
-                            a {
-                                margin-left: 3rem;
-                            }
-
-                            li {
-                                a {
-                                    margin-left: 3.5rem;
-                                }
-
-                                li {
-                                    a {
-                                        margin-left: 4rem;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }

@@ -1,11 +1,45 @@
 <div class="layout-sidebar flex flex-col h-full relative">
-    <div class="flex-1 overflow-y-auto pb-6">
+    <!-- Sidebar Header -->
+    <div class="flex items-center justify-between pb-3.5 mb-3 border-b border-surface-200 dark:border-surface-800 shrink-0">
+        <div class="flex items-center gap-2.5">
+            <img src="utc.jpeg" alt="UTC Logo" class="w-9 h-9 object-contain rounded-full border border-emerald-500/30 bg-white p-0.5 shadow-xs shrink-0" />
+            <div class="flex flex-col leading-tight">
+                <span class="text-sm font-extrabold tracking-wide text-emerald-600 dark:text-emerald-400">Quán Café UTC</span>
+                <span class="text-[11px] font-medium text-surface-500 dark:text-surface-400">Hệ thống Quản lý POS</span>
+            </div>
+        </div>
+        @if (layoutService.isOverlay() || layoutService.isMobile()) {
+        <button type="button" (click)="layoutService.onMenuToggle()"
+            class="w-7 h-7 rounded-lg flex items-center justify-center text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors cursor-pointer">
+            <i class="pi pi-times text-xs"></i>
+        </button>
+        }
+    </div>
+
+    <!-- Section Label -->
+    <div class="px-2 mb-2 text-[10px] font-extrabold uppercase tracking-widest text-surface-400 dark:text-surface-500 shrink-0">
+        Danh mục chức năng
+    </div>
+
+    <!-- Menu -->
+    <div class="flex-1 overflow-y-auto pb-4 pr-0.5">
         <app-menu></app-menu>
     </div>
-    <div class="mt-auto border-t border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 p-3 z-10 w-full block sm:hidden">
-        <div class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold border border-emerald-200 dark:border-emerald-800">
-            <i class="pi pi-coffee"></i>
-            <span>Quán Café UTC</span>
+
+    <!-- Sidebar Footer Card -->
+    <div class="mt-auto pt-3 border-t border-surface-200 dark:border-surface-800 z-10 w-full shrink-0">
+        <div class="w-full p-3 rounded-xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-950/40 dark:via-surface-900/80 dark:to-surface-900 border border-emerald-500/20 dark:border-emerald-800/40 flex flex-col gap-1.5 shadow-2xs">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Quán Café UTC</span>
+                </div>
+                <span class="px-1.5 py-0.5 text-[9px] font-extrabold uppercase rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Đề tài 12</span>
+            </div>
+            <div class="text-[11px] text-surface-500 dark:text-surface-400 flex items-center gap-1.5">
+                <i class="pi pi-building text-[10px]"></i>
+                <span>ĐH Giao thông Vận tải</span>
+            </div>
         </div>
     </div>
 </div>

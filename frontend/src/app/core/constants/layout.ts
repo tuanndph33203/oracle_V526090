@@ -1,4 +1,4 @@
-export const LAYOUT_CONFIG_KEY = 'app_layout_config';
+export const LAYOUT_CONFIG_KEY = 'utc_cafe_layout_config';
 export const actionUser = [
     {
         label: 'Hồ sơ',
