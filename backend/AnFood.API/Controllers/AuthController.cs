@@ -55,8 +55,8 @@ namespace AnFood.API.Controllers
                 {
                     new { roleId = "admin-role", roleName = "Quản trị viên", roleCode = "ADMIN" }
                 },
-                permissions = new[] { "*" },
-                applyBranchCodes = new[] { "00", "97", "136" }
+                permissions = new[] { "*", "ADMIN", "SALEROOM_CASHIER_ADMIN" },
+                applyBranchCodes = new[] { "02", "17A", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17B", "18", "99", "*" }
             };
 
             return Ok(new
@@ -93,8 +93,8 @@ namespace AnFood.API.Controllers
                     {
                         new { roleId = "admin-role", roleName = "Quản trị viên", roleCode = "ADMIN" }
                     },
-                    permissions = new[] { "*" },
-                    applyBranchCodes = new[] { "00", "97", "136" }
+                    permissions = new[] { "*", "ADMIN", "SALEROOM_CASHIER_ADMIN" },
+                    applyBranchCodes = new[] { "02", "17A", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17B", "18", "99", "*" }
                 }
             });
         }
@@ -159,7 +159,7 @@ namespace AnFood.API.Controllers
                 new Claim(ClaimTypes.Role, role),
                 new Claim("userCode", userCode),
                 new Claim("applicationId", appId),
-                new Claim("applyBranchCodes", "00,97,136")
+                new Claim("applyBranchCodes", "02,17A,04,05,06,07,08,09,10,11,12,13,14,15,16,17B,18,99,*")
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -183,3 +183,4 @@ namespace AnFood.API.Controllers
         public string? ApplicationId { get; set; }
     }
 }
+

@@ -94,9 +94,12 @@ export class AuthEffects {
                         const applyBranchCodes: string[] = typeof rawApplyBranchCodes === 'string'
                             ? rawApplyBranchCodes.split(',').map((x: string) => x.trim()).filter((x: string) => x.length > 0)
                             : (Array.isArray(rawApplyBranchCodes) ? rawApplyBranchCodes : []);
-                        const branches = content.filter((b: any) => applyBranchCodes.includes(b.Code));
+                        const branches = (applyBranchCodes.includes('*') || applyBranchCodes.length === 0)
+                            ? content
+                            : content.filter((b: any) => applyBranchCodes.includes(b.Code));
                         const branchSelected = JSON.parse(localStorage.getItem('branchSelected') || '[]');
-                        const selectedBranches = branchSelected.length ? branches.filter((b: any) => branchSelected.includes(b.Code)) : branches;
+                        const matchedSelected = branchSelected.length ? branches.filter((b: any) => branchSelected.includes(b.Code)) : [];
+                        const selectedBranches = matchedSelected.length ? matchedSelected : (branches.length ? [branches[0]] : []);
                         return [
                             AuthAction.successUserProfile({ employee }),
                             BranchFilterAction.loadAvailableBranchesSuccess({
